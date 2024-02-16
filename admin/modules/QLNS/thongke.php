@@ -4,7 +4,7 @@
 
 ?>
 <?php
-    $sqlUser = "SELECT `tbl_user`.`id`,`tbl_user`.`username`, `tbl_user`.`fullname` ,`tbl_user`.`sdt` , `tbl_chucvu`.`department` , `tbl_chucvu`.`chucvu` FROM `tbl_user` JOIN `tbl_chucvu` ON `tbl_user`.`id_department` = `tbl_chucvu`.`stt`;";
+    $sqlUser = "SELECT * FROM `tbl_user` ";
     $query = mysqli_query($mysqli, $sqlUser);
 ?>
 <div class="searchBox">

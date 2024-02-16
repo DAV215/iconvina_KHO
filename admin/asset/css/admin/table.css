@@ -13,6 +13,22 @@ html {
     width: 90%;
 }
 
+.tableComponent {
+    margin: 100px 0;
+}
+
+.tableName {
+    position: relative;
+    width: 50% !important;
+}
+
+tr.tableName {}
+
+.tableName th[colspan="2"] {
+    text-align: right;
+    /* Move the cell with colspan="1" to the end (5th position) */
+}
+
 table,
 th,
 td {
@@ -64,6 +80,17 @@ td {
     font-weight: bolder;
 }
 
+.tacvu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+}
+
+td.tacvu {
+    height: inherit;
+}
+
 .searh_cell {
     height: 40px;
     width: 20%;
@@ -85,17 +112,8 @@ td {
     z-index: 99;
 }
 
-.more.searchBox {
-    position: absolute;
-    right: calc(8%-4px);
-    transform: translate(0%, 0%);
-    background: transparent;
-    height: 40px;
-    border-radius: 0 0 20px 20px;
-    padding: 10px;
-}
-
 .more1.searchBox {
+    display: flex;
     position: absolute;
     right: calc(8%-50px);
     transform: translate(0%, -100%) translateX(60px);
@@ -104,6 +122,19 @@ td {
     border-radius: 20px 20px 0 0;
     padding: 10px;
     z-index: 0;
+}
+
+.searchBox select {
+    display: none;
+}
+
+.searchBox:hover select {
+    display: block;
+    padding: 10px;
+    background: transparent;
+    color: #ccc;
+    outline: none;
+    border: none;
 }
 
 .searchBox:hover>.searchInput {
