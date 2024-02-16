@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif !important;
+}
+
+html {
+    font-family: 'Quicksand', sans-serif !important;
+    scroll-behavior: smooth;
+}
+
+.container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.logo {
+    position: absolute;
+    width: 20%;
+    height: auto;
+    margin-left: calc((90%)/2);
+    margin-top: calc(40px);
+    display: flex;
+    /* background-color: #C850C0; */
+}
+
+.logo img {
+    max-width: 190px;
+    object-fit: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(rgba(0, 0, 0, 0.8) 0px 5px 15px);
+}
+
+.compName {
+    position: relative;
+    font-size: xx-large;
+    font-weight: bolder;
+    margin-top: calc(40px);
+    text-wrap: nowrap;
+}
+
+.loginForm {
+    width: 35%;
+    height: 50%;
+    background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin-top: 10%;
+    margin-left: calc(65%/2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginForm input {
+    width: 50%;
+    height: 40px;
+    margin: 20px 0;
+    outline: none;
+    border: none;
+    background: none !important;
+    border-bottom: solid 2px #ccc;
+}
+
+.loginForm input::placeholder {
+    color: #ccc;
+    font-size: 1rem;
+}
+
+.loginForm button {
+    width: 30%;
+    appearance: none;
+    background-color: #000000;
+    border: 2px solid #1A1A1A;
+    border-radius: 15px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+    margin: 0;
+    min-height: 60px;
+    min-width: 0;
+    outline: none;
+    padding: 16px 24px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    will-change: transform;
+}
+
+.loginForm button:disabled {
+    pointer-events: none;
+}
+
+.loginForm button:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+    transform: translateY(-2px);
+}
+
+.loginForm button:active {
+    box-shadow: none;
+    transform: translateY(0);
+}
