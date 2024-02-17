@@ -1,7 +1,7 @@
 <?php 
     if(isset($_POST['searchJob'])){
         $searchJob = $_POST['searchJob'];
-        $sqlJob = "SELECT * FROM `tbl_Job` WHERE `name` LIKE '%$searchJob'";
+        $sqlJob = "SELECT * FROM `tbl_Job` WHERE `job` LIKE '%$searchJob%' ";
         $query = mysqli_query($mysqli, $sqlJob);
     }else{
         $sqlJob = "SELECT * FROM `tbl_Job`";
@@ -48,7 +48,6 @@
                 <td><?php echo $i ?></td>
                 <td><?php echo $row['job']?></td>
                 <td class="tacvu">
-                    <a href="admin.php?job=QLNS&action=chitiet&id=<?php echo $row['job']; ?>">Chi tiết</a>
                     <a href="admin.php?job=QLNS&action=permission&jobDelete=<?php echo $row['job'];?>">Xóa</a>
                 </td>
             </tr>
