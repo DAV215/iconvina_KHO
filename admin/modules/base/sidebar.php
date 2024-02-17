@@ -23,9 +23,7 @@
             </div>
             <div class="sub-sideMenu ">
                 <ul>
-                    <li><a href="admin.php?job=QLNS&action=thongke" onclick="changeActive(this)">Thống kê</a></li>
-                    <li><a href="admin.php?job=QLNS&action=them" onclick="changeActive(this)">Thêm</a></li>
-                    <li><a href="" onclick="changeActive(this)">Sửa</a></li>
+                    <li><a href="admin.php?job=QLNS&action=personnel" onclick="changeActive(this)">Nhân sự</a></li>
                     <li><a href="admin.php?job=QLNS&action=permission" onclick="changeActive(this)">Quản lý các quyền</a></li>
                     <li><a href="admin.php?job=QLNS&action=department" onclick="changeActive(this)">Quản lý phòng ban</a></li>
                 </ul>

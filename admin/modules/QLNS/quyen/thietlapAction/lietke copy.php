@@ -8,8 +8,8 @@
     if(isset($_GET['PageofjobAction'])){
         $PageofjobAction=$_GET['PageofjobAction'];
         $end = ($PageofjobAction-1)*10; 
-        if(isset($_GET['searchJobAction'])){
-            $searchJobAction = $_GET['searchJobAction'];
+        if(isset($_POST['searchJobAction'])){
+            $searchJobAction = $_POST['searchJobAction'];
             $sqlJobAction = "SELECT * FROM `tbl_jobaction` WHERE `job` LIKE '%$searchJobAction%' OR `action` LIKE '%$searchJobAction%' LIMIT  $end,10";
     
         }else{
@@ -17,8 +17,8 @@
         }
         $query = mysqli_query($mysqli, $sqlJobAction);
     }else{
-        if(isset($_GET['searchJobAction'])){
-            $searchJobAction = $_GET['searchJobAction'];
+        if(isset($_POST['searchJobAction'])){
+            $searchJobAction = $_POST['searchJobAction'];
             $sqlJobAction = "SELECT * FROM `tbl_jobaction` WHERE `job` LIKE '%$searchJobAction%' OR `action` LIKE '%$searchJobAction%' LIMIT 10 ";
     
         }else{
@@ -29,10 +29,8 @@
 ?>
 <h1>Hành động</h1>
 <div class="tableComponent">
-    <form action="" method="get">
+    <form action="" method="post">
         <div class="searchBox">
-            <input type="hidden" name="job" value="QLNS">
-            <input type="hidden" name="action" value="permission">
             <input class="searchInput" type="text" name="searchJobAction" placeholder="Tìm công việc">
             <button class="searchButton" href="#">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -55,7 +53,7 @@
                     }
                 ?>
             </select>
-            <select name="ADD_JobAction" id="" class="searchInput">
+            <select name="ADD_JobAction" id=""  class="searchInput">
                 <option value="Add">Thêm</option>
                 <option value="Del">Xóa</option>
                 <option value="Modify">Sửa</option>
@@ -64,15 +62,6 @@
 
             <button class="searchButton" type="submit">
                 <i class="fa-solid fa-plus"></i>
-            </button>
-        </div>
-    </form>
-    <form action="">
-        <input type="hidden" name="job" value="QLNS">
-        <input type="hidden" name="action" value="permission">
-        <div class="searchBox more2">
-            <button class="searchButton" href="">
-                <i class="fa-solid fa-filter-circle-xmark"></i>
             </button>
         </div>
     </form>
@@ -102,8 +91,7 @@
                 <td><?php echo $row['id']?></td>
 
                 <td class="tacvu">
-                    <a
-                        href="admin.php?job=QLNS&action=permission&jobDel=<?php echo $row['job'];?>&actionDel=<?php echo $row['action'];?>">Xóa</a>
+                    <a href="admin.php?job=QLNS&action=permission&jobDel=<?php echo $row['job'];?>&actionDel=<?php echo $row['action'];?>">Xóa</a>
                 </td>
             </tr>
             <?php
@@ -112,14 +100,17 @@
         </tbody>
     </table>
     <div class="Pagination">
-        <?php
-            $i = 0;
-            while($i < $totalPageofjobAction){
-                $i++;
-        ?>
-            <a href="admin.php?job=QLNS&action=permission&PageofjobAction=<?php echo $i?>&searchJobAction=<?php echo isset($searchJobAction) ? urlencode($searchJobAction) : ''; ?>"><?php echo $i?></a>
-        <?php
-            }
-        ?>
+        <form action="" method="post">
+            <?php
+
+                $i = 0;
+                while($i < $totalPageofjobAction){
+                    $i++;
+            ?>  
+                <a href="admin.php?job=QLNS&action=permission&PageofjobAction=<?php echo $i?>"><?php echo $i?></a>
+            <?php
+                }
+            ?>
+        </form>
     </div>
 </div>
