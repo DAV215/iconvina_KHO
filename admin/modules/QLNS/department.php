@@ -14,7 +14,7 @@
     }elseif(isset($_POST['ADD_department'])){
         include('QLNS\phongban\add.php');
     }elseif(isset($_GET['phongDelete'])){
-        include('QLNS\phongban\del.php');
+        include('QLNS\phongban\delete.php');
     }
 ?>
 <h1 class="tableName">Phòng ban</h1>
