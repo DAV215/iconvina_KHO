@@ -20,9 +20,6 @@ try {
     $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
     $mail->Port = 587;                                    // TCP port to connect to
  
-
-
-
 } catch (Exception $e) {
 
 }

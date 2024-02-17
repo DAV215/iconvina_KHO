@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif !important;
+}
+
+html {
+    font-family: 'Quicksand', sans-serif !important;
+    scroll-behavior: smooth;
+}
+
+nav {
+    height: 40px;
+    font-weight: bolder;
+    background-color: #edf1f8;
+    box-shadow: rgba(0, 0, 0, 0.35) 0010px 5px 15px;
+    width: 80%;
+    position: fixed;
+    top: 0px;
+    z-index: 99999;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.menu a {
+    width: 30px;
+    height: 30px;
+    background-color: none;
+    outline: none;
+    border: none;
+    margin: 0 20px;
+    transition: all 0.2s;
+    margin: 0 10px;
+    border-radius: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: black;
+}
+
+.menu a:first-child {
+    /* margin-right: 30px; */
+}
+
+.menu a:hover {
+    background-color: tomato;
+}

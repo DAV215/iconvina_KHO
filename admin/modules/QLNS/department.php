@@ -65,7 +65,7 @@
                 </td>
                 <td class="tacvu">
                     <a href="admin.php?job=QLNS&action=chitiet&id=<?php echo $row['id']; ?>">Chi tiết</a>
-                    <a href="admin.php?job=QLNS&action=department&phongDelete=<?php echo $row['department'];?> ?>">Xóa</a>
+                    <a href="admin.php?job=QLNS&action=department&phongDelete=<?php echo $row['name'];?>">Xóa</a>
                 </td>
             </tr>
             <?php

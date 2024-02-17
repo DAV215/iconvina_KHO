@@ -12,6 +12,10 @@ html {
 .sidebar {
     width: 20%;
     background-color: #edf1f8;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    z-index: 9999;
 }
 
 .sideMenu-Top {

@@ -1,3 +1,15 @@
+<?php 
+    session_start();
+    if(!isset($_SESSION['mailAdmin'])){
+        header('Location:login.php');
+    }
+    if(isset($_GET['logout']) && $_GET['logout']=='true'){
+        unset($_SESSION['mailAdmin']);
+        header('Location:login.php');
+
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,3 +30,6 @@
 </body>
 
 </html>
+daovu.dev@gmail.com
+anhvu215
+123123

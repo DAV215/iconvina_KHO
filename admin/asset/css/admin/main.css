@@ -17,7 +17,14 @@ html {
 }
 
 .mainContent {
-    width: 90%;
-    margin-top: 5%;
-    margin-left: 5%;
+    width: 80%;
+    height: 3000px;
+    margin-top: 40px;
+    left: 20%;
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app {
+    margin-left: 10%;
 }
