@@ -1,77 +1,189 @@
+<?php 
+    if(isset($_POST['addUser']) && isset($_POST['username'])){
+        $addby = $_SESSION['username_Login'];
+        $mail = $_POST['mail'];
+        $username = $_POST['username'];
+        $password = 'iconvina123';
+        $department = $_POST['department'];
+        $chucvu = $_POST['chucvu'];
+        $fullname = $_POST['fullname'];
+        $sdt = $_POST['sdt'];
+        
+        $otp = checkValue('otp');
+        $birthDay = checkValue('birthDay');
+        $startDay = checkValue('startDay');
+        $queQuan = checkValue('queQuan');
+        $tamTru = checkValue('tamTru');
+        $sdtEmg = checkValue('sdtEmg');
+        $nameEmg = checkValue('nameEmg');
+
+        $avt = $_FILES['avt']['name'];
+        $avt_tmp = $_FILES['avt']['tmp_name'];
+        $avt = time().'_'.$username;
+         
+
+        // echo $addby . ' ' .
+        // $mail . ' ' .
+        // $username . ' ' .
+        // $password . ' ' .
+        // $department . ' ' .
+        // $chucvu . ' ' .
+        // $fullname . ' ' .
+        // $sdt . ' ' .
+        // $otp . ' ' .
+        // $avt . ' ' .
+        // $birthDay . ' ' .
+        // $startDay . ' ' .
+        // $queQuan . ' ' .
+        // $tamTru . ' ' .
+        // $sdtEmg;
+
+        $sqlAddUser = "INSERT INTO `tbl_user` 
+        (`addby`, `mail`, `password`, `username`, `department`, `chucvu`, `fullname`, `sdt`, `otp`, `avt`, `birthDay`, `startDay`, `queQuan`, `tamTru`, `sdtEmg`,`nameEmg`) 
+        VALUES 
+        ('$addby', '$mail', '$password', '$username', '$department', '$chucvu', '$fullname', '$sdt', '$otp', '$avt', '$birthDay', '$startDay', '$queQuan', '$tamTru','$sdtEmg', '$nameEmg')";
+        $queryAddUse = mysqli_query($mysqli, $sqlAddUser);
+        move_uploaded_file($avt_tmp,'../asset/media/private/avt/'.$avt);
+        echo "<script> window.open('modules/admin.php?job=QLNS&action=personnel');</script>";
+        exit;
+    }
+    function checkValue($x){
+        if(isset($_POST[$x])){
+            return $x = $_POST[$x];
+        } else {
+            $x = '';
+        }
+        return $x;
+    }
+    
+    
+?>
+
 <h1>Thêm nhân sự</h1>
-<div class="userForm">
-    <div class="avtGrid">
-        <img src="../asset/media/base/logo/ICONVINA_logo.png" alt="">
-        <button type="upload">Upload</button>
-    </div>
-    <div class="mainForm">
-        <div class="inforForm">
-            <h2 class="nameForm">Thông tin cơ bản</h2>
-            <div class="bodyofForm">
-                <input type="text" name="username" placeholder="Username">
-                <input type="text" name="fullname" placeholder="Tên dầy đủ">
-                <input type="phonenumber" name="sdt" placeholder="SDT">
-                <input type="email" name="sdt" placeholder="Mail">
-                <select name="department" id="">
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                </select>
-                <select name="chucvu" id="">
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                </select>
+<form action="" method="post" enctype="multipart/form-data">
+    <div class="userForm">
+        <div class="avtGrid">
+            <div class="avatar-upload">
+                <div class="avatar-edit">
+                    <input type='file' name="avt"  id="avt" accept=".png, .jpg, .jpeg" />
+                    <label for="avt"></label>
+                </div>
+                <div class="avatar-preview">
+                    <div id="imagePreview" style="background-image: url(../asset/media/base/user/user.png);">
+                    </div>
+                </div>
             </div>
-
+            <button type="submit" name="addUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Thêm
+                nhân sự</button>
         </div>
-        <div class="inforForm">
-            <h2 class="nameForm">Thông tin cơ bản</h2>
-            <div class="bodyofForm">
-                <input type="text" name="username" placeholder="Username">
-                <input type="text" name="fullname" placeholder="Tên dầy đủ">
-                <input type="phonenumber" name="sdt" placeholder="SDT">
-                <input type="email" name="sdt" placeholder="Mail">
-                <select name="department" id="">
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                </select>
-                <select name="chucvu" id="">
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                </select>
-            </div>
+        <div class="mainForm">
+            <div class="inforForm">
+                <h2 class="nameForm">Thông tin cơ bản</h2>
+                <div class="bodyofForm">
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="text" name="fullname" placeholder="Tên dầy đủ" required>
+                    <input type="phonenumber" name="sdt" placeholder="SDT" required>
+                    <input type="email" name="mail" placeholder="Mail" required>
+                    <select name="department" id="department" required>
+                        <?php
+                    require('QLNS/getdataUser.php');
+                    foreach (getDepartment() as $row) {
+                        $department = $row['department'];
+                    ?>
+                        <option value="<?php echo $department; ?>"><?php echo $department; ?></option>
+                        <?php
+                    }
+                    ?>
+                    </select>
 
-        </div>
-        <div class="inforForm">
-            <h2 class="nameForm">Thông tin cơ bản</h2>
-            <div class="bodyofForm">
-                <input type="text" name="username" placeholder="Username">
-                <input type="text" name="fullname" placeholder="Tên dầy đủ">
-                <input type="phonenumber" name="sdt" placeholder="SDT">
-                <input type="email" name="sdt" placeholder="Mail">
-                <select name="department" id="">
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                    <option value="DEV">DEV</option>
-                </select>
-                <select name="chucvu" id="">
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                    <option value="Nhanvien">Nhanvien</option>
-                </select>
+                    <select name="chucvu" id="chucvu" required>
+                        <option value="chucvu">Quản Lý</option>
+                        <option value="chucvu">Nhân viên</option>
+                    </select>
+                </div>
             </div>
+            <div class="inforForm">
+                <h2 class="nameForm">Thông tin bổ sung</h2>
+                <div class="bodyofForm">
+                    <div class="inputHaveLable">
+                        <label for="birthDay"> Ngày sinh</label>
+                        <input type="date" name="birthDay" placeholder="Ngày sinh">
+                    </div>
+                    <div class="inputHaveLable">
+                        <label for="startDay"> Ngày bắt đầu</label>
+                        <input type="date" name="startDay" placeholder="Ngày bắt đầu">
+                    </div>
 
+                    <input type="text" name="queQuan" placeholder="Quê quán">
+                    <input type="text" name="tamTru" placeholder="Tạm Trú">
+                    <input type="text" name="nameEmg" placeholder="Người liên hệ khẩn cấp">
+                    <input type="tel" name="sdtEmg" placeholder="Số liên hệ khẩn cấp">
+                </div>
+
+            </div>
+            <div class="inforForm big">
+                <h2 class="nameForm">Phân quyền</h2>
+                <div class="bodyofForm">
+                    pppppppppp
+                </div>
+
+            </div>
         </div>
     </div>
+</form>
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+function updateSelectOption(parentSelectId, childSelectId) {
+    // No need to use vanilla JavaScript for getting elements by ID
+    // Use jQuery selectors instead
+    var parentSelect = $('#' + parentSelectId);
+    var childSelect = $('#' + childSelectId);
 
-</div>
+    parentSelect.change(function() {
+        // Get the selected value
+        var selectedParent = parentSelect.val();
+        updateChildOptions(selectedParent, childSelect);
+    });
+
+    function updateChildOptions(selectedParent, childSelect) {
+        $.ajax({
+            type: 'POST',
+            url: 'QLNS/getdataUser.php',
+            data: {
+                selectedDepartment: selectedParent
+            },
+            success: function(response) {
+                var childOptions = JSON.parse(response);
+                childSelect.empty();
+
+                $.each(childOptions, function(index, option) {
+                    childSelect.append($('<option>', {
+                        value: option.chucvu,
+                        text: option.chucvu
+                    }));
+                });
+            }
+        });
+    }
+
+    // Initial update of child options based on the initial selected parent
+    updateChildOptions(parentSelect.val(), childSelect);
+}
+updateSelectOption('department', 'chucvu');
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#imagePreview').css('background-image', 'url('+e.target.result +')');
+            $('#imagePreview').hide();
+            $('#imagePreview').fadeIn(650);
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+$("#avt").change(function() {
+    readURL(this);
+});
+</script>

@@ -96,7 +96,7 @@
                 <td><?php echo $row['department']?></td>
                 <td><?php echo $row['chucvu']?></td>
                 <td class="tacvu">
-                    <a href="admin.php?job=QLNS&action=chitiet&id=<?php echo $row['id']; ?>">Chi tiết</a>
+                    <a href="admin.php?job=QLNS&action=userDetail&id=<?php echo $row['id']; ?>">Chi tiết</a>
                 </td>
             </tr>
             <?php
@@ -115,4 +115,6 @@
             }
         ?>
     </div>
+
+
 </div>

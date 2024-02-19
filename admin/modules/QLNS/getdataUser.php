@@ -1,0 +1,41 @@
+<?php 
+        include('../../config/configDb.php');
+
+    $sqlUserAll = "SELECT * FROM `tbl_user`";
+    $queryALL = mysqli_query($mysqli, $sqlUserAll);
+
+    function getDepartment(){
+        include('../config/configDb.php');
+        $sql = "SELECT * FROM `tbl_department`";
+        $query= mysqli_query($mysqli, $sql);
+        $arrChucvu = [];
+        while ($row = mysqli_fetch_array($query)){
+            $arrChucvu[] = [
+                'department' => $row['name'],
+            ];
+        }
+        return $arrChucvu;
+    }
+    function getChucvu($department){
+        include('../../config/configDb.php');
+        $sql = "SELECT * FROM `tbl_chucvu` WHERE `department` = '$department'";
+        $query = mysqli_query($mysqli, $sql);
+        $arrChucvu = [];
+        while ($row = mysqli_fetch_array($query)){
+            $arrChucvu[] = [
+                'chucvu' => $row['chucvu'],
+            ];
+        }
+        return $arrChucvu;
+    }
+    
+    if(isset($_POST['selectedDepartment'])){
+        $selectedDepartment = $_POST['selectedDepartment'];
+        $chucvuData = getChucvu($selectedDepartment);
+    
+        // You can echo or json_encode the result to send it back to JavaScript
+        echo json_encode($chucvuData, JSON_UNESCAPED_UNICODE);
+        // Alternatively, if you want to return HTML or another format, you can customize this part
+    }
+    
+?>

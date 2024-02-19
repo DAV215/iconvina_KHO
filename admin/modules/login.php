@@ -9,6 +9,8 @@
         $query = mysqli_query($mysqli, $sql);
         if(mysqli_num_rows($query) > 0){
             $_SESSION['mailAdmin'] = $adminMail;
+            $_SESSION['username_Login'] =  $adminMail;
+
             header('Location: ../../PHPmailer/mailControl/loginNoti.php?user=admin&mail=' . $adminMail);
         } else{
             echo '<script>alert("Cút");</script>';
@@ -34,8 +36,8 @@
         <div class="logo">
             <img src="../asset/media/base/logo/ICONVINA_logo.png" alt="">
         </div>
-        <form action="" method="post" class="loginForm" autocomplete="off">
-            <input type="text" placeholder="Mail" name="mail" autocomplete="false">
+        <form action="" method="post" class="loginForm" autocomplete="true">
+            <input type="text" placeholder="Mail" name="mail" autocomplete="true">
             <input type="password" placeholder="Password" name="pass">
             <input type="password" placeholder="Otp" name="otp">
             <button type="submit" name="btn_login" >Đăng nhập</button>
