@@ -24,6 +24,7 @@ html {
     background-color: aliceblue;
     color: White;
     font-family: 'Quicksand', sans-serif !important;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
 h1,
@@ -214,4 +215,10 @@ input[type="date"] {
             background-position: center;
         }
     }
+}
+
+.big .bodyofForm {
+    padding: 0;
+    background: none;
+    box-shadow: none;
 }

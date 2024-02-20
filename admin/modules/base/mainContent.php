@@ -20,7 +20,6 @@
             if($job=="QLNS"){
                 if($action == 'them') include('QLNS/them.php');
                 if($action == 'thongke') include('QLNS/thongke.php');
-                if($action == 'chitiet') include('QLNS/chitiet.php'); 
                 if($action == 'personnel') include('QLNS/personnel.php'); 
                 if($action == 'department') include('QLNS/department.php'); 
                 if($action == 'permission') include('QLNS/permission.php'); 

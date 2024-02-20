@@ -1,5 +1,5 @@
 <?php 
-    if(isset($_POST['addUser']) && isset($_POST['username'])){
+    if(isset($_POST['addUser']) && isset($_POST['username']) && !isset($_POST['userId'])){
         $addby = $_SESSION['username_Login'];
         $mail = $_POST['mail'];
         $username = $_POST['username'];
@@ -22,21 +22,20 @@
         $avt = time().'_'.$username;
          
 
-        // echo $addby . ' ' .
-        // $mail . ' ' .
-        // $username . ' ' .
-        // $password . ' ' .
-        // $department . ' ' .
-        // $chucvu . ' ' .
-        // $fullname . ' ' .
-        // $sdt . ' ' .
-        // $otp . ' ' .
-        // $avt . ' ' .
-        // $birthDay . ' ' .
-        // $startDay . ' ' .
-        // $queQuan . ' ' .
-        // $tamTru . ' ' .
-        // $sdtEmg;
+        if (isset($_POST["Permission"])) {
+            // Retrieve the values of all 'Permission' inputs
+            $permissionValues = $_POST["Permission"];
+    
+            // Initialize an array to store the values
+            $permissionArray = [];
+    
+            // Loop through the values and push them into the array
+            foreach ($permissionValues as $value) {
+                $permissionArray[] = $value;
+                $sql = "INSERT INTO `tbl_user_role`( `id_role`, `id_user`) VALUES ('[value-1]','[value-2]','[value-3]')";
+            }
+    
+        } 
 
         $sqlAddUser = "INSERT INTO `tbl_user` 
         (`addby`, `mail`, `password`, `username`, `department`, `chucvu`, `fullname`, `sdt`, `otp`, `avt`, `birthDay`, `startDay`, `queQuan`, `tamTru`, `sdtEmg`,`nameEmg`) 
@@ -44,8 +43,8 @@
         ('$addby', '$mail', '$password', '$username', '$department', '$chucvu', '$fullname', '$sdt', '$otp', '$avt', '$birthDay', '$startDay', '$queQuan', '$tamTru','$sdtEmg', '$nameEmg')";
         $queryAddUse = mysqli_query($mysqli, $sqlAddUser);
         move_uploaded_file($avt_tmp,'../asset/media/private/avt/'.$avt);
+        exit();
         echo "<script> window.open('modules/admin.php?job=QLNS&action=personnel');</script>";
-        exit;
     }
     function checkValue($x){
         if(isset($_POST[$x])){
@@ -65,7 +64,7 @@
         <div class="avtGrid">
             <div class="avatar-upload">
                 <div class="avatar-edit">
-                    <input type='file' name="avt"  id="avt" accept=".png, .jpg, .jpeg" />
+                    <input type='file' name="avt" id="avt" accept=".png, .jpg, .jpeg" />
                     <label for="avt"></label>
                 </div>
                 <div class="avatar-preview">
@@ -73,7 +72,8 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" name="addUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Thêm
+            <button type="submit" name="addUser"
+                style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Thêm
                 nhân sự</button>
         </div>
         <div class="mainForm">
@@ -124,9 +124,57 @@
             <div class="inforForm big">
                 <h2 class="nameForm">Phân quyền</h2>
                 <div class="bodyofForm">
-                    pppppppppp
-                </div>
+                    <table class="data_table permissionTable">
+                        <thead>
+                            <tr class="headerTable ">
+                                <th>Công việc</th>
+                                <th> Thêm</th>
+                                <th> Duyệt</th>
+                                <th> Xóa</th>
+                                <th> Sửa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                            foreach (getAllJob() as $row) {
+                                $job = $row['job'];
+                                $actions = getActionofJob($job);
 
+                                // Ensure there are at least 4 actions
+                                $existingActions = array_column($actions, 'action');
+
+                                // Define the desired order
+                                $desiredOrder = ["Add", "Aporval", "Del", "Modify"];
+
+                                ?>
+                                <tr>
+                                    <td><?php echo $job; ?></td>
+                                    <?php
+                                    foreach ($desiredOrder as $action) {
+                                        $disabled = !in_array($action, $existingActions);
+                                        $id;
+                                        //tìm id trong mảng nếu có hành động
+                                        if(!$disabled){
+                                            foreach ($actions as $action_) {
+                                                if ($action_['action'] === $action) {
+                                                    $id = $action_['id'];
+                                                }
+                                            }
+                                        }
+                                        ?>
+                                        <td>
+                                            <input type="checkbox" name="Permision[]" value="<?php echo $id; ?>" id="" <?php echo $disabled ? 'disabled' : ''; ?>>
+                                        </td>
+                                    <?php
+                                    }
+                                    ?>
+                                </tr>
+                                <?php
+                            }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -176,7 +224,7 @@ function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
         reader.onload = function(e) {
-            $('#imagePreview').css('background-image', 'url('+e.target.result +')');
+            $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
             $('#imagePreview').hide();
             $('#imagePreview').fadeIn(650);
         }
@@ -187,3 +235,7 @@ $("#avt").change(function() {
     readURL(this);
 });
 </script>
+
+<?php 
+exit();
+?>
