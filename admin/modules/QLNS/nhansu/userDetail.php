@@ -298,7 +298,6 @@ $("#avt").change(function() {
     readURL(this);
 });
 </script>
-
 <?php 
 exit();
 ?>

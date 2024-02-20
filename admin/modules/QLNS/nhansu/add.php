@@ -22,20 +22,7 @@
         $avt = time().'_'.$username;
          
 
-        if (isset($_POST["Permission"])) {
-            // Retrieve the values of all 'Permission' inputs
-            $permissionValues = $_POST["Permission"];
-    
-            // Initialize an array to store the values
-            $permissionArray = [];
-    
-            // Loop through the values and push them into the array
-            foreach ($permissionValues as $value) {
-                $permissionArray[] = $value;
-                $sql = "INSERT INTO `tbl_user_role`( `id_role`, `id_user`) VALUES ('[value-1]','[value-2]','[value-3]')";
-            }
-    
-        } 
+ 
 
         $sqlAddUser = "INSERT INTO `tbl_user` 
         (`addby`, `mail`, `password`, `username`, `department`, `chucvu`, `fullname`, `sdt`, `otp`, `avt`, `birthDay`, `startDay`, `queQuan`, `tamTru`, `sdtEmg`,`nameEmg`) 
@@ -43,6 +30,22 @@
         ('$addby', '$mail', '$password', '$username', '$department', '$chucvu', '$fullname', '$sdt', '$otp', '$avt', '$birthDay', '$startDay', '$queQuan', '$tamTru','$sdtEmg', '$nameEmg')";
         $queryAddUse = mysqli_query($mysqli, $sqlAddUser);
         move_uploaded_file($avt_tmp,'../asset/media/private/avt/'.$avt);
+        if (isset($_POST["Permission"])) {
+            // Retrieve the values of all 'Permission' inputs
+            $permissionValues = $_POST["Permission"];
+    
+            // Initialize an array to store the values
+            $permissionArray = [];
+            require('QLNS/getdataUser.php');
+
+            $id_User = getIDbyUNAME($username)['id'];
+            // Loop through the values and push them into the array
+            foreach ($permissionValues as $value) {
+                $permissionArray[] = $value;
+                $sql = "INSERT INTO `tbl_user_role`( `id_role`, `id_user`) VALUES ($value, $id_User)";
+                $queryJob = mysqli_query($mysqli, $sql);
+            }    
+        } 
         exit();
         echo "<script> window.open('modules/admin.php?job=QLNS&action=personnel');</script>";
     }
@@ -163,7 +166,7 @@
                                         }
                                         ?>
                                         <td>
-                                            <input type="checkbox" name="Permision[]" value="<?php echo $id; ?>" id="" <?php echo $disabled ? 'disabled' : ''; ?>>
+                                            <input type="checkbox" name="Permission[]" value="<?php echo $id; ?>" id="" <?php echo $disabled ? 'disabled' : ''; ?>>
                                         </td>
                                     <?php
                                     }
