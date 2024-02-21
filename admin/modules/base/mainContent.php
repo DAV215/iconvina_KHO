@@ -24,8 +24,14 @@
                 if($action == 'department') include('QLNS/department.php'); 
                 if($action == 'permission') include('QLNS/permission.php'); 
             }
-            else{
-                echo'delco';
+            if($job=="QLTC"){
+                if($action == 'dexuatmua') include('QLDXM/buysuggest.php');
+                if($action == 'phieuchi') include('QLNS/personnel.php'); 
+                if($action == 'phieuthu') include('QLNS/department.php');  
+            }
+            if($job=="QLDA"){
+                include('QLDA/projectManager.php');
+
             }
         ?>
     </div>

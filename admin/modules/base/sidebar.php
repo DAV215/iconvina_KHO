@@ -39,9 +39,25 @@
             </div>
             <div class="sub-sideMenu ">
                 <ul>
-                    <li><a href="" onclick="changeActive(this)">Thống kê</a></li>
-                    <li><a href="" onclick="changeActive(this)">Thêm</a></li>
-                    <li><a href="" onclick="changeActive(this)">Sửa</a></li>
+                    <li><a href="admin.php?job=QLTC&action=dexuatmua" onclick="changeActive(this)">Đề xuất mua</a></li>
+                    <li><a href="admin.php?job=QLTC&action=phieuchi" onclick="changeActive(this)">Phiếu chi</a></li>
+                    <li><a href="admin.php?job=QLTC&action=phieuthu" onclick="changeActive(this)">Phiếu thu</a></li>
+                    <li><a href="admin.php?job=QLTC&action=tonghop" onclick="changeActive(this)">Tổng hợp</a></li>
+                </ul>
+            </div>
+        </div>
+        <div href="" class="sideMenu-Item">
+            <div class="Main-sideMenu">
+                <div class="sideMenu-icon-title">
+                    <span class="sideMenu-icon"> <i class="fa-solid fa-diagram-project"></i></i></span>
+                    <span class="sideMenu-Title">Quản lý dự án</span>
+                </div>
+                <button onclick="toggleSubMenu(this)"><i class="fa-solid fa-angle-right"></i></button>
+            </div>
+            <div class="sub-sideMenu ">
+                <ul>
+                    <li><a href="admin.php?job=QLDA&action=thongke" onclick="changeActive(this)">Thống kê</a></li>
+                    <li><a href="admin.php?job=QLTC&action=phieuchi" onclick="changeActive(this)">Thêm</a></li>
                 </ul>
             </div>
         </div>

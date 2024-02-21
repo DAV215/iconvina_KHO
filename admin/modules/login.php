@@ -2,16 +2,20 @@
     session_start();
     include("../config/configDb.php");
     if(isset($_POST['btn_login'])){
-        $adminMail = $_POST["mail"];
+        $username = $_POST["username"];
         $adminPass = $_POST["pass"];
         $adminOtp = $_POST["otp"];
-        $sql = "SELECT * FROM tbl_admin WHERE mail = '".$adminMail."' AND password = '".$adminPass."' AND otp = '".$adminOtp."'";
+        $sql = "SELECT * FROM tbl_admin WHERE username = '".$username."' AND password = '".$adminPass."' AND otp = '".$adminOtp."'";
         $query = mysqli_query($mysqli, $sql);
+        $data=[];
         if(mysqli_num_rows($query) > 0){
-            $_SESSION['mailAdmin'] = $adminMail;
-            $_SESSION['username_Login'] =  $adminMail;
-
-            header('Location: ../../PHPmailer/mailControl/loginNoti.php?user=admin&mail=' . $adminMail);
+            while ($row = mysqli_fetch_array($query)){
+                $data = $row;
+            }
+            $_SESSION['mailAdmin'] = $data['mail'];
+            $_SESSION['username_Login'] =  $data['username'];
+            $_SESSION['userFullname'] =  $data['fullname'];
+            header('Location: ../../PHPmailer/mailControl/loginNoti.php?user=admin&mail='.$data['mail']);
         } else{
             echo '<script>alert("Cút");</script>';
         }
@@ -37,9 +41,9 @@
             <img src="../asset/media/base/logo/ICONVINA_logo.png" alt="">
         </div>
         <form action="" method="post" class="loginForm" autocomplete="true">
-            <input type="text" placeholder="Mail" name="mail" autocomplete="true">
-            <input type="password" placeholder="Password" name="pass">
-            <input type="password" placeholder="Otp" name="otp">
+            <input type="text" placeholder="username" name="username" autocomplete="true">
+            <input type="password" placeholder="Password" name="pass" autocomplete="true">
+            <input type="text" placeholder="Otp" name="otp" autocomplete="true">
             <button type="submit" name="btn_login" >Đăng nhập</button>
         </form>
     </div>

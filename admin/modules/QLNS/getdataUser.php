@@ -99,6 +99,67 @@
         }
         return $data;
     }
+    function getAllPersonnel(){
+        include('../config/configDb.php');
+        $sql = "SELECT `username`, `fullname` FROM `tbl_admin` 
+        UNION ALL
+        SELECT `username`, `fullname` FROM `tbl_user` ;";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data[] = [
+                'username' => $row['username'],
+                'fullname' => $row['fullname'],
+            ];
+        }
+        return $data;
+    }
+    function getPersonnel($username){
+        include('../config/configDb.php');
+        $sql = "SELECT `username`, `fullname` FROM `tbl_admin` WHERE `username` = '$username'
+        UNION ALL
+        SELECT `username`, `fullname` FROM `tbl_user` WHERE `username` = '$username';";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data = $row;
+        }
+        return $data;
+    }
+    function getAllQuyTrinh(){
+        include('../config/configDb.php');
+        $sql = "SELECT `name` FROM `tbl_quytrinhmuahang`";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_assoc($query)) {
+            $data[] = $row;
+        }
+    
+        return $data;
+    }
+    function getAllProject(){
+        include('../config/configDb.php');
+        $sql = "SELECT `name` FROM `tbl_project`";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)) {
+            $data[] = $row;
+        }
+    
+        return $data;
+    }
+    function getAllSupplier(){
+        include('../config/configDb.php');
+        $sql = "SELECT `supplier_name` FROM `tbl_buysuggest`";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data[] = [
+                'supplier_name' => $row['supplier_name'],
+            ];
+        }
+        return $data;
+    }
     function get_client_ip() {
         $ipaddress = '';
         if (getenv('HTTP_CLIENT_IP')) {
