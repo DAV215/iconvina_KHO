@@ -160,6 +160,57 @@
         }
         return $data;
     }
+        function getBuySuggestDetail($id){
+        include('../config/configDb.php');
+        $sql = "SELECT * FROM `tbl_buysuggest` WHERE `id` = '$id'";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data = $row;
+        }
+        return $data;
+    }
+    function getBuySuggest_IMG($id){
+        include('../config/configDb.php');
+        $sql = "SELECT `link` FROM `tbl_imgbuysugest` WHERE `buysuggestCode` = '$id'";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data[] = [
+                'link' => $row['link'],
+            ];
+        }
+        return $data;
+    }
+    class getBuySuggest{
+        private $id;
+        function __construct() {
+
+        }
+        function getAll(){
+            include('../config/configDb.php');
+            $sql = "SELECT * FROM `tbl_buysuggest`";
+            $query= mysqli_query($mysqli, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data = $row;
+            }
+            return $data;
+        }
+        function get1Data($type){
+            include('../config/configDb.php');
+            $sql = "SELECT * FROM `tbl_buysuggest`";
+            $query= mysqli_query($mysqli, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data[] = [
+                    $type => $row[$type],
+                ];
+            }
+            return $data;
+        }
+    }
+
     function get_client_ip() {
         $ipaddress = '';
         if (getenv('HTTP_CLIENT_IP')) {

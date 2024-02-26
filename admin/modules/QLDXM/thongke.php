@@ -7,7 +7,7 @@
     $sqlbuysuggestAll = "SELECT * FROM `tbl_buysuggest`";
     $queryALL = mysqli_query($mysqli, $sqlbuysuggestAll);
     $num_rows = mysqli_num_rows($queryALL);
-    $totalPageofbuysuggest = round($num_rows/10, 2);
+    $totalPageofBuysuggest = round($num_rows/10, 2);
 
     if(isset($_GET['PageofBuysuggest'])){
         $PageofBuysuggest=$_GET['PageofBuysuggest'];
@@ -18,9 +18,9 @@
             `nameDXM` LIKE '%$searchBuysuggest%' OR 
             `namebuyer` LIKE '%$searchBuysuggest%' OR 
             `daySuggest` LIKE '%$searchBuysuggest%' OR 
-            `supplier_name` LIKE '%$searchBuysuggest%' LIMIT  $end,10";
+            `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT  $end,10";
         }else{
-            $sqlbuysuggest = "SELECT * FROM `tbl_buysuggest` LIMIT $end,10";
+            $sqlbuysuggest = "SELECT * FROM `tbl_buysuggest` ORDER BY `id` DESC LIMIT $end,10";
         }
         $query = mysqli_query($mysqli, $sqlbuysuggest);
     }else{
@@ -30,10 +30,10 @@
             `nameDXM` LIKE '%$searchBuysuggest%' OR 
             `namebuyer` LIKE '%$searchBuysuggest%' OR 
             `daySuggest` LIKE '%$searchBuysuggest%' OR 
-            `supplier_name` LIKE '%$searchBuysuggest%' LIMIT 10";
+            `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT 10";
         
         }else{
-            $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` LIMIT 10";
+            $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest`  ORDER BY `id` DESC LIMIT 10";
         }
         $query = mysqli_query($mysqli, $sqlBuysuggest);
     }
@@ -75,6 +75,7 @@
                     <th>Số thứ tự</th>
                     <th>Dự án</th>
                     <th>Tên đề xuất</th>
+                    <th>Tổng tiền</th>
                     <th>Người đề xuất</th>
                     <th>Ngày đề xuất</th>
                     <th>Nhà cung cấp</th>
@@ -93,6 +94,7 @@
                 <td><?php echo $i ?></td>
                 <td><?php echo $row['nameproject']?></td>
                 <td><?php echo $row['nameDXM']?></td>
+                <td><?php echo number_format($row['money'])?></td>
                 <td><?php echo $row['namebuyer']?></td>
                 <td><?php echo $row['daySuggest']?></td>
                 <td><?php echo $row['supplier_name']?></td>
@@ -102,7 +104,7 @@
                     ?>
                 </td>
                 <td class="tacvu">
-                    <a href="admin.php?job=QLTC&action=dexuatmua&actionChild=buysuggestDetail&id=<?php echo $row['id']; ?>">Chi tiết</a>
+                    <a href="admin.php?job=QLTC&action=dexuatmua&actionChild=buysuggestDetail&idBuySuggest=<?php echo $row['id']; ?>">Chi tiết</a>
                 </td>
             </tr>
             <?php
@@ -113,10 +115,10 @@
     <div class="Pagination">
         <?php
             $i = 0;
-            while($i < $totalPageofbuysuggest){
+            while($i < $totalPageofBuysuggest){
                 $i++;
         ?>
-            <a href="admin.php?job=QLTC&action=dexuatmua&Pageofbuysuggest=<?php echo $i?>&searchbuysuggest=<?php echo isset($searchbuysuggest) ? urlencode($searchbuysuggest) : ''; ?>"><?php echo $i?></a>
+            <a href="admin.php?job=QLTC&action=dexuatmua&PageofBuysuggest=<?php echo $i?>&searchbuysuggest=<?php echo isset($searchbuysuggest) ? urlencode($searchbuysuggest) : ''; ?>"><?php echo $i?></a>
         <?php
             }
         ?>

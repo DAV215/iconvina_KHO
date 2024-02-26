@@ -136,7 +136,7 @@ input[type="date"] {
     cursor: pointer;
     display: inline-block;
     font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 600;
     line-height: normal;
     margin: 0;
@@ -165,6 +165,49 @@ input[type="date"] {
 }
 
 .avtGrid button:active {
+    box-shadow: none;
+    transform: translateY(0);
+}
+
+.inforForm button {
+    appearance: none;
+    background-color: #000000;
+    border: none;
+    border-radius: 15px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: normal;
+    margin: 0;
+    min-height: 60px;
+    min-width: 0;
+    outline: none;
+    padding: 16px 24px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: 100%;
+    will-change: transform;
+    margin: 10px 0;
+}
+
+.inforForm button:disabled {
+    pointer-events: none;
+}
+
+.inforForm button:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+    transform: translateY(-2px);
+}
+
+.inforForm button:active {
     box-shadow: none;
     transform: translateY(0);
 }
@@ -226,6 +269,21 @@ input[type="date"] {
             background-position: center;
         }
     }
+}
+
+.preview-item {
+    width: 100%;
+    min-width: 700px;
+    height: auto;
+    min-height: 700px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 20px;
+}
+
+.preview-item:hover {
+    /* Adjust the scaling factor as needed */
 }
 
 .big .bodyofForm {
@@ -293,7 +351,7 @@ textarea {
     border-style: none solid solid none;
     border-width: medium 1px 1px medium;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12) inset;
-    color: #555555;
+    color: #ffffff;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 1em;
     line-height: 1.4em;
@@ -304,10 +362,132 @@ textarea {
 textarea:focus {
     background: none repeat scroll 0 0 #FFFFFF;
     outline-width: 0;
+    color: #000000;
 }
 
 input::placeholder,
 textarea::placeholder {
     color: #b1b1b1;
     /* Set the desired color */
+}
+
+.receipt {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    text-decoration: none;
+}
+
+.receiptItem:hover img {
+    transform: scale(5);
+    transition: transform 0.3s;
+}
+
+.receiptItem a:hover {
+    /* Styling for hover state */
+    text-decoration: underline;
+    /* Underline on hover */
+}
+
+.receiptItem img {
+    width: 90px;
+    height: 90px;
+    border-radius: 10px;
+    background-size: contain;
+}
+
+.receiptItem {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.receiptItem:hover {}
+
+.subACT a,
+.subACT button {
+    text-decoration: none;
+    margin: 0 20px;
+    font-weight: bolder;
+    color: #000000;
+    background: none;
+    outline: none;
+    border: none;
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: 1.25rem;
+}
+
+.subACT a:hover,
+.subACT button:hover {
+    transform: scale(1.2);
+    color: tomato;
+}
+
+.addReceipt [type=file] {
+    height: 0;
+    overflow: hidden;
+    width: 0;
+}
+
+.addReceipt [type=file]+label {
+    right: 9%;
+    background: #f15d22;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    /* font-weight: 500; */
+    outline: none;
+    padding: 10px 20px;
+    position: absolute;
+    transition: all 0.3s;
+    vertical-align: middle;
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: 1.25rem;
+    font-weight: bolder;
+}
+
+.addReceipt [type=file]+label:hover {
+    background-color: #d3460d;
+}
+
+[type=file]+label.lableAddReceipt {
+    background-color: #f79159;
+    box-shadow: 0 6px #f57128;
+    transition: none;
+}
+
+[type=file]+label.lableAddReceipt:hover {
+    box-shadow: 0 4px #f57128;
+}
+
+.addReceipt button {
+    right: 17%;
+    background: #f15d22;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    /* font-weight: 500; */
+    outline: none;
+    padding: 10px 20px;
+    position: absolute;
+    transition: all 0.3s;
+    vertical-align: middle;
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: 1.25rem;
+    font-weight: bolder;
+    background-color: #f79159;
+    box-shadow: 0 6px #f57128;
+    transition: none;
+}
+
+.addReceipt button:hover {
+    box-shadow: 0 4px #f57128;
 }

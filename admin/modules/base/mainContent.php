@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="../asset/css/admin/table.css">
 <link rel="stylesheet" href="../asset/css/admin/formInfo.css">
-
+<link rel="stylesheet" href="../asset/css/admin/modalForm.css">
+<script src="../asset/js/modal.js"></script>
 <div class="mainContent">
     <?php 
     include("../modules/base/menuTop.php");
@@ -17,21 +18,24 @@
                 $tam = '';
                 $action = '';
             }
-            if($job=="QLNS"){
-                if($action == 'them') include('QLNS/them.php');
-                if($action == 'thongke') include('QLNS/thongke.php');
-                if($action == 'personnel') include('QLNS/personnel.php'); 
-                if($action == 'department') include('QLNS/department.php'); 
-                if($action == 'permission') include('QLNS/permission.php'); 
-            }
-            if($job=="QLTC"){
-                if($action == 'dexuatmua') include('QLDXM/buysuggest.php');
-                if($action == 'phieuchi') include('QLNS/personnel.php'); 
-                if($action == 'phieuthu') include('QLNS/department.php');  
-            }
-            if($job=="QLDA"){
-                include('QLDA/projectManager.php');
-
+            if(isset($job)){
+                if($job=="QLNS"){
+                    if($action == 'them') include('QLNS/them.php');
+                    if($action == 'thongke') include('QLNS/thongke.php');
+                    if($action == 'personnel') include('QLNS/personnel.php'); 
+                    if($action == 'department') include('QLNS/department.php'); 
+                    if($action == 'permission') include('QLNS/permission.php'); 
+                }
+                if($job=="QLTC"){
+                    if($action == 'dexuatmua') include('QLDXM/buysuggest.php');
+                    if($action == 'phieuchi') include('QLNS/personnel.php'); 
+                    if($action == 'phieuthu') include('QLNS/department.php');  
+                }
+                if($job=="QLDA"){
+                    include('QLDA/projectManager.php');
+                }
+            }else{
+                include('QLNS/personnel.php');
             }
         ?>
     </div>
