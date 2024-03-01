@@ -101,9 +101,9 @@
     }
     function getAllPersonnel(){
         include('../config/configDb.php');
-        $sql = "SELECT `username`, `fullname` FROM `tbl_admin` 
+        $sql = "SELECT  `username`, `fullname` FROM `tbl_admin` 
         UNION ALL
-        SELECT `username`, `fullname` FROM `tbl_user` ;";
+        SELECT  `username`, `fullname` FROM `tbl_user` ;";
         $query= mysqli_query($mysqli, $sql);
         $data = [];
         while ($row = mysqli_fetch_array($query)){
@@ -182,10 +182,23 @@
         }
         return $data;
     }
+    function getPhieuChi_IMG($id){
+        include('../config/configDb.php');
+        $sql = "SELECT * FROM `tbl_imgphieuchi` WHERE `codePhieuChi` = '$id'";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data[] = [
+                'link' => $row['link'],
+            ];
+        }
+        return $data;
+    }
     class getBuySuggest{
         private $id;
-        function __construct() {
 
+        function __construct($id = null) {
+            $this->id = $id;
         }
         function getAll(){
             include('../config/configDb.php');
@@ -209,8 +222,120 @@
             }
             return $data;
         }
+        function getBuySuggestDetail($id){
+            include('../config/configDb.php');
+            $sql = "SELECT * FROM `tbl_buysuggest` WHERE `id` = '$id'";
+            $query= mysqli_query($mysqli, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data = $row;
+            }
+            return $data;
+        }
     }
+    class getPhieuChi{
+      public  function __construct() {
 
+        }
+       public function getAll(){
+            include('../config/configDb.php');
+            $sql = "SELECT * FROM `tbl_phieuchi`";
+            $query= mysqli_query($mysqli, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data[] = $row;
+            }
+            return $data;
+        }
+        public   function get1Data($type){
+            include('../config/configDb.php');
+            $sql = "SELECT * FROM `tbl_phieuchi`";
+            $query= mysqli_query($mysqli, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data[] = [
+                    $type => $row[$type],
+                ];
+            }
+            return $data;
+        }
+        function getPhieuChiDetail($id){
+            include('../config/configDb.php');
+            $sql = "SELECT * FROM `tbl_phieuchi` WHERE `id` = '$id'";
+            $query= mysqli_query($mysqli, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data = $row;
+            }
+            return $data;
+        }
+    }
+    function getReceiptOfPC($loaichi, $id_phieuchi){
+        include('../config/configDb.php');
+        if($loaichi == "Chi mua hàng"){
+            $sql = "SELECT * FROM `tbl_itemdetail_cmh` WHERE `id_phiechi` = '$id_phieuchi'";
+        }elseif($loaichi == "Chi khác"){
+            $sql = "SELECT * FROM `tbl_itemdetail_ckhac` WHERE `id_phiechi` = '$id_phieuchi'";
+        }elseif($loaichi == "Chi tạm ứng"){
+            $sql = "SELECT * FROM `tbl_itemdetail_tu` WHERE `id_phiechi` = '$id_phieuchi'";
+        }elseif($loaichi == "Chi tạm ứng lương"){
+            $sql = "SELECT * FROM `tbl_itemdetail_tul` WHERE `id_phiechi` = '$id_phieuchi'";
+        }
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data[] = $row;
+        }
+        return $data;
+    }
+    function resetReceiptPC($loaichi, $id_phieuchi){
+        include('../config/configDb.php');
+        if ($loaichi == "Chi mua hàng") {
+            $sql = "DELETE FROM `tbl_itemdetail_cmh` WHERE `id_phiechi` = '$id_phieuchi'";
+        } elseif ($loaichi == "Chi khác") {
+            $sql = "DELETE FROM `tbl_itemdetail_ckhac` WHERE `id_phiechi` = '$id_phieuchi'";
+        } elseif ($loaichi == "Chi tạm ứng") {
+            $sql = "DELETE FROM `tbl_itemdetail_tu` WHERE `id_phiechi` = '$id_phieuchi'";
+        } elseif ($loaichi == "Chi tạm ứng lương") {
+            $sql = "DELETE FROM `tbl_itemdetail_tul` WHERE `id_phiechi` = '$id_phieuchi'";
+        }
+        mysqli_query($mysqli, $sql);
+    }
+    function resetReceiptPC_( $id_phieuchi){
+        include('../config/configDb.php');
+        $sql = "DELETE FROM `tbl_itemdetail_cmh` WHERE `id_phiechi` = '$id_phieuchi'";
+        $sql = "DELETE FROM `tbl_itemdetail_ckhac` WHERE `id_phiechi` = '$id_phieuchi'";
+        $sql = "DELETE FROM `tbl_itemdetail_tu` WHERE `id_phiechi` = '$id_phieuchi'";
+        $sql = "DELETE FROM `tbl_itemdetail_tul` WHERE `id_phiechi` = '$id_phieuchi'";
+        mysqli_query($mysqli, $sql);
+    }
+    function resetIMGPC($id_phieuchi){
+        include('../config/configDb.php');
+        $sql = "DELETE FROM `tbl_imgphieuchi` WHERE `codePhieuChi` = '$id_phieuchi'";
+        mysqli_query($mysqli, $sql);
+    }
+    function getAllLoaiChi(){
+        include('../config/configDb.php');
+        $sql = "SELECT `name` FROM `tbl_loaichi`";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_assoc($query)) {
+            $data[] = $row;
+        }
+    
+        return $data;
+    }
+    function getAllLoaiTaiKhoan(){
+        include('../config/configDb.php');
+        $sql = "SELECT `name` FROM `tbl_loaitaikhoan`";
+        $query= mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_assoc($query)) {
+            $data[] = $row;
+        }
+    
+        return $data;
+    }
     function get_client_ip() {
         $ipaddress = '';
         if (getenv('HTTP_CLIENT_IP')) {

@@ -259,7 +259,7 @@
                         mua</button>
                         <?php if($infoBuySuggest['bool_approve'] == 0){
                             ?>
-                            <button type="submit" name="approveDXM" style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Duyệt và lập phiếu chi</button>
+                            <a href="admin.php?job=QLTC&action=phieuchi&actionChild=addPhieuChi&idBuySuggest=<?php echo $infoBuySuggest['id']; ?>">Duyệt và lập phiếu chi</a>
                         <?php 
                         }else{
                             ?>

@@ -28,7 +28,7 @@
                 }
                 if($job=="QLTC"){
                     if($action == 'dexuatmua') include('QLDXM/buysuggest.php');
-                    if($action == 'phieuchi') include('QLNS/personnel.php'); 
+                    if($action == 'phieuchi') include('QLPC/phieuchi.php'); 
                     if($action == 'phieuthu') include('QLNS/department.php');  
                 }
                 if($job=="QLDA"){
