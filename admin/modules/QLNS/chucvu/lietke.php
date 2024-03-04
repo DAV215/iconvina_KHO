@@ -7,7 +7,8 @@
         $sqlUser = "SELECT * FROM `tbl_department`";
         $query = mysqli_query($mysqli, $sqlUser);
     }
-
+    include('../config/configDb.php');
+    $per[] = getPermission(getIDbyUNAME($_SESSION['username_Login']));
 ?>
 <div class="tableComponent">
     <form action="" method="post">
@@ -20,6 +21,7 @@
     </form>
     <form action="" method="post">
         <div class="searchBox more1">
+            <?php ?>
             <input class="searchInput" type="text" name="ADD_department" placeholder="Thêm phòng ban">
             <button class="searchButton" type="submit">
                 <i class="fa-solid fa-plus"></i>

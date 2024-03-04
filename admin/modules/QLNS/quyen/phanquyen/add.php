@@ -9,7 +9,8 @@ if(isset($_POST['ADD_job'])){
     else{
         $sql = "INSERT INTO `tbl_job`( `job`) VALUES ('$job') ";
         $result = $mysqli->query($sql);
-        header('Location: admin.php?job=QLNS&action=permission');
+        echo "<meta http-equiv='refresh' content='0'>";
+
     }
 }
 ?>

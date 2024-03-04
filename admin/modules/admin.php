@@ -1,12 +1,21 @@
 <?php 
     session_start();
-    if(!isset($_SESSION['mailAdmin'])){
+    if($_SESSION['boolUser']){
+        if(!isset($_SESSION['username_Login'])){
+        header('Location:userlogin.php');
+        }
+    }
+    elseif(!isset($_SESSION['mailAdmin'])){
         header('Location:login.php');
     }
     if(isset($_GET['logout']) && $_GET['logout']=='true'){
-        unset($_SESSION['mailAdmin']);
-        header('Location:login.php');
-
+        if($_SESSION['boolUser'] ){
+            unset($_SESSION['boolUser']);
+            header('Location:userlogin.php');
+        }else{
+            unset($_SESSION['mailAdmin']);
+            header('Location:login.php');
+        }
     }
 ?>
 

@@ -603,3 +603,9 @@ textarea::placeholder {
     margin: 10px 2%;
     justify-content: flex-start;
 }
+
+.map {
+    width: 100%;
+    height: auto;
+    scrollbar-width: 3px;
+}

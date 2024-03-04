@@ -31,6 +31,7 @@ if (isset($_POST['modifyPC'])) {
             `note` = '$note',
             `quytrinh` = '$quytrinh',
             `total` = '$total',
+            `taikhoanchi` = '$taikhoanchi',
             `bool_VAT` = '$bool_VAT'
             WHERE `id` = '$idPhieuChi'";  // Adjust the WHERE clause according to your identifier
 
@@ -117,13 +118,50 @@ if (isset($_FILES['imgHoaDon'])) {
     }
     echo "<meta http-equiv='refresh' content='0'>";
 }
-if (isset($_POST['ApprovePC'])) {
-    $linkDel = $_POST['ImgDel'];
-    $sql = "DELETE FROM `tbl_imgphieuchi` WHERE `codePhieuChi`='$idPhieuChi' AND `link`='$linkDel'";
-    $query = mysqli_query($mysqli, $sql);
-    echo "<meta http-equiv='refresh' content='0'>";
+// if (isset($_POST['ApprovePC'])) {
+//     $linkDel = $_POST['ImgDel'];
+//     $sql = "DELETE FROM `tbl_imgphieuchi` WHERE `codePhieuChi`='$idPhieuChi' AND `link`='$linkDel'";
+//     $query = mysqli_query($mysqli, $sql);
+//     echo "<meta http-equiv='refresh' content='0'>";
+// }
+if($_SESSION['boolUser']){
+    $phanquyenDuyet = getPhanQuyenDuyet($_SESSION['userINFO']['username']);
+    echo $phanquyenDuyet;
 }
+if(isset($_POST['ApprovePC'])){
+    if(!$infoPhieuChi['bool_VAT']){
+        if($infoPhieuChi['taikhoanchi']=='Tiền Mặt'){
+            if($infoPhieuChi['total'] < 500000){
+                if(getPhanQuyenDuyet($_SESSION['userINFO']['username']) == 'thuquy'){
+                    $id = $infoPhieuChi['id'];
+                    $sql = " UPDATE `tbl_phieuchi` SET `bool_approveBy_TQ`= 1,`bool_AllApprove`=1 WHERE `id` = '$id'";
+                    $query = mysqli_query($mysqli, $sql);
+                }
+            }else{
+                if(getPhanQuyenDuyet($_SESSION['userINFO']['username']) == 'thuquy'){
+                    $id = $infoPhieuChi['id'];
+                    $sql = " UPDATE `tbl_phieuchi` SET `bool_approveBy_TQ`= 1 WHERE `id` = '$id'";
+                    $query = mysqli_query($mysqli, $sql);
+                }elseif(getPhanQuyenDuyet($_SESSION['userINFO']['username']) == 'admin1'){
+                    $id = $infoPhieuChi['id'];
+                    $sql = " UPDATE `tbl_phieuchi` SET `bool_approveBy_ADMIN1`= 1 ,`bool_AllApprove`=1  WHERE `id` = '$id'";
+                    $query = mysqli_query($mysqli, $sql);
+                }
+            }
+        }elseif($infoPhieuChi['taikhoanchi']=='Ngân hàng cá nhân '){
+            if(getPhanQuyenDuyet($_SESSION['userINFO']['username']) == 'thuquy'){
+                $id = $infoPhieuChi['id'];
+                $sql = " UPDATE `tbl_phieuchi` SET `bool_approveBy_TQ`= 1 WHERE `id` = '$id'";
+                $query = mysqli_query($mysqli, $sql);
+            }elseif(getPhanQuyenDuyet($_SESSION['userINFO']['username']) == 'admin2'){
+                $id = $infoPhieuChi['id'];
+                $sql = " UPDATE `tbl_phieuchi` SET `bool_approveBy_ADMIN2`= 1 ,`bool_AllApprove`=1  WHERE `id` = '$id'";
+                $query = mysqli_query($mysqli, $sql);
+            }
+        }
 
+    }
+}
 //FUNCTION
 function insertImgtoDB($id, $link)
 {
@@ -313,29 +351,14 @@ function uploadToImgur($file, $title)
                     <div class="inputHaveLable">
                         <label for="supervisor"> Loại Tài khoản</label>
                         <select name="loaitaikhoan" id="loaitaikhoan">
-                            <?php
-                            foreach (getAllLoaiTaiKhoan() as $row) {
-                                ?>
-                                <?php
-                                if ($row['name'] == $infoPhieuChi['$taikhoanchi']) {
-                                    ?>
-                                    <option selected value="<?php echo $row['name'] ?>">
-                                        <?php echo $row['name'] ?>
-                                    </option>
-                                    <?php
-                                } else {
-                                    ?>
-                                    <option value="<?php echo $row['name'] ?>">
-                                        <?php echo $row['name'] ?>
-                                    </option>
-
-                                    <?php
-                                }
-                                ?>
-                                <?php
-                            }
-                            ?>
+                            <?php foreach (getAllLoaiTaiKhoan() as $row): ?>
+                                <option <?php echo ($row['name'] == $infoPhieuChi['taikhoanchi']) ? 'selected' : ''; ?>
+                                    value="<?php echo $row['name']; ?>">
+                                    <?php echo $row['name']; ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
+
                     </div>
                     <div class="inputHaveLable oneRow">
                         <label for=""> Tổng tiền duyệt chi: </label>
@@ -359,14 +382,82 @@ function uploadToImgur($file, $title)
                 <div class="bodyofForm">
                     <textarea name="note" id="" cols="30" rows="10" placeholder="Ghi chú" autocomplete="list"
                         aria-haspopup="true"></textarea>
+                    <?php 
+                        if($_SESSION['admin'] || checkPerOfUser(20, $_SESSION['userINFO']['id'])) {
+                            if(!$_SESSION['admin']){
+                                if($infoPhieuChi['taikhoanchi']=="Tiền Mặt" ){
+                                    if(( $phanquyenDuyet == "admin1" || $phanquyenDuyet == "thuquy")){
+                                        if(($phieuchi->getSTT_PC($phanquyenDuyet,$idPhieuChi)) == 1){
+                                            $content_BTN_DUYET = "Đã duyệt trong quyền hạn!";
+                                            $disable_BTN_DUYET = 1;
+                                        } elseif(($phieuchi->getSTT_PC($phanquyenDuyet,$idPhieuChi)) == 99){
+                                            $content_BTN_DUYET = "Phiếu chi đã duyệt!";
+                                            $disable_BTN_DUYET = 1;
+                                        }else{
+                                            $content_BTN_DUYET = "Duyệt phiếu chi";
+                                            $disable_BTN_DUYET = 0;
+                                        }
+                                    }else{
+                                        $content_BTN_DUYET = "Không đủ quyền hạn - Tài Khoản chi";
+                                        $disable_BTN_DUYET = 1;
+                                    }
 
-                    <button type="submit" name="ApprovePC"
-                        style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Duyệt phiếu
-                        chi</button>
-                        <button type="submit" name="modifyPC"
-                        style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Xác nhận sửa phiếu
-                        chi</button>
-                        <button type="submit" name="deletePC">Xóa phiếu chi</button>
+                                }elseif($infoPhieuChi['taikhoanchi'] != "Tiền Mặt" ){
+                                    if(( $phanquyenDuyet == "admin2" || $phanquyenDuyet == "ketoan" || $phanquyenDuyet == "thuquy")){
+                                        if(($phieuchi->getSTT_PC($phanquyenDuyet,$idPhieuChi)) == 1){
+                                            $content_BTN_DUYET = "Đã duyệt trong quyền hạn!";
+                                            $disable_BTN_DUYET = 1;
+                                        } elseif(($phieuchi->getSTT_PC($phanquyenDuyet,$idPhieuChi)) == 99){
+                                            $content_BTN_DUYET = "Phiếu chi đã duyệt!";
+                                            $disable_BTN_DUYET = 1;
+                                        }else{
+                                            $content_BTN_DUYET = "Duyệt phiếu chi";
+                                            $disable_BTN_DUYET = 0;
+                                        }
+                                    }else{
+                                        $content_BTN_DUYET = "Không đủ quyền hạn - Tài Khoản chi";
+                                        $disable_BTN_DUYET = 1;
+                                    }
+                                }
+                            }else{
+                                $content_BTN_DUYET = "Duyệt phiếu chi";
+                                $disable_BTN_DUYET = 0;
+                            }
+
+                            ?>
+                            <button type="submit" name="ApprovePC"style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);" <?php echo $disable_BTN_DUYET ? 'disabled' : ''; ?>> 
+                                <?php 
+                                    echo $content_BTN_DUYET;
+                                ?>    
+                            </button>
+                            <?php
+                        }
+                    ?>
+                    <?php 
+                        if(!$_SESSION['admin']){
+                            if($phieuchi->blockModify_PC($idPhieuChi, $phanquyenDuyet) == 0){
+                                $content_BTN_modifyDUYET = "Sửa phiếu chi";
+                                $disable_BTN_modifyDUYET = 0;
+                            }else{
+                                $content_BTN_modifyDUYET = "Cấp cao hơn đã duyệt, không thể sửa !";
+                                $disable_BTN_modifyDUYET = 1;
+                            }
+                        }else{
+                            $content_BTN_modifyDUYET = "Sửa phiếu chi";
+                                $disable_BTN_modifyDUYET = 0;
+                        }
+                    ?>
+                    <button type="submit" name="modifyPC" <?php echo $disable_BTN_modifyDUYET == 1 ? 'disabled':'' ?>
+                    style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);"> <?php echo $content_BTN_modifyDUYET  ?></button>                    
+
+                        <?php 
+                            if($_SESSION['admin'] || checkPerOfUser(19, $_SESSION['userINFO']['id'])) {
+                                ?>
+                                    <button type="submit" name="deletePC">Xóa phiếu chi</button>
+
+                                <?php
+                            }
+                        ?>
                 </div>
             </div>
 
@@ -551,7 +642,7 @@ function uploadToImgur($file, $title)
 <h1>Hóa đơn từ tạo lệnh phiếu chi</h1>
 <form action="" method="post" id="addReceipForm" enctype="multipart/form-data">
     <div class="addReceipt">
-        <input type='file' name="imgHoaDon[]" id="fileInputaddReceipt" accept=".png, .jpg, .jpeg" multiple />
+        <input type='file' name="imgHoaDon[]" id="fileInputaddReceipt" accept=".png, .jpg, .jpeg" multiple <?php echo $disable_BTN_modifyDUYET==1?'disabled':'' ?> />
         <label for="fileInputaddReceipt" class="lableAddReceipt">Thêm</label>
         <input type="hidden" name="name" placeholder="Tên đề xuất"value="<?php echo $infoPhieuChi['name']; ?>">
         <input type="hidden" name="createDay" value="<?php echo $infoPhieuChi['createDay'] ?>" required disabled>
@@ -737,9 +828,5 @@ calculator_Money();
 </script>
 
 <?php
- foreach (getReceiptOfPC($infoPhieuChi['loaichi'], $infoPhieuChi['id']) as $row) {
-    echo $row['price'].'</br>';
-
- }
 exit();
 ?>

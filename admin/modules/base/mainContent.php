@@ -30,12 +30,16 @@
                     if($action == 'dexuatmua') include('QLDXM/buysuggest.php');
                     if($action == 'phieuchi') include('QLPC/phieuchi.php'); 
                     if($action == 'phieuthu') include('QLNS/department.php');  
+                    if($action == 'quytrinhxetduyet') include('QLQT/QuanlyQuyTrinh.php');  
                 }
                 if($job=="QLDA"){
                     include('QLDA/projectManager.php');
                 }
+                if($job=="DashBoard"){
+                    if($action == 'listJob') include('Dashboard/listJob.php');  
+                }
             }else{
-                include('QLNS/personnel.php');
+                include('QLDXM/buysuggest.php');
             }
         ?>
     </div>

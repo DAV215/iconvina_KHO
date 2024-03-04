@@ -46,8 +46,9 @@
                 $queryJob = mysqli_query($mysqli, $sql);
             }    
         } 
+        echo "<meta http-equiv='refresh' content='0'>";
+
         exit();
-        echo "<script> window.open('modules/admin.php?job=QLNS&action=personnel');</script>";
     }
     function checkValue($x){
         if(isset($_POST[$x])){
@@ -57,8 +58,9 @@
         }
         return $x;
     }
+    // require('QLNS/getdataUser.php');
     
-    
+
 ?>
 
 <h1>Thêm nhân sự</h1>
@@ -89,7 +91,6 @@
                     <input type="email" name="mail" placeholder="Mail" required>
                     <select name="department" id="department" required>
                         <?php
-                    require('QLNS/getdataUser.php');
                     foreach (getDepartment() as $row) {
                         $department = $row['department'];
                     ?>
@@ -124,61 +125,11 @@
                 </div>
 
             </div>
-            <div class="inforForm big">
-                <h2 class="nameForm">Phân quyền</h2>
-                <div class="bodyofForm">
-                    <table class="data_table permissionTable">
-                        <thead>
-                            <tr class="headerTable ">
-                                <th>Công việc</th>
-                                <th> Thêm</th>
-                                <th> Duyệt</th>
-                                <th> Xóa</th>
-                                <th> Sửa</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php
-                            foreach (getAllJob() as $row) {
-                                $job = $row['job'];
-                                $actions = getActionofJob($job);
+            <?php 
+            
+            
+            ?>
 
-                                // Ensure there are at least 4 actions
-                                $existingActions = array_column($actions, 'action');
-
-                                // Define the desired order
-                                $desiredOrder = ["Add", "Aporval", "Del", "Modify"];
-
-                                ?>
-                                <tr>
-                                    <td><?php echo $job; ?></td>
-                                    <?php
-                                    foreach ($desiredOrder as $action) {
-                                        $disabled = !in_array($action, $existingActions);
-                                        $id;
-                                        //tìm id trong mảng nếu có hành động
-                                        if(!$disabled){
-                                            foreach ($actions as $action_) {
-                                                if ($action_['action'] === $action) {
-                                                    $id = $action_['id'];
-                                                }
-                                            }
-                                        }
-                                        ?>
-                                        <td>
-                                            <input type="checkbox" name="Permission[]" value="<?php echo $id; ?>" id="" <?php echo $disabled ? 'disabled' : ''; ?>>
-                                        </td>
-                                    <?php
-                                    }
-                                    ?>
-                                </tr>
-                                <?php
-                            }
-                        ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 </form>

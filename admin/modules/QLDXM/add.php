@@ -13,10 +13,15 @@
         $suppiler_phone = checkValue('suppiler_phone');
         $suppiler_add = checkValue('suppiler_add');
         $note = checkValue('note');
-
+        if($_SESSION['boolUser']){
+            $id_buyer =  $_SESSION['userINFO']['id'];
+        }else{
+            $id_buyer = 210520;
+        }
 
         $sqlAddDMX = "INSERT INTO `tbl_buysuggest` 
         (
+            `id_buyer`,
             `namebuyer`, 
             `nameDXM`, 
             `money`, 
@@ -28,11 +33,11 @@
             `suppiler_phone`, 
             `suppiler_add`, 
             `bool_VAT`, 
-         
             `note`
         ) 
         VALUES 
         (
+            '$id_buyer', 
             '$namebuyer', 
             '$nameDXM', 
             '$money', 
@@ -173,7 +178,7 @@
         }
     }
     
-    include('QLNS/getdataUser.php');
+    // include('QLNS/getdataUser.php');
     $userInfo = getPersonnel($_SESSION['username_Login']);
     $getBuySuggest = new getBuySuggest();
     $ranCode = $getBuySuggest->get1Data('ranCode');

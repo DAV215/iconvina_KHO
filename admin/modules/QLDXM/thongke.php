@@ -8,35 +8,74 @@
     $queryALL = mysqli_query($mysqli, $sqlbuysuggestAll);
     $num_rows = mysqli_num_rows($queryALL);
     $totalPageofBuysuggest = round($num_rows/10, 2);
+    if($_SESSION['boolUser'] && !checkPerOfUser(16, $_SESSION['userINFO']['id'])){
+    $userID = $_SESSION['userINFO']['id'];
 
-    if(isset($_GET['PageofBuysuggest'])){
-        $PageofBuysuggest=$_GET['PageofBuysuggest'];
-        $end = ($PageofBuysuggest-1)*10; 
-        if(isset($_GET['searchBuysuggest'])){
-            $searchBuysuggest = $_GET['searchBuysuggest'];
-            $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
-            `nameDXM` LIKE '%$searchBuysuggest%' OR 
-            `namebuyer` LIKE '%$searchBuysuggest%' OR 
-            `daySuggest` LIKE '%$searchBuysuggest%' OR 
-            `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT  $end,10";
+        if(isset($_GET['PageofBuysuggest'])){
+            $PageofBuysuggest=$_GET['PageofBuysuggest'];
+            $end = ($PageofBuysuggest-1)*10; 
+            if(isset($_GET['searchBuysuggest'])){
+                $searchBuysuggest = $_GET['searchBuysuggest'];
+                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` 
+                WHERE `id_buyer` = '$userID' 
+                AND (`nameDXM` LIKE '%$searchBuysuggest%' OR 
+                    `namebuyer` LIKE '%$searchBuysuggest%' OR 
+                    `daySuggest` LIKE '%$searchBuysuggest%' OR 
+                    `supplier_name` LIKE '%$searchBuysuggest%') 
+                ORDER BY `id` DESC LIMIT $end, 10";
+
+            }else{
+                $sqlbuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$userID' ORDER BY `id` DESC LIMIT $end,10";
+            }
+            $query = mysqli_query($mysqli, $sqlbuysuggest);
         }else{
-            $sqlbuysuggest = "SELECT * FROM `tbl_buysuggest` ORDER BY `id` DESC LIMIT $end,10";
+            if(isset($_GET['searchBuysuggest'])){
+                $searchBuysuggest = $_GET['searchBuysuggest'];
+                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
+                WHERE `id_buyer` = '$userID' 
+                AND(
+                `nameDXM` LIKE '%$searchBuysuggest%' OR 
+                `namebuyer` LIKE '%$searchBuysuggest%' OR 
+                `daySuggest` LIKE '%$searchBuysuggest%' OR 
+                `supplier_name` LIKE '%$searchBuysuggest%' )
+                ORDER BY `id` DESC LIMIT 10";
+            
+            }else{
+                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$userID' ORDER BY `id` DESC LIMIT 10";
+            }
+            $query = mysqli_query($mysqli, $sqlBuysuggest);
         }
-        $query = mysqli_query($mysqli, $sqlbuysuggest);
     }else{
-        if(isset($_GET['searchBuysuggest'])){
-            $searchBuysuggest = $_GET['searchBuysuggest'];
-            $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
-            `nameDXM` LIKE '%$searchBuysuggest%' OR 
-            `namebuyer` LIKE '%$searchBuysuggest%' OR 
-            `daySuggest` LIKE '%$searchBuysuggest%' OR 
-            `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT 10";
-        
+        if(isset($_GET['PageofBuysuggest'])){
+            $PageofBuysuggest=$_GET['PageofBuysuggest'];
+            $end = ($PageofBuysuggest-1)*10; 
+            if(isset($_GET['searchBuysuggest'])){
+                $searchBuysuggest = $_GET['searchBuysuggest'];
+                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
+                `nameDXM` LIKE '%$searchBuysuggest%' OR 
+                `namebuyer` LIKE '%$searchBuysuggest%' OR 
+                `daySuggest` LIKE '%$searchBuysuggest%' OR 
+                `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT  $end,10";
+            }else{
+                $sqlbuysuggest = "SELECT * FROM `tbl_buysuggest` ORDER BY `id` DESC LIMIT $end,10";
+            }
+            $query = mysqli_query($mysqli, $sqlbuysuggest);
         }else{
-            $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest`  ORDER BY `id` DESC LIMIT 10";
+            if(isset($_GET['searchBuysuggest'])){
+                $searchBuysuggest = $_GET['searchBuysuggest'];
+                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
+                `nameDXM` LIKE '%$searchBuysuggest%' OR 
+                `namebuyer` LIKE '%$searchBuysuggest%' OR 
+                `daySuggest` LIKE '%$searchBuysuggest%' OR 
+                `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT 10";
+            
+            }else{
+                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest`  ORDER BY `id` DESC LIMIT 10";
+            }
+            $query = mysqli_query($mysqli, $sqlBuysuggest);
         }
-        $query = mysqli_query($mysqli, $sqlBuysuggest);
     }
+
 ?>
 
 <h1>Đề xuất mua</h1>

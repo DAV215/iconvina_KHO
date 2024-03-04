@@ -407,6 +407,33 @@
             </div>
     </div>
 </form>
+<h1>Hóa đơn từ đề xuất mua</h1>
+<form action="" method="post">
+    <div class="userForm">
+        <div class="mainForm receipt">
+            <?php
+            $imgBuysuggest = getBuySuggest_IMG($id_BuySuggest);
+            foreach ($imgBuysuggest as $link => $value) {
+
+                ?>
+                <div class="receiptItem">
+                    <a href="<?php echo $value['link']; ?>" target="_blank">
+                        <div class="subImg">
+                            <img src="<?php print_r($value['link']) ?>" alt="">
+                        </div>
+                        <div class="subACT">
+                            <input type="hidden" name="ImgDel" value="<?php print_r($value['link']) ?>">
+                            <a href="<?php echo $value['link']; ?>" target="_blank">Chi tiết</a>
+
+                        </div>
+                    </a>
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+    </div>
+</form>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
 function readURL(input) {

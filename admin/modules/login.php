@@ -1,5 +1,9 @@
 <?php 
+
+
     session_start();
+    $_SESSION['boolUser'] = 0;
+    $_SESSION['admin'] = 1;
     include("../config/configDb.php");
     if(isset($_POST['btn_login'])){
         $username = $_POST["username"];

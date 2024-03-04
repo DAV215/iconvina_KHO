@@ -109,7 +109,7 @@
         }
         return $x;
     }
-    include('../modules/QLNS/getdataUser.php');
+    // include('../modules/QLNS/getdataUser.php');
     $userDetail = getUserdetail($_GET['id']);
 
 ?>
@@ -128,9 +128,21 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" name="modifyUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Sửa thông tin</button>
-            <button type="submit" name="deleteUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);" onclick="return confirm('Bạn có chắc xóa người dùng này?')">Xóa người dùng</button>
-            <button type="submit" name="hideUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);" onclick="return confirm('Bạn có chắc tạm khóa người dùng này?')">Tạm ngưng</button>
+            <?php 
+                if ($_SESSION['admin'] || checkPerOfUser(26, $_SESSION['userINFO']['id'])){
+                    ?>
+                        <button type="submit" name="modifyUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Sửa thông tin</button>
+                    <?php
+                }
+
+                if ($_SESSION['admin'] || checkPerOfUser(27, $_SESSION['userINFO']['id'])){
+                    ?>
+                        <button type="submit" name="deleteUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);" onclick="return confirm('Bạn có chắc xóa người dùng này?')">Xóa người dùng</button>
+                        <button type="submit" name="hideUser" style="    background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);" onclick="return confirm('Bạn có chắc tạm khóa người dùng này?')">Tạm ngưng</button>
+                    <?php
+                }
+            ?>
+
         </div>
         <div class="mainForm">
             <div class="inforForm">
@@ -177,7 +189,10 @@
                 </div>
 
             </div>
-            <div class="inforForm big">
+            <?php 
+                if ($_SESSION['admin'] || checkPerOfUser(30, $_SESSION['userINFO']['id'])){
+                    ?>
+                                    <div class="inforForm big">
                 <h2 class="nameForm">Phân quyền</h2>
                 <div class="bodyofForm">
                     <table class="data_table permissionTable">
@@ -236,7 +251,12 @@
                         </tbody>
                     </table>
                 </div>
-            </div>            
+            </div>   
+                    <?php
+                }
+            
+            ?>
+         
         </div>
     </div>
 </form>

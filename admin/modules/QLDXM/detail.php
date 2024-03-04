@@ -2,79 +2,94 @@
     if($_GET['actionChild'] == "buysuggestDetail"){
         $id_BuySuggest = $_GET['idBuySuggest'];
     }
-    include('QLNS/getdataUser.php');
+    if($_SESSION['admin']){
+        if($_SESSION['boolUser'] && !checkPerOfUser(16, $_SESSION['userINFO']['id']) && !checkBuySuggestofUser($id_BuySuggest,$_SESSION['userINFO']['id'])){
+            echo '<script>';
+            echo 'alert("Không có quyền truy cập!");';
+            echo 'window.location.href = "admin.php?job=QLTC&action=dexuatmua";';
+            echo '</script>';
+       }
+    }
+    // include('QLNS/getdataUser.php');
     $infoBuySuggest = getBuySuggestDetail($id_BuySuggest);
     $imgBuysuggest = getBuySuggest_IMG($id_BuySuggest);
 ?>
 <?php 
-    if(isset($_POST['modifyBuySuggest'] ) ){
-        $nameDXM = $_POST['nameDXM'];
-        $money = $_POST['money'];
-        $daySuggest = $_POST['daySuggest'];
-        $supervisor = $_POST['supervisor'];
-        $supplier_name = $_POST['supplier_name'];
-        $bool_VAT = checkValue('bool_VAT')?1:0;
-        $suppiler_phone = checkValue('suppiler_phone');
-        $suppiler_add = checkValue('suppiler_add');
-        $note = checkValue('note');
-
-        $sqlUpdateDMX = "UPDATE `tbl_buysuggest` SET 
-        `nameDXM` = '$nameDXM',
-        `money` = '$money',
-        `daySuggest` = '$daySuggest',
-        `supervisor` = '$supervisor',
-        `supplier_name` = '$supplier_name',
-        `suppiler_phone` = '$suppiler_phone',
-        `suppiler_add` = '$suppiler_add',
-        `bool_VAT` = '$bool_VAT',
-        `note` = '$note'
-        WHERE `id` = $id_BuySuggest";
-        $queryUpdateDMX = mysqli_query($mysqli, $sqlUpdateDMX);
-        echo "<meta http-equiv='refresh' content='0'>";
-    }
-    if(isset($_POST['ImgDel'])){
-        $linkDel = $_POST['ImgDel'];
-        $sql  = "DELETE FROM `tbl_imgbuysugest` WHERE `buysuggestCode`='$id_BuySuggest' AND `link`='$linkDel'";
-        $query = mysqli_query($mysqli, $sql);
-        echo "<meta http-equiv='refresh' content='0'>";
-    }
-    if(isset($_FILES['imgHoaDon']) ){
-        $daySuggest = $_POST['daySuggest'];
-        $nameDXM = $_POST['nameDXM'];
-        $linkImg = [];
-        $imgurData = array(); 
-        $coutImage = count(array_filter($_FILES['imgHoaDon']['tmp_name']));
-        $pathImgTemp = "QLDXM/media/";
-        removeImgTemp($pathImgTemp);
-        if ($coutImage == 1 ) {
-            $uploadedFilePath = $_FILES['imgHoaDon']['tmp_name'][0];
-            $linkImg = uploadToImgur($uploadedFilePath, 'HDBL_DXM_' . $nameDXM.$daySuggest);
-            insertImgtoDB($id_BuySuggest, $linkImg);
+    $temp_PC = new getPhieuChi;
+    $checkHavePC = $temp_PC ->checkHavePC($id_BuySuggest);
+    var_dump(($checkHavePC));
+    if(!$checkHavePC){
+    }else{
+        if(isset($_POST['modifyBuySuggest'] ) ){
+            $nameDXM = $_POST['nameDXM'];
+            $money = $_POST['money'];
+            $daySuggest = $_POST['daySuggest'];
+            $supervisor = $_POST['supervisor'];
+            $supplier_name = $_POST['supplier_name'];
+            $bool_VAT = checkValue('bool_VAT')?1:0;
+            $suppiler_phone = checkValue('suppiler_phone');
+            $suppiler_add = checkValue('suppiler_add');
+            $note = checkValue('note');
+    
+            $sqlUpdateDMX = "UPDATE `tbl_buysuggest` SET 
+            `nameDXM` = '$nameDXM',
+            `money` = '$money',
+            `daySuggest` = '$daySuggest',
+            `supervisor` = '$supervisor',
+            `supplier_name` = '$supplier_name',
+            `suppiler_phone` = '$suppiler_phone',
+            `suppiler_add` = '$suppiler_add',
+            `bool_VAT` = '$bool_VAT',
+            `note` = '$note'
+            WHERE `id` = $id_BuySuggest";
+            $queryUpdateDMX = mysqli_query($mysqli, $sqlUpdateDMX);
+            echo "<meta http-equiv='refresh' content='0'>";
         }
-        elseif ($coutImage > 1){
-            $link ;
-            for ($i=0; $i < $coutImage; $i++) { 
-                $uploadedFilePath = $_FILES['imgHoaDon']['tmp_name'][$i];
-                $link = uploadToImgur($uploadedFilePath, 'HDBL_DXM_' . $nameDXM . $daySuggest);
-                insertImgtoDB($id_newestBuggest, $link);
+        if(isset($_POST['ImgDel'])){
+            $linkDel = $_POST['ImgDel'];
+            $sql  = "DELETE FROM `tbl_imgbuysugest` WHERE `buysuggestCode`='$id_BuySuggest' AND `link`='$linkDel'";
+            $query = mysqli_query($mysqli, $sql);
+            echo "<meta http-equiv='refresh' content='0'>";
+        }
+        if(isset($_FILES['imgHoaDon']) ){
+            $daySuggest = $_POST['daySuggest'];
+            $nameDXM = $_POST['nameDXM'];
+            $linkImg = [];
+            $imgurData = array(); 
+            $coutImage = count(array_filter($_FILES['imgHoaDon']['tmp_name']));
+            $pathImgTemp = "QLDXM/media/";
+            removeImgTemp($pathImgTemp);
+            if ($coutImage == 1 ) {
+                $uploadedFilePath = $_FILES['imgHoaDon']['tmp_name'][0];
+                $linkImg = uploadToImgur($uploadedFilePath, 'HDBL_DXM_' . $nameDXM.$daySuggest);
+                insertImgtoDB($id_BuySuggest, $linkImg);
             }
-        }else{
-            echo "không có ảnh";
-            echo '<script>alert("Nhập hóa đơn");</script>'; 
+            elseif ($coutImage > 1){
+                $link ;
+                for ($i=0; $i < $coutImage; $i++) { 
+                    $uploadedFilePath = $_FILES['imgHoaDon']['tmp_name'][$i];
+                    $link = uploadToImgur($uploadedFilePath, 'HDBL_DXM_' . $nameDXM . $daySuggest);
+                    insertImgtoDB($id_newestBuggest, $link);
+                }
+            }else{
+                echo "không có ảnh";
+                echo '<script>alert("Nhập hóa đơn");</script>'; 
+            }
+            echo "<meta http-equiv='refresh' content='0'>";
         }
-        echo "<meta http-equiv='refresh' content='0'>";
+        if(isset($_POST['approveDXM'])){
+            $bool_approve = 1;
+            $approve_by = $_SESSION['userFullname'];
+    
+            $sqlApprove = "UPDATE `tbl_buysuggest` SET 
+            `bool_approve` = '$bool_approve',
+            `approve_by` = '$approve_by'
+            WHERE `id` = $id_BuySuggest";
+            $queryApprove = mysqli_query($mysqli, $sqlApprove);
+            echo "<meta http-equiv='refresh' content='0'>";
+        }
     }
-    if(isset($_POST['approveDXM'])){
-        $bool_approve = 1;
-        $approve_by = $_SESSION['userFullname'];
 
-        $sqlApprove = "UPDATE `tbl_buysuggest` SET 
-        `bool_approve` = '$bool_approve',
-        `approve_by` = '$approve_by'
-        WHERE `id` = $id_BuySuggest";
-        $queryApprove = mysqli_query($mysqli, $sqlApprove);
-        echo "<meta http-equiv='refresh' content='0'>";
-    }
     //FUNCTION
     function insertImgtoDB($id, $link){
         include('../config\configDb.php');
@@ -251,21 +266,46 @@
                         value="<?php echo $infoBuySuggest['suppiler_phone']; ?>">
                     <input type="text" name="suppiler_add" placeholder="Địa chỉ nhà cung cấp"
                         value="<?php echo $infoBuySuggest['suppiler_add']; ?>">
+                        
                     <textarea name="note" id="" cols="30" rows="10" placeholder="Ghi chú" autocomplete="list"
                         aria-haspopup="true"><?php echo $infoBuySuggest['note']; ?></textarea>
-                    <button type="button">Xóa</button>
-                    <button type="submit" name="modifyBuySuggest"
-                        style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Sửa đề xuất
-                        mua</button>
-                        <?php if($infoBuySuggest['bool_approve'] == 0){
-                            ?>
-                            <a href="admin.php?job=QLTC&action=phieuchi&actionChild=addPhieuChi&idBuySuggest=<?php echo $infoBuySuggest['id']; ?>">Duyệt và lập phiếu chi</a>
                         <?php 
-                        }else{
-                            ?>
-                                <button type="submit" name="modifyPhieuChi_DXM" style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Chi tiết phiếu chi</button>
-                            <?php 
-                        }?>
+                                $temp_PC = new getPhieuChi;
+                                $checkHavePC = $temp_PC ->checkHavePC($id_BuySuggest);
+                                if($checkHavePC){
+                                    ?>
+                                        <h3 style="color:white;">Đã lập phiếu chi không thể thay đổi đề xuất mua !</h3>
+                                    <?php
+                                }else{
+                                    ?>
+                                        <button type="button">Xóa</button>
+                                        <button type="submit" name="modifyBuySuggest"
+                                            style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);">Sửa đề xuất
+                                            mua</button>           
+                                    <?php
+                                }
+                            
+  
+                        ?>
+
+                        <?php 
+                            if($_SESSION['admin'] || checkPerOfUser(16, $_SESSION['userINFO']['id'])) {
+                                $temp_PC = new getPhieuChi;
+                                $checkHavePC = $temp_PC ->checkHavePC($id_BuySuggest);
+                                if(!$checkHavePC){
+                                    ?>
+                                        <a href="admin.php?job=QLTC&action=phieuchi&actionChild=addPhieuChi&idBuySuggest=<?php echo $infoBuySuggest['id']; ?>">Duyệt và lập phiếu chi</a>
+                                    <?php
+                                }else{
+                                    ?>
+                                        <a href="admin.php?job=QLTC&action=phieuchi&actionChild=phieuchiDetail&idPhieuChi=<?php echo $temp_PC->getPC_From_IdBuySuggest($id_BuySuggest)['id'] ?>">Chi tiết phiếu chi</a>
+                                    <?php
+                                }
+                            }
+  
+                        ?>
+
+
                         
                 </div>
             </div>

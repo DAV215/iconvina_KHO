@@ -269,6 +269,85 @@
             }
             return $data;
         }
+        function checkHavePC($id_BuySuggest){
+            foreach ($this->getAll() as $row) {
+                if ($id_BuySuggest == $row['id_buySuggest']) {
+                    return 1;
+                }
+            }
+            return 0;  // Return 0 only after checking all rows
+        }
+        function getPC_From_IdBuySuggest($id_BuySuggest){
+            foreach ($this->getAll() as $row) {
+                if ($id_BuySuggest == $row['id_buySuggest']) {
+                    return $row;
+                }
+            }
+            return null;
+        }
+        function getSTT_PC($Permission, $id_PC){
+            include('../config/configDb.php');
+            $PC = $this->getPhieuChiDetail($id_PC);
+            if(!$PC['bool_AllApprove']){
+                if($Permission == 'thuquy'){
+                    if($PC['bool_approveBy_TQ']){
+                        return 1;
+                    } else return 0;
+                }elseif($Permission == 'admin1'){
+                    if($PC['bool_approveBy_ADMIN1']){
+                        return 1;
+                    } else return 0;
+                }elseif($Permission == 'admin2'){
+                    if($PC['bool_approveBy_ADMIN2']){
+                        return 1;
+                    } else return 0;
+                }elseif($Permission == 'ketoan'){
+                    if($PC['bool_approveBy_KT']){
+                        return 1;
+                    } else return 0;
+                }else return 0;
+            }else return 99;
+        }
+        function blockModify_PC($id_PC, $Permission){
+            include('../config/configDb.php');
+            $PC = $this->getPhieuChiDetail($id_PC);
+            if( ($Permission == "admin1") || $Permission == "admin2"){
+                return 0;
+            }
+            else{
+                if(!($this->getSTT_PC($Permission,$id_PC) == 99)){
+                    if($Permission == 'thuquy'){
+                        if($PC['bool_approveBy_ADMIN1'] || $PC['bool_approveBy_ADMIN2'] || $PC['bool_approveBy_KT']){
+                            return 1;
+                        }else return 0;
+                    }elseif($Permission == 'ketoan'){
+                        if($PC['bool_approveBy_ADMIN1'] || $PC['bool_approveBy_ADMIN2'] ){
+                            return 1;
+                        }else return 0;
+                    }
+                    else return 0;
+                }else return 1;
+            }
+        }
+        function getPC_Phanquyen($Permission){
+            include('../config/configDb.php');
+            if($Permission == 'thuquy'){
+                $sql = "SELECT * FROM `tbl_phieuchi`";
+            }elseif($Permission == 'admin1'){
+                $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Tiền Mặt'";
+            }elseif($Permission == 'admin2'){
+                $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng cá nhân '";
+            }elseif($Permission == 'ketoan'){
+                $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng công ty'";
+            }
+            
+            $query= mysqli_query($mysqli, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data[] = $row;
+            }
+            return $data;
+        }
     }
     function getReceiptOfPC($loaichi, $id_phieuchi){
         include('../config/configDb.php');
@@ -336,6 +415,63 @@
     
         return $data;
     }
+    function checkPerOfUser($id_role, $id_user){
+        include('../config/configDb.php');
+        $sql = "SELECT COUNT(*) AS count FROM `tbl_user_role` WHERE `id_user`='$id_user' AND `id_role`='$id_role'";
+        $query = mysqli_query($mysqli, $sql);
+        if (!$query) {
+            // Handle the query error if needed
+            echo "Error: " . mysqli_error($mysqli);
+            return false;
+        }
+        $result = mysqli_fetch_assoc($query);
+        $count = $result['count'];
+        return $count;
+    }
+    function checkBuySuggestofUser($id_BuySuggest, $id_user){
+        include('../config/configDb.php');
+        $sql = "SELECT COUNT(*) AS count FROM `tbl_buysuggest` WHERE `id_buyer`='$id_user' AND `id`='$id_BuySuggest'";
+        $query = mysqli_query($mysqli, $sql);
+        if (!$query) {
+            // Handle the query error if needed
+            echo "Error: " . mysqli_error($mysqli);
+            return false;
+        }
+        $result = mysqli_fetch_assoc($query);
+        $count = $result['count'];
+        return $count;
+    }
+    function check_PC_ofBuySuggest($id_BuySuggest){
+        include('../config/configDb.php');
+        $sql = "SELECT COUNT(*) AS count FROM `tbl_phieuchi` WHERE `id_buysuggest`='$id_BuySuggest'";
+        $query = mysqli_query($mysqli, $sql);
+        if (!$query) {
+            // Handle the query error if needed
+            echo "Error: " . mysqli_error($mysqli);
+            return false;
+        }
+        $result = mysqli_fetch_assoc($query);
+        $count = $result['count'];
+        return $count;
+    }
+    function getPhanQuyenDuyet($username){
+        include('../config/configDb.php');
+        $sql = "SELECT * FROM `tbl_phanquyenduyet`";
+        $query = mysqli_query($mysqli, $sql);
+        $data = [];
+        while ($row = mysqli_fetch_array($query)){
+            $data[]= $row;
+        }
+        $i=0;
+        foreach($data as $row){
+            if($row['username']==$username){
+                return $row['permission'];
+                $i = 1;
+            }
+        }
+        if(!$i) return null;
+    }
+
     function get_client_ip() {
         $ipaddress = '';
         if (getenv('HTTP_CLIENT_IP')) {

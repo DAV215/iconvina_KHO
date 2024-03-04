@@ -5,4 +5,10 @@
 <nav class="menu">
     <a href="admin.php?logout=true"><i class="fa-regular fa-bell"></i></a>
     <a href="admin.php?logout=true"><i class="fa-solid fa-power-off"></i></a>
+    <h1>
+        <?php 
+        if($_SESSION['admin']){
+            echo 'ADMIN';
+        }else echo $_SESSION['userINFO']['fullname']; ?>
+    </h1>
 </nav>

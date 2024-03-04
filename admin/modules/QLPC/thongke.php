@@ -1,6 +1,6 @@
 <?php 
     include('../config/configDb.php');
-    include('QLNS/getdataUser.php');
+    // include('QLNS/getdataUser.php');
 
     $classPhieuChi = new getPhieuChi();
     $allPhieuChi = $classPhieuChi->getAll();
@@ -100,7 +100,7 @@ if(isset($_GET['PageofPhieuchi'])){
                 <td><?php echo $i ?></td>
                 <td><?php echo $row['nameproject'] ?? '' ?></td>
                 <td><?php echo $row['name'] ?? '' ?></td>
-                <td><?php echo $row['total'] ?></td>
+                <td><?php echo number_format($row['total']) ?></td>
                 <td><?php echo $row['quytrinh'] ?? '' ?></td>
                 <td><?php echo $row['nguoitaolenh'] ?? '' ?></td>
                 <td><?php echo $row['createDay'] ?? '' ?></td>

@@ -10,7 +10,8 @@ if(isset($_POST['ADD_chucvu'])){
     else{
         $sql = "INSERT INTO `tbl_chucvu`( `department`, `chucvu`) VALUES ('$phong','$chucvu') ";
         $result = $mysqli->query($sql);
-        header('Location: admin.php?job=QLNS&action=department');
+        echo "<meta http-equiv='refresh' content='0'>";
+
     }
 }
 ?>
