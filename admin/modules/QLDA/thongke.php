@@ -24,7 +24,7 @@
         $end = ($PageofProject-1)*10; 
         if(isset($_GET['searchProject'])){
             $searchProject = $_GET['searchProject'];
-            $sqlProject = "SELECT * FROM `tbl_Project` WHERE `name` LIKE '%$searchProject%' LIMIT  $end,10";
+            $sqlProject = "SELECT * FROM `tbl_project` WHERE `name` LIKE '%$searchProject%' LIMIT  $end,10";
     
         }else{
             $sqlUser = "SELECT * FROM `tbl_user` LIMIT $end,10";
@@ -33,9 +33,9 @@
     }else{
         if(isset($_GET['searchProject'])){
             $searchProject = $_GET['searchProject'];
-            $sqlProject = "SELECT * FROM `tbl_Project` WHERE `name` LIKE '%$searchProject%' LIMIT  10";
+            $sqlProject = "SELECT * FROM `tbl_project` WHERE `name` LIKE '%$searchProject%' LIMIT  10";
         }else{
-            $sqlProject = "SELECT * FROM `tbl_Project` LIMIT 10";
+            $sqlProject = "SELECT * FROM `tbl_project` LIMIT 10";
         }
         $query = mysqli_query($mysqli, $sqlProject);
     }

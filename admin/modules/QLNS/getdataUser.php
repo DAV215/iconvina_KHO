@@ -335,13 +335,13 @@
 
             }else{
                 if($Permission == 'thuquy'){
-                    $sql = "SELECT * FROM `tbl_phieuchi`";
+                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ` IS NULL ORDER BY `id` DESC ";
                 }elseif($Permission == 'admin1'){
-                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Tiền Mặt'";
+                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE  `bool_approveBy_TQ`=1  AND `taikhoanchi`='Tiền Mặt' AND `bool_approveBy_ADMIN1`IS NULL ORDER BY `id` DESC";
                 }elseif($Permission == 'admin2'){
-                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng cá nhân '";
+                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE  `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng cá nhân ' AND `bool_approveBy_ADMIN1`IS NULL ORDER BY `id` DESC";
                 }elseif($Permission == 'ketoan'){
-                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng công ty'";
+                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng công ty' AND `bool_approveBy_KT`IS NULL ORDER BY `id` DESC ";
                 }
                 $query= mysqli_query($mysqli, $sql);
                 $data = [];

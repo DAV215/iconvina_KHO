@@ -1,4 +1,6 @@
 <?php 
+            include('../config/configDb.php');
+
     if(isset($_POST['addProject']) && isset($_POST['projectName'])){
         $projectName = $_POST['projectName'];
         $createby_admin = $_SESSION['userFullname'];
