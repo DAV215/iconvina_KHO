@@ -609,3 +609,28 @@ textarea::placeholder {
     height: auto;
     scrollbar-width: 3px;
 }
+
+.lable_row {
+    display: flex;
+    width: 100%;
+    color: #000000;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.heading_TBL input[type="text"] {
+    outline: none !important;
+    border: none;
+}
+
+.roadmap {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    color: #878787;
+}
+
+.roadmap h4.approve_MAP_element {
+    color: #d3460d;
+}

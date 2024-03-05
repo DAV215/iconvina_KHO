@@ -20,10 +20,10 @@
             $UserNameKT= $row['username'];
         }
     }
+
 $phieuchi = new getPhieuChi;
 $phieuchi_Phanquyen = $phieuchi -> getPC_Phanquyen(getPhanQuyenDuyet($_SESSION['userINFO']['username']));
 ?>
-
 <div class="tableComponent">
     <form action="" method="get">
         <div class="searchBox">

@@ -165,7 +165,7 @@ if(isset($_POST['ApprovePC'])){
 //FUNCTION
 function insertImgtoDB($id, $link)
 {
-    include('../config\configDb.php');
+    include('../config/configDb.php');
     $sql = "INSERT INTO `tbl_imgphieuchi`(`codePhieuChi`, `link`)
         VALUES(
             '$id',
@@ -173,9 +173,9 @@ function insertImgtoDB($id, $link)
         )";
     $query = mysqli_query($mysqli, $sql);
 
-    if (!$query) {
-        echo "Error: " . mysqli_error($mysqli);
-    }
+        if (!$query) {
+            echo "Error: " . mysqli_error($mysqli);
+        }
 }
 function compressImage($source, $destination, $quality)
 {
@@ -225,8 +225,10 @@ function removeImgTemp($folderPath)
 function uploadToImgur($file, $title)
 {
     $IMGUR_CLIENT_ID = "2207b606e4513b2";
-    $pathImgTemp = "/media";
+    $pathImgTemp = "../media";
+    chmod($pathImgTemp, 0755);
     // Compress the image
+    chmod($pathImgTemp, 755);
     $compressedImage = compressImage($file, $pathImgTemp, 50);
     // Prepare API post parameters
     $postFields = array(
@@ -261,7 +263,63 @@ function uploadToImgur($file, $title)
     }
 }
 ?>
+<div class="roadmap">
+    <h4 class="approve_MAP_element">Đã lập đề xuất</h4>
+    <h4 class="approve_MAP_element">Đã lập phiếu chi</h4>
 
+    <div class="PC_DUYET" >
+        <?php 
+            if($infoPhieuChi['bool_AllApprove']){
+                ?>
+                    <h4 class="approve_MAP_element">Đã được duyệt</h4>
+                <?php
+            }else{
+                if($infoPhieuChi['bool_approveBy_TQ']){
+                    ?>
+                        <h4 class="approve_MAP_element">Thủ Quỹ đã duyệt</h4>
+                    <?php
+                }else{
+                    ?>
+                        <h4>Thủ Quỹ chưa duyệt</h4>
+                    <?php
+                }
+                if($infoPhieuChi['taikhoanchi']=="Tiền Mặt"){
+                    if($infoPhieuChi['bool_approveBy_ADMIN1']){
+                        ?>
+                            <h4 class="approve_MAP_element">Admin 1 đã duyệt</h4>
+                        <?php
+                    }else{
+                        ?>
+                            <h4>Admin 1 chưa duyệt</h4>
+                        <?php
+                    }
+                }elseif($infoPhieuChi['taikhoanchi']=="Ngân hàng cá nhân "){
+                        if($infoPhieuChi['bool_approveBy_ADMIN2']){
+                            ?>
+                                <h4 class="approve_MAP_element">Admin 2 đã duyệt</h4>
+                            <?php
+                        }else{
+                            ?>
+                                <h4>Admin 2 chưa duyệt</h4>
+                            <?php
+                        }
+                }elseif($infoPhieuChi['taikhoanchi']=="Ngân hàng công ty "){
+                    if($infoPhieuChi['bool_approveBy_KT']){
+                        ?>
+                            <h4 class="approve_MAP_element">Kế toán đã duyệt</h4>
+                        <?php
+                    }else{
+                        ?>
+                            <h4>Kế toán chưa duyệt</h4>
+                        <?php
+                    }
+                }
+            }
+        ?>
+    </div>
+
+
+</div>
 <h1>Chi tiết đề xuất</h1>
 <form action="" method="post" enctype="multipart/form-data">
     <div class="userForm">
@@ -471,11 +529,21 @@ function uploadToImgur($file, $title)
                 <?php
                 if ($infoPhieuChi['loaichi'] == 'Chi mua hàng') {
                     ?>
-                    <div class="bodyofForm calculator" id="loaichi_muahang">    
+  
+                    <div class="bodyofForm calculator" id="loaichi_muahang">  
+                    <div class="cal_row heading_TBL">
+                        <input type="text" style="width: 30%;"  placeholder="Sản phẩm" value="Sản phẩm" disabled>
+                        <input type="text" style="width: 8%;"  placeholder="Số lượng" value="Số lượng" disabled>
+                        <input type="text" style="width: 10%;"  placeholder="Đơn giá" value="Đơn giá" disabled>
+                        <input type="text" style="width: 8%;"  placeholder="Thuế" value="Thuế" disabled>
+                        <input type="text" style="width: 20%;"  disabled value="Thành tiền" disabled>
+                        <button type="button" id="del_cal_row" disabled></button>
+                    </div>
                             <?php
                                 if(count(getReceiptOfPC($infoPhieuChi['loaichi'], $infoPhieuChi['id'])) < 1){
                                 ?>
                                     <div class="bodyofForm calculator" id="loaichi_muahang">
+    
                                         <div class="cal_row">
                                             <input type="text" style="width: 30%;" name="prodName[]" placeholder="Sản phẩm">
                                             <input type="text" style="width: 8%;" name="quantity[]" placeholder="Số lượng">
@@ -513,7 +581,15 @@ function uploadToImgur($file, $title)
                     <?php
                 } elseif ($infoPhieuChi['loaichi'] == 'Chi khác') {
                     ?>
+
                     <div class="bodyofForm calculator" id="loaichi_chikhac">    
+                        <div class="cal_row heading_TBL">
+                            <input type="text" style="width: 30%;"  placeholder="Sản phẩm" value="Mục đích chi" disabled>
+                            <input type="text" style="width: 8%;"  placeholder="Số lượng" value="Số tiền" disabled>
+                            <input type="text" style="width: 8%;"  placeholder="Thuế" value="Thuế" disabled>
+                            <input type="text" style="width: 20%;"  disabled value="Thành tiền" disabled>
+                            <button type="button" id="del_cal_row" disabled></button>
+                        </div>
                     <?php
                     if(count(getReceiptOfPC($infoPhieuChi['loaichi'], $infoPhieuChi['id'])) < 1){
                         ?>
@@ -553,6 +629,7 @@ function uploadToImgur($file, $title)
                     foreach (getReceiptOfPC($infoPhieuChi['loaichi'], $infoPhieuChi['id']) as $row) {
                         ?>
                         <div class="bodyofForm calculator" id="loaichi_tamung">
+                            
                             <div class="cal_row">
       
                                     <select name="prodName[]" id="">

@@ -17,8 +17,8 @@
 <?php 
     $temp_PC = new getPhieuChi;
     $checkHavePC = $temp_PC ->checkHavePC($id_BuySuggest);
-    var_dump(($checkHavePC));
-    if(!$checkHavePC){
+    if($checkHavePC){
+
     }else{
         if(isset($_POST['modifyBuySuggest'] ) ){
             $nameDXM = $_POST['nameDXM'];
@@ -52,6 +52,7 @@
             echo "<meta http-equiv='refresh' content='0'>";
         }
         if(isset($_FILES['imgHoaDon']) ){
+
             $daySuggest = $_POST['daySuggest'];
             $nameDXM = $_POST['nameDXM'];
             $linkImg = [];
@@ -92,7 +93,7 @@
 
     //FUNCTION
     function insertImgtoDB($id, $link){
-        include('../config\configDb.php');
+        include('../config/configDb.php');
         $sql = "INSERT INTO `tbl_imgbuysugest`(`buysuggestCode`, `link`)
         VALUES(
             '$id',
@@ -148,7 +149,7 @@
     }
     function uploadToImgur($file, $title ) {
         $IMGUR_CLIENT_ID = "2207b606e4513b2";
-        $pathImgTemp = "/media";
+        $pathImgTemp = "../media";
         // Compress the image
         $compressedImage = compressImage($file, $pathImgTemp, 50);
         // Prepare API post parameters
@@ -185,7 +186,78 @@
     }
 ?>
 
+<div class="roadmap">
+    <h4 class="approve_MAP_element">Đã lập đề xuất</h4>
+    <?php 
+        if($temp_PC->checkHavePC($id_BuySuggest)){
+            ?>
+                <h4 class="approve_MAP_element">Đã lập phiếu chi</h4>
+            <?php
+        }else{
+            ?>
+                <h4>Chưa lập phiếu chi</h4>
+            <?php
+        }
+    ?>
+    <div class="PC_DUYET" style="display: <?php ($temp_PC->checkHavePC($id_BuySuggest)) == 1 ? 'block':'none'; ?> ;">
+        <?php 
+            if($temp_PC->checkHavePC($id_BuySuggest)){
+                $CheckMap = $temp_PC->getPC_From_IdBuySuggest($id_BuySuggest);
+                if($CheckMap['bool_AllApprove']){
+                    ?>
+                        <h4 class="approve_MAP_element">Đã được duyệt</h4>
+                    <?php
+                }else{
+                    if($CheckMap['bool_approveBy_TQ']){
+                        ?>
+                            <h4 class="approve_MAP_element">Thủ Quỹ đã duyệt</h4>
+                        <?php
+                    }else{
+                        ?>
+                            <h4>Thủ Quỹ chưa duyệt</h4>
+                        <?php
+                    }
+                    if($CheckMap['taikhoanchi']=="Tiền Mặt"){
+                        if($CheckMap['bool_approveBy_ADMIN1']){
+                            ?>
+                                <h4 class="approve_MAP_element">Admin 1 đã duyệt</h4>
+                            <?php
+                        }else{
+                            ?>
+                                <h4>Admin 1 chưa duyệt</h4>
+                            <?php
+                        }
+                    }elseif($CheckMap['taikhoanchi']=="Ngân hàng cá nhân "){
+                            if($CheckMap['bool_approveBy_ADMIN2']){
+                                ?>
+                                    <h4 class="approve_MAP_element">Admin 2 đã duyệt</h4>
+                                <?php
+                            }else{
+                                ?>
+                                    <h4>Admin 2 chưa duyệt</h4>
+                                <?php
+                            }
+                    }elseif($CheckMap['taikhoanchi']=="Ngân hàng công ty "){
+                        if($CheckMap['bool_approveBy_KT']){
+                            ?>
+                                <h4 class="approve_MAP_element">Kế toán đã duyệt</h4>
+                            <?php
+                        }else{
+                            ?>
+                                <h4>Kế toán chưa duyệt</h4>
+                            <?php
+                        }
+                }
+                }
+            }
+        ?>
+    </div>
+
+
+</div>
+
 <h1>Chi tiết đề xuất</h1>
+
 <form action="" method="post" enctype="multipart/form-data">
     <div class="userForm">
         <div class="mainForm">

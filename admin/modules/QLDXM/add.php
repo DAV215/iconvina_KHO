@@ -83,7 +83,7 @@
         echo "<meta http-equiv='refresh' content='0'>";
     }
     function insertImgtoDB($id, $link){
-        include('../config\configDb.php');
+        include('../config/configDb.php');
         $sql = "INSERT INTO `tbl_imgbuysugest`(`buysuggestCode`, `link`)
         VALUES(
             '$id',
@@ -139,9 +139,8 @@
     }
     function uploadToImgur($file, $title ) {
         $IMGUR_CLIENT_ID = "2207b606e4513b2";
-        $pathImgTemp = "/media";
-// or
-// $pathImgTemp = $_SERVER['DOCUMENT_ROOT'] . "/QLDXM/media/";
+        $pathImgTemp = "../media";
+        chmod($pathImgTemp, 0755);
 
         // Compress the image
         $compressedImage = compressImage($file, $pathImgTemp, 50);

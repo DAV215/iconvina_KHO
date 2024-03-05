@@ -331,22 +331,26 @@
         }
         function getPC_Phanquyen($Permission){
             include('../config/configDb.php');
-            if($Permission == 'thuquy'){
-                $sql = "SELECT * FROM `tbl_phieuchi`";
-            }elseif($Permission == 'admin1'){
-                $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Tiền Mặt'";
-            }elseif($Permission == 'admin2'){
-                $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng cá nhân '";
-            }elseif($Permission == 'ketoan'){
-                $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng công ty'";
+            if($Permission != 'thuquy' ||  $Permission == 'admin1' || $Permission == 'admin2' || $Permission == 'ketoan'){
+
+            }else{
+                if($Permission == 'thuquy'){
+                    $sql = "SELECT * FROM `tbl_phieuchi`";
+                }elseif($Permission == 'admin1'){
+                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Tiền Mặt'";
+                }elseif($Permission == 'admin2'){
+                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng cá nhân '";
+                }elseif($Permission == 'ketoan'){
+                    $sql = "SELECT * FROM `tbl_phieuchi` WHERE `bool_approveBy_TQ`=1 AND `taikhoanchi`='Ngân hàng công ty'";
+                }
+                $query= mysqli_query($mysqli, $sql);
+                $data = [];
+                while ($row = mysqli_fetch_array($query)){
+                    $data[] = $row;
+                }
+                return $data;
             }
-            
-            $query= mysqli_query($mysqli, $sql);
-            $data = [];
-            while ($row = mysqli_fetch_array($query)){
-                $data[] = $row;
-            }
-            return $data;
+
         }
     }
     function getReceiptOfPC($loaichi, $id_phieuchi){

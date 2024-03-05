@@ -121,7 +121,7 @@
         echo "<meta http-equiv='refresh' content='0'>";
     }
     function insertImgtoDB($id, $link){
-        include('../config\configDb.php');
+        include('../config/configDb.php');
         $sql = "INSERT INTO  `tbl_imgphieuchi`(`codePhieuChi`, `link`)
         VALUES(
             '$id',
@@ -177,7 +177,8 @@
     }
     function uploadToImgur($file, $title ) {
         $IMGUR_CLIENT_ID = "2207b606e4513b2";
-        $pathImgTemp = "/media";
+        $pathImgTemp = "../media";
+        chmod($pathImgTemp, 0755);
         $compressedImage = compressImage($file, $pathImgTemp, 50);
         // Prepare API post parameters
         $postFields = array(
