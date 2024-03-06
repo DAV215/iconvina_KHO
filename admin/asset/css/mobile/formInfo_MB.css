@@ -17,6 +17,19 @@ html {
     .app {
         margin-left: 0;
     }
+    .userForm {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: 90%;
+        margin-left: 5%;
+        border-radius: 0 !important;
+        background-color: none !important;
+        color: White;
+        font-family: 'Quicksand', sans-serif !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
+    }
     .mainContent {
         width: 96%;
         height: 3000px;
@@ -73,13 +86,9 @@ html {
     .mainForm {
         padding-left: 0px !important;
     }
-    .userForm {
-        width: 100% !important;
-        box-shadow: none;
-        background-color: none;
-    }
     .inforForm {
         width: 100% !important;
+        background-color: none !important;
     }
     .inforForm button,
     .inforForm a {
@@ -119,5 +128,17 @@ html {
         color: #878787;
         flex-wrap: wrap !important;
         flex-direction: column !important;
+    }
+    .subACT a,
+    .subACT button {
+        text-decoration: none;
+        margin: 0 5px !important;
+        font-weight: bolder;
+        color: #000000;
+        background: none;
+        outline: none;
+        border: none;
+        font-family: 'Quicksand', sans-serif !important;
+        font-size: 0.9rem !important;
     }
 }

@@ -6,7 +6,7 @@
         }
     }
     elseif(!isset($_SESSION['mailAdmin'])){
-        header('Location:login.php');
+        header('Location:userlogin.php');
     }
     if(isset($_GET['logout']) && $_GET['logout']=='true'){
         if($_SESSION['boolUser'] ){
@@ -14,7 +14,7 @@
             header('Location:userlogin.php');
         }else{
             unset($_SESSION['mailAdmin']);
-            header('Location:login.php');
+            header('Location:userlogin.php');
         }
     }
 ?>
