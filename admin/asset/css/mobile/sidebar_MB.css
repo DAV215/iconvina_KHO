@@ -18,10 +18,10 @@ html {
     }
     .sidebar-mb {
         width: 100% !important;
-        height: 5%;
+        height: 10%;
         background-color: #edf1f8;
         position: fixed;
-        top: 95% !important;
+        top: 90% !important;
         z-index: 9999;
         overflow-y: scroll !important;
         display: flex;

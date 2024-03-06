@@ -2,89 +2,11 @@
     include('../config/configDb.php');
 
 ?>
-<?php
-
-    $sqlbuysuggestAll = "SELECT * FROM `tbl_buysuggest`";
-    $queryALL = mysqli_query($mysqli, $sqlbuysuggestAll);
-    $num_rows = mysqli_num_rows($queryALL);
-    $totalPageofBuysuggest = round($num_rows/10, 2);
-    if($_SESSION['boolUser'] && !checkPerOfUser(16, $_SESSION['userINFO']['id'])){
-    $userID = $_SESSION['userINFO']['id'];
-
-        if(isset($_GET['PageofBuysuggest'])){
-            $PageofBuysuggest=$_GET['PageofBuysuggest'];
-            $end = ($PageofBuysuggest-1)*10; 
-            if(isset($_GET['searchBuysuggest'])){
-                $searchBuysuggest = $_GET['searchBuysuggest'];
-                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` 
-                WHERE `id_buyer` = '$userID' 
-                AND (`nameDXM` LIKE '%$searchBuysuggest%' OR 
-                    `namebuyer` LIKE '%$searchBuysuggest%' OR 
-                    `daySuggest` LIKE '%$searchBuysuggest%' OR 
-                    `supplier_name` LIKE '%$searchBuysuggest%') 
-                ORDER BY `id` DESC LIMIT $end, 10";
-
-            }else{
-                $sqlbuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$userID' ORDER BY `id` DESC LIMIT $end,10";
-            }
-            $query = mysqli_query($mysqli, $sqlbuysuggest);
-        }else{
-            if(isset($_GET['searchBuysuggest'])){
-                $searchBuysuggest = $_GET['searchBuysuggest'];
-                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
-                WHERE `id_buyer` = '$userID' 
-                AND(
-                `nameDXM` LIKE '%$searchBuysuggest%' OR 
-                `namebuyer` LIKE '%$searchBuysuggest%' OR 
-                `daySuggest` LIKE '%$searchBuysuggest%' OR 
-                `supplier_name` LIKE '%$searchBuysuggest%' )
-                ORDER BY `id` DESC LIMIT 10";
-            
-            }else{
-                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$userID' ORDER BY `id` DESC LIMIT 10";
-            }
-            $query = mysqli_query($mysqli, $sqlBuysuggest);
-        }
-    }else{
-        if(isset($_GET['PageofBuysuggest'])){
-            $PageofBuysuggest=$_GET['PageofBuysuggest'];
-            $end = ($PageofBuysuggest-1)*10; 
-            if(isset($_GET['searchBuysuggest'])){
-                $searchBuysuggest = $_GET['searchBuysuggest'];
-                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
-                `nameDXM` LIKE '%$searchBuysuggest%' OR 
-                `namebuyer` LIKE '%$searchBuysuggest%' OR 
-                `daySuggest` LIKE '%$searchBuysuggest%' OR 
-                `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT  $end,10";
-            }else{
-                $sqlbuysuggest = "SELECT * FROM `tbl_buysuggest` ORDER BY `id` DESC LIMIT $end,10";
-            }
-            $query = mysqli_query($mysqli, $sqlbuysuggest);
-        }else{
-            if(isset($_GET['searchBuysuggest'])){
-                $searchBuysuggest = $_GET['searchBuysuggest'];
-                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest` WHERE 
-                `nameDXM` LIKE '%$searchBuysuggest%' OR 
-                `namebuyer` LIKE '%$searchBuysuggest%' OR 
-                `daySuggest` LIKE '%$searchBuysuggest%' OR 
-                `supplier_name` LIKE '%$searchBuysuggest%' ORDER BY `id` DESC LIMIT 10";
-            
-            }else{
-                $sqlBuysuggest = "SELECT * FROM `tbl_buysuggest`  ORDER BY `id` DESC LIMIT 10";
-            }
-            $query = mysqli_query($mysqli, $sqlBuysuggest);
-        }
-    }
-
-?>
 <?php 
-    $temp_DXM = new getBuySuggest;
-    $idUser = $_SESSION['userINFO']['id'];
-    if(!isset($_GET['PageofBuysuggestMB'])){
-        $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser, 1);
+    if(isset($_GET['searchBuysuggest'])){
+        $searchBuysuggest = $_GET['searchBuysuggest'];
     }else{
-        $page = $_GET['PageofBuysuggestMB'];
-        $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser, $page);
+        $searchBuysuggest = null;
     }
 ?>
 <h1>Đề xuất mua</h1>
@@ -134,8 +56,19 @@
         </thead>
         <tbody>
             <?php
+            $temp_DXM = new getBuySuggest;
+            $idUser = $_SESSION['userINFO']['id'];
+            if(!isset($_GET['searchBuysuggest'])){
+                $search = null;
+            }else $search = $_GET['searchBuysuggest'];
+            if(!isset($_GET['PageofBuysuggestMB'])){
+                $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser, 5,1, $search);
+            }else{
+                $page = $_GET['PageofBuysuggestMB'];
+                $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser,5, $page, $search);
+            }
             $i = 0;
-            while ($row = mysqli_fetch_array($query)) {
+            foreach ($All_DXM as $row) {
                 $i++;
             ?>
             <tr>
@@ -163,21 +96,46 @@
     <div class="Pagination">
         <?php
             $i = 0;
-            while($i < $totalPageofBuysuggest){
+            while($i < $temp_DXM->getNumberPage2($_SESSION['userINFO']['id'], 5, $searchBuysuggest)){
                 $i++;
         ?>
-            <a href="admin.php?job=QLTC&action=dexuatmua&PageofBuysuggest=<?php echo $i?>&searchbuysuggest=<?php echo isset($searchbuysuggest) ? urlencode($searchbuysuggest) : ''; ?>"><?php echo $i?></a>
+            <a href="admin.php?job=QLTC&action=dexuatmua&PageofBuysuggestMB=<?php echo $i ?>&searchBuysuggest=<?php echo isset($searchBuysuggest) ? urlencode($searchBuysuggest) : ''; ?>" 
+                <?php
+                    if(isset($_GET['PageofBuysuggestMB'])){
+                        echo ($_GET['PageofBuysuggestMB'] == $i? 'style="background:tomato;"' : '');
+                    }
+                ?>
+            >
+                <?php echo $i ?>
+            </a>
+
         <?php
             }
         ?>
-    </div>
+    </div> 
 
 
 </div>
 <div class="tableComponent mb">
+    <form action="" method="get" class = "search_MB">
+        <input type="hidden" name="job" value="QLTC">
+        <input type="hidden" name="action" value="dexuatmua">
+        <input type="text" name="searchBuysuggest" placeholder="Tìm đề xuất mua" value="<?php echo isset($_GET['searchBuysuggest']) ? $_GET['searchBuysuggest'] : ''; ?>">
+
+        <button type="submit">Tìm</button>
+    </form>
     <div class="data_table mb">
 
         <?php
+            $temp_DXM = new getBuySuggest;
+            $idUser = $_SESSION['userINFO']['id'];
+            $row_of_page = 3;
+            if(!isset($_GET['PageofBuysuggestMB'])){
+                $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser, $row_of_page,1, $search);
+            }else{
+                $page = $_GET['PageofBuysuggestMB'];
+                $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser,$row_of_page, $page, $search);
+            }
             $i = 0;
             foreach ($All_DXM as $row) {
                 $i++;
@@ -204,16 +162,27 @@
             }
         ?>
     </div>
-    <div class="Pagination">
-        <?php
-            $i = 0;
-            while($i < $temp_DXM->getNumberPage($_SESSION['userINFO']['id'])){
-                $i++;
-        ?>
-            <a href="admin.php?job=QLTC&action=dexuatmua&PageofBuysuggestMB=<?php echo $i ?>&searchbuysuggest=<?php echo isset($searchbuysuggest) ? urlencode($searchbuysuggest) : ''; ?>" <?php echo ($_GET['PageofBuysuggestMB'] == $i? 'style="background:tomato;"' : ''); ?>><?php echo $i ?></a>
+    <div class="allPage">
+        <div class="Pagination mb">
+            <?php
+                $i = 0;
+                while($i < $temp_DXM->getNumberPage2($_SESSION['userINFO']['id'], $row_of_page, $searchBuysuggest)){
+                    $i++;
+            ?>
+                <a href="admin.php?job=QLTC&action=dexuatmua&PageofBuysuggestMB=<?php echo $i ?>&searchBuysuggest=<?php echo isset($searchBuysuggest) ? urlencode($searchBuysuggest) : ''; ?>" 
+                    <?php
+                        if(isset($_GET['PageofBuysuggestMB'])){
+                            echo ($_GET['PageofBuysuggestMB'] == $i? 'style="background:tomato;"' : '');
+                        }
+                    ?>
+                >
+                    <?php echo $i ?>
+                </a>
 
-        <?php
-            }
-        ?>
-    </div> 
+            <?php
+                }
+            ?>
+        </div> 
+    </div>
+
 </div>

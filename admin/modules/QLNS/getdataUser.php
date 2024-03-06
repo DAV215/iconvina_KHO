@@ -248,27 +248,70 @@
                 }
                 return $data;
         }
-        function getNumberPage($id_buyer){
-            $rowOFPage = 3;
+        function getNumberPage($id_buyer, $rowOFPage){
             $numberPage  = ceil(count($this->getDXM_ofUSER($id_buyer))/$rowOFPage);
             return $numberPage;
         }
-        function getDXM_ofUSER_followPAGE( $id_buyer, $page){
-            $rowOFPage = 3;
+        
+        function getNumberPage2($id_buyer, $rowOFPage, $searchBuysuggest){
+            $numberPage  = ceil(count($this->get_ALLDXM_ofUSER_follow_Search($id_buyer, $searchBuysuggest))/$rowOFPage);
+            return $numberPage;
+        }
+         //xác định số lượng phần tử khớp với ID và tìm kiếm và phân trang
+        function getDXM_ofUSER_followPAGE( $id_buyer, $rowOFPage, $page, $searchBuysuggest){
+            if($searchBuysuggest != null){
+                $sql_search =" AND"."
+                (`nameDXM` LIKE '%$searchBuysuggest%' OR 
+                `namebuyer` LIKE '%$searchBuysuggest%' OR 
+                `daySuggest` LIKE '%$searchBuysuggest%' OR 
+                `supplier_name` LIKE '%$searchBuysuggest%')";
+            }else $sql_search = '';
             $number = ($page-1)*$rowOFPage;
             $Permission = checkPerOfUser(16, $id_buyer) ? 1:16;
             include('../config/configDb.php');
-            if($Permission == 16){
-                $sql = "SELECT * FROM `tbl_buysuggest` ORDER BY `id` DESC LIMIT $number, $rowOFPage";
-            }else{
-                $sql = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$id_buyer' ORDER BY `id` DESC LIMIT $number, $rowOFPage";
+            if ($Permission == 16) {
+                $sql = "SELECT * FROM `tbl_buysuggest` WHERE 1" . $sql_search . " ORDER BY `id` DESC LIMIT $number, $rowOFPage";
+            } else {
+                $sql = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$id_buyer'" . $sql_search . " ORDER BY `id` DESC LIMIT $number, $rowOFPage";
             }
                 $query= mysqli_query($mysqli, $sql);
+          
                 $data = [];
                 while ($row = mysqli_fetch_array($query)){
                     $data[] = $row;
                 }
                 return $data;
+        }
+        //xác định số lượng phần tử khớp với ID và tìm kiếm
+        function get_ALLDXM_ofUSER_follow_Search( $id_buyer,  $searchBuysuggest){
+            if ($searchBuysuggest != null) {
+                $sql_search = " AND (
+                    `nameDXM` LIKE '%$searchBuysuggest%' OR 
+                    `namebuyer` LIKE '%$searchBuysuggest%' OR 
+                    `daySuggest` LIKE '%$searchBuysuggest%' OR 
+                    `supplier_name` LIKE '%$searchBuysuggest%'
+                )";
+            } else {
+                $sql_search = '';
+            }
+            
+            $Permission = checkPerOfUser(16, $id_buyer) ? 1 : 16;
+            include('../config/configDb.php');
+            
+            if ($Permission == 16) {
+                $sql = "SELECT * FROM `tbl_buysuggest` WHERE 1" . $sql_search . " ORDER BY `id` DESC ";
+            } else {
+                $sql = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$id_buyer'" . $sql_search . " ORDER BY `id` DESC ";
+            }
+            
+            $query = mysqli_query($mysqli, $sql);
+            
+            $data = [];
+            while ($row = mysqli_fetch_array($query)) {
+                $data[] = $row;
+            }
+            
+            return $data;
         }
     }
     class getPhieuChi{

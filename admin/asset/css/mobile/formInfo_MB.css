@@ -13,6 +13,10 @@ html {
     display: none;
 }
 
+.tableComponent.mb {
+    display: none;
+}
+
 @media screen and (max-width: 800px) {
     .app {
         margin-left: 0;
@@ -140,5 +144,40 @@ html {
         border: none;
         font-family: 'Quicksand', sans-serif !important;
         font-size: 0.9rem !important;
+    }
+    /* ation form */
+    .search_MB {
+        display: flex;
+        gap: 4%;
+    }
+    .search_MB input[type="text"] {
+        width: 75%;
+        outline: none;
+        border: none;
+        border-bottom: 1px solid tomato;
+    }
+    .search_MB button {
+        width: 20%;
+        background-color: #000000;
+        border: none;
+        border-radius: 15px;
+        height: 35px;
+        color: antiquewhite;
+        font-weight: bold;
+    }
+    .allPage {
+        width: 100%;
+        overflow-x: scroll;
+        display: flex;
+        justify-content: flex-start;
+    }
+    .Pagination.mb {
+        flex-direction: row;
+        flex-wrap: nowrap !important;
+        white-space: nowrap;
+        transition: 0.3s ease;
+    }
+    .Pagination.mb a {
+        padding: 0 2px !important;
     }
 }
