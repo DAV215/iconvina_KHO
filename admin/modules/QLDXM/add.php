@@ -286,7 +286,11 @@
                     <input type="text" name="suppiler_add" placeholder="Địa chỉ nhà cung cấp">
                     <textarea name="note" id="" cols="30" rows="10" placeholder="Ghi chú" autocomplete="list"
                         aria-haspopup="true"></textarea>
-
+                    <div class="btn_MB">
+                        <input type='file' name="imgHoaDon[]" id="avt" accept=".png, .jpg, .jpeg" multiple />
+                        <label for="avt">Thêm hóa đơn</label>
+                        <button type="submit" name="addDXM">Nộp đề xuất</button>
+                    </div>
                 </div>
             </div>
 

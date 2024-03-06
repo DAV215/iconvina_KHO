@@ -1,0 +1,122 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif !important;
+}
+
+html {
+    font-family: 'Quicksand', sans-serif !important;
+    scroll-behavior: smooth;
+}
+
+.btn_MB {
+    display: none;
+}
+
+@media screen and (max-width: 800px) {
+    .app {
+        margin-left: 0;
+    }
+    .mainContent {
+        width: 96%;
+        height: 3000px;
+        margin-top: 0px;
+        left: 2%;
+        position: relative;
+    }
+    .tableComponent.pc {
+        display: none;
+    }
+    .tableComponent.mb {
+        display: flex;
+        width: 100%;
+        box-shadow: none;
+        margin: 30px 0;
+    }
+    .data_table.mb {
+        width: 100%;
+        right: 2%;
+        box-shadow: none;
+    }
+    .data_table.mb a {
+        text-decoration: none;
+        color: aliceblue;
+    }
+    .table-item-mb {
+        background-color: rgb(52, 52, 52);
+        border-radius: 20px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        padding: 3px 0;
+        margin: 10px 0;
+    }
+    .table-item-mb ul,
+    .table-item-mb li {
+        text-decoration: none;
+        list-style: none;
+    }
+    .sub_conntent_tbl {
+        display: none;
+    }
+    .table-item-mb button {
+        outline: none;
+        background-color: none;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .stt_of_row {
+        display: flex;
+        gap: 20px;
+    }
+    /* FORM */
+    .mainForm {
+        padding-left: 0px !important;
+    }
+    .userForm {
+        width: 100% !important;
+        box-shadow: none;
+        background-color: none;
+    }
+    .inforForm {
+        width: 100% !important;
+    }
+    .inforForm button,
+    .inforForm a {
+        min-height: 30px !important;
+    }
+    /* ADD_DXM_FORM */
+    .avtGrid {
+        display: none !important;
+    }
+    .btn_MB {
+        display: inline-flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .btn_MB input[type=file] {
+        width: 0;
+        height: 0;
+    }
+    .btn_MB label {
+        background-color: tomato;
+        padding: 13px 5px;
+        border-radius: 10px;
+        position: relative;
+        display: block;
+        font-weight: bolder;
+        width: 40%;
+        text-align: center;
+    }
+    .btn_MB button {
+        width: 50% !important;
+    }
+    .roadmap {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start !important;
+        color: #878787;
+        flex-wrap: wrap !important;
+        flex-direction: column !important;
+    }
+}

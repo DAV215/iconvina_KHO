@@ -77,9 +77,18 @@
     }
 
 ?>
-
+<?php 
+    $temp_DXM = new getBuySuggest;
+    $idUser = $_SESSION['userINFO']['id'];
+    if(!isset($_GET['PageofBuysuggestMB'])){
+        $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser, 1);
+    }else{
+        $page = $_GET['PageofBuysuggestMB'];
+        $All_DXM = $temp_DXM->getDXM_ofUSER_followPAGE($idUser, $page);
+    }
+?>
 <h1>Đề xuất mua</h1>
-<div class="tableComponent">
+<div class="tableComponent pc">
     <form action="" method="get">
         <div class="searchBox">
             <input type="hidden" name="job" value="QLTC">
@@ -107,7 +116,7 @@
             </button>
         </div>
     </form>
-    <table class="data_table">
+    <table class="data_table pc">
         <thead>
             <tr class="headerTable">
                 <div class="rowTitle">
@@ -165,3 +174,46 @@
 
 
 </div>
+<div class="tableComponent mb">
+    <div class="data_table mb">
+
+        <?php
+            $i = 0;
+            foreach ($All_DXM as $row) {
+                $i++;
+            ?>
+            <a href="admin.php?job=QLTC&action=dexuatmua&actionChild=buysuggestDetail&idBuySuggest=<?php echo $row['id']; ?>">
+        
+            <div class="table-item-mb">
+                    <ul class="main_conntent_tbl">
+                        <div class="stt_of_row">
+                            <span><?php echo $row['daySuggest']?></span>
+                            <span style="color:tomato; font-weight:bolder;"><?php echo $row['bool_approve'] ? "Đã duyệt" : "Đang xét duyệt";?></span>
+                        </div>
+                        <li></li>
+                        <li><?php echo $row['namebuyer']?></li>
+                        <li><?php echo $row['nameDXM'].'----'.number_format($row['money'])?></li>
+                    </ul>
+
+                </div>
+        
+            </a>
+                
+
+            <?php
+            }
+        ?>
+    </div>
+</div>
+<div class="Pagination">
+        <?php
+            $i = 0;
+            while($i < $temp_DXM->getNumberPage($_SESSION['userINFO']['id'])){
+                $i++;
+        ?>
+            <a href="admin.php?job=QLTC&action=dexuatmua&PageofBuysuggestMB=<?php echo $i ?>&searchbuysuggest=<?php echo isset($searchbuysuggest) ? urlencode($searchbuysuggest) : ''; ?>" <?php echo ($_GET['PageofBuysuggestMB'] == $i? 'style="background:tomato;"' : ''); ?>><?php echo $i ?></a>
+
+        <?php
+            }
+        ?>
+    </div> 

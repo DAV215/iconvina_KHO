@@ -27,20 +27,19 @@
 ?>
 
 <link rel="stylesheet" href="../asset/css/admin/sidebar.css">
+<link rel="stylesheet" href="../asset/css/moblie/sidebar_MB.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <?php 
     if($_SESSION['admin']){
         ?>
-<div class="sidebar">
+<div class="sidebar pc">
     <div class="sideMenu-Top">
         <ul>
             <?php 
                 if($_SESSION['boolUser']){
-                    ?>
-                        <li onclick="changeActive(this)">Employee IconVina</li>
-                    <?php
+                    echo getUserdetail($_SESSION['userINFO'])['department'].' '.getUserdetail($_SESSION['userINFO'])['chucvu'];
                 }else{
                     ?>
                     <li onclick="changeActive(this)">Admin IconVina</li>
@@ -109,7 +108,7 @@
     }
     else{
         ?>
-        <div class="sidebar">
+        <div class="sidebar pc">
             <div class="sideMenu-Top">
                 <ul>
                     <?php 
@@ -250,6 +249,47 @@
         <?php
     }
 ?>
+<div class="sidebar-mb">
+        <div href="" class="sideMenu-Item-mb">
+            <form action="" method="post">
+                <div class="Main-sideMenu-mb">
+                    <div class="sideMenu-icon-title-mb">
+                        <button type="submit"><i class="fa-solid fa-plus"></i></button>
+                        
+                        <input type="hidden" name="job" value="QLTC">
+                        <input type="hidden" name="action" value="dexuatmua">   
+                        <input type="hidden" name="addBuysuggest" value = "true">
+                        <span class="sideMenu-Title-mb">Tạo đề xuất</span>
+                    </div>
+                </div>
+            </form>
+ 
+        </div>
+        <div href="" class="sideMenu-Item-mb">
+            <div class="Main-sideMenu-mb">
+                <div class="sideMenu-icon-title-mb">
+                    <a href=""><i class="fa-solid fa-bell"></i></a>
+                    <span class="sideMenu-Title-mb">Thông báo</span>
+                </div>
+            </div>
+        </div>
+        <div href="" class="sideMenu-Item-mb">
+            <div class="Main-sideMenu-mb">
+                <div class="sideMenu-icon-title-mb">
+                    <a href=""><i class="fa-solid fa-right-from-bracket"></i></a>
+                    <span class="sideMenu-Title-mb">Đăng xuất</span>
+                </div>
+            </div>
+        </div>
+        <div href="" class="sideMenu-Item-mb">
+            <div class="Main-sideMenu-mb">
+                <div class="sideMenu-icon-title-mb">
+                    <a href=""><i class="fa-solid fa-bars"></i></a>
+                    <span class="sideMenu-Title-mb">Menu</span>
+                </div>
+            </div>
+        </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="../asset/js/sidebar.js"></script>
 <?php 
