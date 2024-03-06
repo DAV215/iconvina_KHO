@@ -204,8 +204,7 @@
             }
         ?>
     </div>
-</div>
-<div class="Pagination">
+    <div class="Pagination">
         <?php
             $i = 0;
             while($i < $temp_DXM->getNumberPage($_SESSION['userINFO']['id'])){
@@ -217,3 +216,4 @@
             }
         ?>
     </div> 
+</div>
