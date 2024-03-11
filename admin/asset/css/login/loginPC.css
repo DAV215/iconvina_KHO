@@ -111,3 +111,37 @@ html {
     box-shadow: none;
     transform: translateY(0);
 }
+
+@media screen and (max-width: 800px) {
+    .logo {
+        display: none !important;
+    }
+    .loginForm {
+        width: 90%;
+        height: 50%;
+        background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        margin-top: 10%;
+        margin-left: calc(5%);
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .loginForm input {
+        width: 90%;
+        height: 40px;
+        margin: 20px 0;
+        outline: none;
+        border: none;
+        background: none !important;
+        border-bottom: solid 2px #ccc;
+    }
+    .loginForm button {
+        width: 90%;
+    }
+    .loginForm h1 {
+        font-weight: bolder;
+    }
+}

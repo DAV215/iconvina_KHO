@@ -18,7 +18,9 @@
             $_SESSION['mailUser'] = $data['mail'];
             $_SESSION['username_Login'] =  $data['username'];
             $_SESSION['userFullname'] =  $data['fullname'];
-            header('Location: ../../PHPmailer/mailControl/loginNoti.php?user=admin&mail='.$data['mail']);
+            // header('Location: ../../PHPmailer/mailControl/loginNoti.php?user=admin&mail='.$data['mail']);
+            header('Location:../../admin/modules/admin.php ');
+
         } else{
             echo '<script>alert("Cút");</script>';
         }

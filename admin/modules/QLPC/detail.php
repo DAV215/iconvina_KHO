@@ -505,7 +505,7 @@ function uploadToImgur($file, $title)
                                 $disable_BTN_modifyDUYET = 0;
                         }
                     ?>
-                    <button type="submit" name="modifyPC" <?php echo $disable_BTN_modifyDUYET == 1 ? 'disabled':'' ?>
+                    <button type="submit" name="modifyPC" <?php echo $disable_BTN_modifyDUYET == 1 ? 'disabled':'' ?>  <?php echo checkPerOfUser(18, $_SESSION['userINFO']['id']) ? '': 'disabled' ?>
                     style="background-image: linear-gradient(147deg, #fe8a39 0%, #fd3838 74%);"> <?php echo $content_BTN_modifyDUYET  ?></button>                    
 
                         <?php 
@@ -522,6 +522,7 @@ function uploadToImgur($file, $title)
 
         </div>
     </div>
+
     <div class="userForm" id="CalMoney_typeLoaichi" style="margin-top:20px;">
         <div class="mainForm">
             <div class="big inforForm">
@@ -545,7 +546,7 @@ function uploadToImgur($file, $title)
                                     <div class="bodyofForm calculator" id="loaichi_muahang">
     
                                         <div class="cal_row">
-                                            <input type="text" style="width: 30%;" name="prodName[]" placeholder="Sản phẩm">
+                                            <input type="text" style="width: 30%;" name="prodName[]" placeholder="Sản phẩm" >
                                             <input type="text" style="width: 8%;" name="quantity[]" placeholder="Số lượng">
                                             <input type="text" style="width: 10%;" name="price[]" placeholder="Đơn giá">
                                             <input type="text" style="width: 8%;" name="tax[]" placeholder="Thuế">
@@ -719,7 +720,7 @@ function uploadToImgur($file, $title)
 <h1>Hóa đơn từ tạo lệnh phiếu chi</h1>
 <form action="" method="post" id="addReceipForm" enctype="multipart/form-data">
     <div class="addReceipt">
-        <input type='file' name="imgHoaDon[]" id="fileInputaddReceipt" accept=".png, .jpg, .jpeg" multiple <?php echo $disable_BTN_modifyDUYET==1?'disabled':'' ?> />
+        <input type='file' name="imgHoaDon[]" id="fileInputaddReceipt" accept=".png, .jpg, .jpeg" multiple <?php echo $disable_BTN_modifyDUYET==1?'disabled':'' ?>  <?php echo checkPerOfUser(18, $_SESSION['userINFO']['id']) ? '': 'disabled' ?>/>
         <label for="fileInputaddReceipt" class="lableAddReceipt">Thêm</label>
         <input type="hidden" name="name" placeholder="Tên đề xuất"value="<?php echo $infoPhieuChi['name']; ?>">
         <input type="hidden" name="createDay" value="<?php echo $infoPhieuChi['createDay'] ?>" required disabled>
@@ -741,7 +742,7 @@ function uploadToImgur($file, $title)
                         <div class="subACT">
                             <input type="hidden" name="ImgDel" value="<?php print_r($value['link']) ?>">
                             <a href="<?php echo $value['link']; ?>" target="_blank">Chi tiết</a>
-                            <button type="submit">Xóa</button>
+                            <button type="submit" <?php echo $disable_BTN_modifyDUYET == 1 ? 'disabled':'' ?> >Xóa</button>
                         </div>
                     </a>
                 </div>
@@ -903,7 +904,30 @@ calculator_Money();
     }
 
 </script>
+<?php 
+    if(!checkPerOfUser(18, $_SESSION['userINFO']['id'])){
+        echo '<script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Get all div elements with the class "cal_row"
+                var calRowDivs = document.querySelectorAll(".cal_row");
+        
+                // Iterate over each "cal_row" div
+                calRowDivs.forEach(function (calRowDiv) {
+                    // Query all input and button elements within the current "cal_row" div
+                    var inputsAndButtons = calRowDiv.querySelectorAll("input, button");
+        
+                    // Set readonly and disabled attributes for each element
+                    inputsAndButtons.forEach(function (element) {
+                        element.setAttribute("readonly", true);
+                        element.setAttribute("disabled", true);
+                    });
+                });
+            });
+        </script>';
+        
 
+    }
+    ?>
 <?php
 exit();
 ?>

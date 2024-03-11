@@ -6,7 +6,7 @@
         }
     }
     elseif(!isset($_SESSION['mailAdmin'])){
-        header('Location:login.php');
+        header('Location:userlogin.php');
     }
     if(isset($_GET['logout']) && $_GET['logout']=='true'){
         if($_SESSION['boolUser'] ){
@@ -14,7 +14,7 @@
             header('Location:userlogin.php');
         }else{
             unset($_SESSION['mailAdmin']);
-            header('Location:login.php');
+            header('Location:userlogin.php');
         }
     }
 ?>
@@ -26,6 +26,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../asset/css/admin/main.css">
+    <link rel="stylesheet" href="../asset/css/mobile/formInfo_MB.css">
+    <link rel="stylesheet" href="../asset/css/mobile/sidebar_MB.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <title>Document</title>

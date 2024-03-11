@@ -408,9 +408,23 @@
                             <img src="<?php print_r($value['link']) ?>" alt="">
                         </div>
                         <div class="subACT">
-                            <input type="hidden" name="ImgDel" value="<?php print_r($value['link']) ?>">
-                            <a href="<?php echo $value['link']; ?>" target="_blank">Chi tiết</a>
-                            <button type="submit">Xóa</button>
+                            <?php 
+                                $temp_PC = new getPhieuChi;
+                                $checkHavePC = $temp_PC ->checkHavePC($id_BuySuggest);
+                                if($checkHavePC){
+                                    ?>
+                                        <a href="<?php echo $value['link']; ?>" target="_blank">Chi tiết</a>
+
+                                    <?php
+                                }else{
+                                    ?>
+                                        <input type="hidden" name="ImgDel" value="<?php print_r($value['link']) ?>">
+                                        <a href="<?php echo $value['link']; ?>" target="_blank">Chi tiết</a>
+                                        <button type="submit">Xóa</button>
+                                    <?php
+                                }
+                            ?>
+
                         </div>
                     </a>
                 </div>

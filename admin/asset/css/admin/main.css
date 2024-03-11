@@ -18,6 +18,7 @@ html {
 
 .mainContent {
     width: 80%;
+    position: absolute !important;
     height: 3000px;
     margin-top: 40px;
     left: 20%;

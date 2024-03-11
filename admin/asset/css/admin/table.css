@@ -234,10 +234,17 @@ td.tacvu {
     background-color: rgb(250, 133, 112);
 }
 
-@media screen and (max-width: 620px) {
+@media screen and (max-width: 900px) {
     .searchBox:hover>.searchInput {
         width: 150px;
         padding: 0 6px;
+    }
+    .Pagination {
+        gap: 5px !important;
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        flex-wrap: wrap !important;
     }
 }
 
