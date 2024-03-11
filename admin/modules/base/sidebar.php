@@ -242,6 +242,21 @@
                 </ul>
             </div>
         </div>
+        <div href="" class="sideMenu-Item">
+            <div class="Main-sideMenu">
+                <div class="sideMenu-icon-title">
+                    <span class="sideMenu-icon"> <i class="fa-solid fa-list"></i></i></i></span>
+                    <span class="sideMenu-Title">Kho vận</span>
+                </div>
+                <button onclick="toggleSubMenu(this)"><i class="fa-solid fa-angle-right"></i></button>
+            </div>
+            <div class="sub-sideMenu ">
+                <ul>
+                    <li><a href="admin.php?job=QLKHO&action=thongke" onclick="changeActive(this)">Thống kê </a></li>
+                    <li><a href="admin.php?job=DashBoard&action=listJob" onclick="changeActive(this)">Công việc cần làm</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
         </div>
         

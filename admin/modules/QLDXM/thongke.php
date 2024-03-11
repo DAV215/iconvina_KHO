@@ -184,5 +184,7 @@
             ?>
         </div> 
     </div>
-
 </div>
+<div class="report">
+        <h3> Tổng đề xuất mua theo tìm kiếm: <?php echo number_format($temp_DXM->getTotal($idUser, $search)) ?></h3>
+    </div>

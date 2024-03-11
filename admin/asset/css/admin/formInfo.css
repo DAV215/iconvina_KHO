@@ -634,3 +634,58 @@ textarea::placeholder {
 .roadmap h4.approve_MAP_element {
     color: #d3460d;
 }
+
+.formLable {
+    color: white !important;
+}
+
+.inforForm input[type="text"],
+.inforForm input[type="number"] {
+    color: black;
+}
+
+.component_CT,
+.item_CT {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.component_CT button,
+.component_CT button:hover,
+.item_CT button,
+.item_CT button:hover {
+    width: 10%;
+    color: #000000;
+    background: none;
+    box-shadow: none;
+}
+
+.Info_tab {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.tab {
+    display: flex;
+    flex-direction: row;
+}
+
+.tab button {
+    background-color: #ccc;
+    border-radius: 0;
+    width: 20%;
+    color: black;
+}
+
+.tab button.active {
+    background-color: black;
+    border-radius: 0;
+    width: 20%;
+    color: white;
+}
+
+.Material input {}

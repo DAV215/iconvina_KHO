@@ -38,6 +38,9 @@
                 if($job=="DashBoard"){
                     if($action == 'listJob') include('Dashboard/listJob.php');  
                 }
+                if($job=="QLKHO"){
+                    if($action == 'thongke') include('QLKHO/code/QLKHO.php');  
+                }
             }else{
                 include('QLDXM/buysuggest.php');
             }

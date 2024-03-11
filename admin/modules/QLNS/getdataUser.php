@@ -267,9 +267,8 @@
                 `supplier_name` LIKE '%$searchBuysuggest%')";
             }else $sql_search = '';
             $number = ($page-1)*$rowOFPage;
-            $Permission = checkPerOfUser(16, $id_buyer) ? 1:16;
             include('../config/configDb.php');
-            if ($Permission == 16) {
+            if (checkPerOfUser(16, $id_buyer)) {
                 $sql = "SELECT * FROM `tbl_buysuggest` WHERE 1" . $sql_search . " ORDER BY `id` DESC LIMIT $number, $rowOFPage";
             } else {
                 $sql = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$id_buyer'" . $sql_search . " ORDER BY `id` DESC LIMIT $number, $rowOFPage";
@@ -295,10 +294,9 @@
                 $sql_search = '';
             }
             
-            $Permission = checkPerOfUser(16, $id_buyer) ? 1 : 16;
             include('../config/configDb.php');
             
-            if ($Permission == 16) {
+            if (checkPerOfUser(16, $id_buyer)) {
                 $sql = "SELECT * FROM `tbl_buysuggest` WHERE 1" . $sql_search . " ORDER BY `id` DESC ";
             } else {
                 $sql = "SELECT * FROM `tbl_buysuggest` WHERE `id_buyer` = '$id_buyer'" . $sql_search . " ORDER BY `id` DESC ";
@@ -312,6 +310,14 @@
             }
             
             return $data;
+        }
+
+        function getTotal($id_buyer,  $searchBuysuggest){
+            $total = 0;
+            foreach($this->get_ALLDXM_ofUSER_follow_Search($id_buyer,  $searchBuysuggest) as $row){
+                $total += $row['money'];
+            }
+            return $total;
         }
     }
     class getPhieuChi{
@@ -430,8 +436,48 @@
                     $data[] = $row;
                 }
                 return $data;
+            } 
+        }
+        function getTotal_ALL(){
+            $total = 0;
+            foreach ($this->getAll() as $row) {
+                $total += $row['total'];
             }
-
+            return $total;
+        }
+        function get_ALLPC_ofUSER_follow_Search( $searchPhieuchi){
+            if ($searchPhieuchi != null) {
+                $sql_search = " AND (
+                    `name` LIKE '%$searchPhieuchi%' OR 
+                    `nguoitaolenh` LIKE '%$searchPhieuchi%' OR 
+                    `taikhoanchi` LIKE '%$searchPhieuchi%' OR 
+                    `createDay` LIKE '%$searchPhieuchi%' OR 
+                    `loaichi` LIKE '%$searchPhieuchi%'
+                )";
+                
+            } else {
+                $sql_search = '';
+            }
+            
+            include('../config/configDb.php');
+            
+            $sql = "SELECT * FROM `tbl_phieuchi` WHERE 1" . $sql_search . " ORDER BY `id` DESC ";
+            
+            $query = mysqli_query($mysqli, $sql);
+            
+            $data = [];
+            while ($row = mysqli_fetch_array($query)) {
+                $data[] = $row;
+            }
+            
+            return $data;
+        }
+        function getTotal($searchPhieuchi){
+            $total = 0;
+            foreach($this->get_ALLPC_ofUSER_follow_Search($searchPhieuchi) as $row){
+                $total += $row['total'];
+            }
+            return $total;
         }
     }
     function getReceiptOfPC($loaichi, $id_phieuchi){

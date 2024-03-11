@@ -11,7 +11,12 @@ $sqlphieuchiAll = "SELECT * FROM `tbl_phieuchi`";
 $queryALL = mysqli_query($mysqli, $sqlphieuchiAll);
 $num_rows = mysqli_num_rows($queryALL);
 $totalPageofPhieuchi = round($num_rows/10, 2);
+if(isset($_GET['searchPhieuchi'])){
+    $searchPhieuchi = $_GET['searchPhieuchi'];
+}else{
+    $searchPhieuchi = '';
 
+}
 if(isset($_GET['PageofPhieuchi'])){
     $PageofPhieuchi = $_GET['PageofPhieuchi'];
     $end = ($PageofPhieuchi-1)*10; 
@@ -93,8 +98,10 @@ if(isset($_GET['PageofPhieuchi'])){
         <tbody>
         <?php
             $i = 0;
+            $total = 0;
             while ($row = mysqli_fetch_array($query)) {
                 $i++;
+                $total += $row['total'];
             ?>
             <tr>
                 <td><?php echo $i ?></td>
@@ -131,6 +138,7 @@ if(isset($_GET['PageofPhieuchi'])){
             }
         ?>
     </div>
-
-
+    <div class="report">
+        <h1>Tổng chi: <?php echo  number_format($classPhieuChi->getTotal($searchPhieuchi)); ?></h1>
+    </div>
 </div>
