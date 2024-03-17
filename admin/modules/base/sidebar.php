@@ -1,4 +1,5 @@
 <?php 
+ob_start(); 
         include_once('QLNS/getdataUser.php');
         include('../config/configDb.php');
         if($_SESSION['boolUser']){
@@ -253,7 +254,10 @@
             <div class="sub-sideMenu ">
                 <ul>
                     <li><a href="admin.php?job=QLKHO&action=thongke" onclick="changeActive(this)">Thống kê </a></li>
-                    <li><a href="admin.php?job=DashBoard&action=listJob" onclick="changeActive(this)">Công việc cần làm</a></li>
+                    <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=addFILE_ADD" onclick="changeActive(this)">Thêm sản phẩm</a></li>
+                    <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=import" onclick="changeActive(this)">Nhập kho</a></li>
+                    <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=export" onclick="changeActive(this)">Xuất kho</a></li>
+                    <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=setting" onclick="changeActive(this)">Thông tin kho</a></li>
                 </ul>
             </div>
         </div>
@@ -307,4 +311,5 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="../asset/js/sidebar.js"></script>
+
 <?php 
