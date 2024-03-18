@@ -82,7 +82,7 @@
         public $name;
         public $quantity;
 
-        public  static $baseDirectory = '../asset/KHO/Material/';
+        public  static $baseDirectory =  __DIR__.'/..'.'/MEDIA/material/';
 
         function __construct($id = null) {
             $this->id = $id;
@@ -115,9 +115,8 @@
             return $db->get_1row('`tbl_info_material`','*',"  `id_item` =  ".$id);
         }
         public static function createFolder($folderName) {
-            $root =  $_SERVER['DOCUMENT_ROOT']. '/ICONVINA_KHO/admin/asset/KHO/Material/';
-            $newFolderPath = $root . $folderName;
-            chmod($newFolderPath,0777);
+            $newFolderPath =self::$baseDirectory . $folderName;
+            // chmod($newFolderPath,0777);
             if (!is_dir($newFolderPath)) {
                 mkdir($newFolderPath, 0777);
             }
@@ -145,8 +144,7 @@
             return $targetDirectory;
         }
         public static function modify_FILE($folderName, $_POST_name_Files){
-            // Specify the target directory for file upload
-            $targetDirectory = $_SERVER['DOCUMENT_ROOT']. '/ICONVINA_KHO/admin/asset/KHO/Material/'. $folderName;
+            $targetDirectory =info_Material::createFolder($folderName);
             if (isset($_FILES[$_POST_name_Files]) && is_array($_FILES[$_POST_name_Files]['tmp_name'])) {
                 $uploadedFiles = count($_FILES[$_POST_name_Files]['tmp_name']);
             
@@ -613,8 +611,7 @@
         public $id;
         public $name;
         public $quantity;
-
-        public  static $baseDirectory = '../asset/KHO/Component/';
+        public  static $baseDirectory =  __DIR__.'/..'.'/MEDIA/component/';
 
         function __construct($id = null) {
             $this->id = $id;
@@ -654,10 +651,7 @@
         }
         
         public static function createFolder($folderName) {
-            $root =  $_SERVER['DOCUMENT_ROOT']. '/ICONVINA_KHO/admin/asset/KHO/Component/';
-            chmod($root, 0777); 
-            $newFolderPath = $root . $folderName;
-            
+            $newFolderPath =self::$baseDirectory . $folderName;
             if (!is_dir($newFolderPath)) {
                 mkdir($newFolderPath, 0777);
             }
@@ -778,8 +772,7 @@
 
     }
     if (isset($_POST["path_Material_Img_DEL"])) {
-        $path = $_SERVER['DOCUMENT_ROOT'].preg_replace('/^\.\.\//', '/ICONVINA_KHO/admin/', $_POST['path_Material_Img_DEL']);
-
+        $path =info_Material::$baseDirectory.$_POST['path_Material_Img_DEL'];
         if (is_file(    $path)) {
             // Attempt to remove the file
             if (unlink($path)) {
@@ -793,7 +786,7 @@
         exit;
     }
     if (isset($_POST["path_Component_Img_DEL"])) {
-        $path = $_SERVER['DOCUMENT_ROOT'].preg_replace('/^\.\.\//', '/ICONVINA_KHO/admin/', $_POST['path_Component_Img_DEL']);
+        $path = info_Component::$baseDirectory. $_POST['path_Component_Img_DEL'];
 
         if (is_file(    $path)) {
             // Attempt to remove the file
@@ -922,15 +915,15 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
             $rowCount++;
         }
         // ob_end_clean();
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer = new Xlsx($spreadsheet);
         $writer->setOffice2003Compatibility(true);
         $filename=time().".xlsx";
         return realpath($filename);
     }
-if(isset($_POST['TREEDATA'])){
-    $id_parent = $_POST['id_parent'];
-    $m =  new component;
-    $data = $m->testDEQUY_5($id_parent);
-    echo json_encode($data);
-}
+    if(isset($_POST['TREEDATA'])){
+        $id_parent = $_POST['id_parent'];
+        $m =  new component;
+        $data = $m->testDEQUY_5($id_parent);
+        echo json_encode($data);
+    }
 ?>

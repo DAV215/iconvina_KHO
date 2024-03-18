@@ -83,13 +83,11 @@
                                 <input type="file" name="img_Material_New[]" id="img_Material_New" multiple
                                     onchange="ADD_Img_Material(this)">
                                 <div class="preview_IMG" id="img_preview_Material_New">
-                                    <img src="" alt="">
                                     <?php 
                                     if(isset($info_Material['link_folder'])){
                                         $images = array('jpg','png','jpeg','gif');
-                                        $path = info_Material::$baseDirectory .$info_Material['link_folder'].'/';
-                                        $files = scandir($path);
-                                        $found = false;
+                                        $path = 'QLKHO\MEDIA\material'.'/' .$info_Material['link_folder'].'/';
+                                        $files = scandir( $path);
                                         foreach($files as $key => $value) {
                                             if($value != '.' && $value != '..'){
                                                 $ext = pathinfo($value, PATHINFO_EXTENSION);
@@ -97,15 +95,16 @@
                                                     ?>
                                                     <div class="sub_preview_Img">
                                                         <img src="<?php echo $path.$value ?>" alt="">
-                                                        <button type="button" class="delete_ITEM_CT" onclick="del_Img_Material('<?php echo $path.$value; ?>')">X</button>
+                                                        <button type="button" class="delete_ITEM_CT" onclick="del_Img_Material('<?php echo $info_Material['link_folder'].'/'.$value; ?>')">X</button>
 
                                                     </div>
                                                     <?php
                                                 }else{
                                                     ?>
                                                     <div class="sub_preview_Img">
-                                                        <a href="#" onclick="openFileInNewTab('<?php echo $path.$value; ?>')"><?php echo $value ?></a>
-                                                        <button type = "button" class="delete_ITEM_CT" onclick="del_Img_Material('<?php echo $path.$value; ?>')">X</button>
+                                                    <a href="<?php echo $path . $value ?>" target="_blank"><?php echo $value ?></a>
+
+                                                        <button type = "button" class="delete_ITEM_CT" onclick="del_Img_Material('<?php echo $info_Material['link_folder'].'/'.$value; ?>')">X</button>
 
                                                     </div>
                                                     <?php

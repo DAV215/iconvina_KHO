@@ -25,7 +25,7 @@
         $info_modify = new info_Component;
         if(info_Component::get_info_Component($id_Component_parent) == null){
             $link_folder = $id_Component_parent.'_'.$name;
-            info_Component::upload_Files($link_folder, 'img_Component');
+            info_Component::modify_FILE($link_folder, 'img_Component');
             $info_modify->addNew($id_Component_parent, $position_Component, $quantity_Component, $code_Component, $link_folder, $note_Component);
         }
         else{
@@ -120,11 +120,10 @@
                                 <input type="file" name="img_Component[]" id="img_Component" multiple
                                     onchange="ADD_new_FILE(this)">
                                 <div class="preview_IMG" id="img_preview_Component">
-                                    <img src="" alt="">
                                     <?php 
                                     if(isset($info_component['link_folder'])){
                                         $images = array('jpg','png','jpeg','gif');
-                                        $path = info_Component::$baseDirectory .$info_component['link_folder'].'/';
+                                        $path = 'QLKHO\MEDIA\component'.'/' .$info_component['link_folder'].'/';
                                         $files = scandir($path);
                                         $found = false;
                                         foreach($files as $key => $value) {
@@ -134,15 +133,15 @@
                                                     ?>
                                                     <div class="sub_preview_Img">
                                                         <img src="<?php echo $path.$value ?>" alt="">
-                                                        <button type="button" class="delete_ITEM_CT" onclick="del_Img_Component('<?php echo $path.$value; ?>')">X</button>
+                                                        <button type="button" class="delete_ITEM_CT" onclick="del_Img_Component('<?php echo $info_component['link_folder'].'/'.$value; ?>')">X</button>
 
                                                     </div>
                                                     <?php
                                                 }else{
                                                     ?>
                                                     <div class="sub_preview_Img">
-                                                        <a href="#" onclick="openFileInNewTab('<?php echo $path.$value; ?>')"><?php echo $value ?></a>
-                                                        <button type = "button" class="delete_ITEM_CT" onclick="del_Img_Component('<?php echo $path.$value; ?>')">X</button>
+                                                        <a href="<?php echo $path . $value ?>" target="_blank"><?php echo $value ?></a>
+                                                        <button type = "button" class="delete_ITEM_CT" onclick="del_Img_Component('<?php echo $info_component['link_folder'].'/'.$value; ?>')">X</button>
 
                                                     </div>
                                                     <?php
@@ -265,6 +264,7 @@
 
 <div id="tbl_taolenhsanxuat" class="tableComponent tabcontent">
                     <?php
+                    $component = new component;
                         $component->testDEQUY_2($id_Component_parent); 
                         echo "<h1>Thống kê vật tư:</h1>";
                         ?>
