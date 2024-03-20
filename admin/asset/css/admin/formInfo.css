@@ -730,3 +730,18 @@ input#img_Component {
     width: 0;
     height: 0;
 }
+
+.tbl_row input {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    margin: 5px 0;
+    color: aliceblue;
+    outline: none;
+    text-align: center;
+}
+
+.sub {
+    display: none;
+    flex-direction: column;
+}

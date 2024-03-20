@@ -14,7 +14,8 @@
             include('export.php');
         }
         if($_GET['actionChild'] == 'setting'){
-            include('setting.php');
+            
+            include('setting_KHO.php');
         }elseif($_GET['actionChild'] == 'MaterialDetail'){
             include('thongke.php');
             include('Material_Detail.php');

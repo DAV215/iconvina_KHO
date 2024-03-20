@@ -255,6 +255,7 @@
         function getALL_WHERE($table,$sql_GET, $sql_WHERE){
             $this->connection();
             $sql = "SELECT " .$sql_GET." FROM ".$table . " WHERE " .$sql_WHERE;
+            // echo $sql;
             $query = mysqli_query($this-> __conn, $sql);
             $data = [];
             while ($row = mysqli_fetch_array($query)){
@@ -753,8 +754,182 @@
         public static function getAll_Where($WHERE){
             return self::getAll('*', $WHERE);
         }
-
+        public static function addNew($array){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_position";
+            $m->add($array);
+        }
+        function update($sum,$where){
+            $InfoSUM = array(
+                'sum'=>$sum
+            );
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_position";
+            $m->update($m->table_, $InfoSUM, $where);
+        }
+        public static function updateSUM(){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_position";
+            foreach( self::getAll('*', '  1 ') as $row){
+                $sum = $row['storage'].' '.$row['row'].' '.$row['col'].' '.$row['shelf_level'];
+                $InfoSUM = array(
+                    'sum'=>$sum
+                );
+                $id = $row['id'];
+                $m->update($m->table_, $InfoSUM, "  id = $id ");
+            }
+        }
     }
+    class Classify{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_classify`',$GET,  $WHERE);
+        }
+        public static function getAll_Where($WHERE){
+            return self::getAll('*', $WHERE);
+        }
+        public static function addNew($array){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_classify";
+            $m->add($array);
+        }
+        function update($sum,$where){
+            $InfoSUM = array(
+                'sum'=>$sum
+            );
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_classify";
+            $m->update($m->table_, $InfoSUM, $where);
+        }
+        public static function updateSUM(){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_classify";
+            foreach( self::getAll('*', '  1 ') as $row){
+                $sum = $row['main_class'].' '.$row['sub_class'].' '.$row['note'];
+                $InfoSUM = array(
+                    'sum'=>$sum
+                );
+                $id = $row['id'];
+                $m->update($m->table_, $InfoSUM, "  id = $id ");
+            }
+        }
+    }
+    class Super_detail{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew($type, $id_material, $id_component, $id_classify, $id_position, $id_business){
+            $array = array(
+                'type' => $type,
+                'id_material' => $id_material,
+                'id_component' => $id_component,
+                'id_classify' => $id_classify,
+                'id_position' => $id_position,
+                'id_business' => $id_business
+            );            
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_super_detail";
+            $m->add($array);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_super_detail`',$GET,  $WHERE);
+        }
+        public static function update($type, $id_material, $id_component, $id_classify, $id_position, $id_business, $where){
+            $array = array(
+                'type' => $type,
+                'id_material' => $id_material,
+                'id_component' => $id_component,
+                'id_classify' => $id_classify,
+                'id_position' => $id_position,
+                'id_business' => $id_business
+            );    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_super_detail";
+            $m->update($m->table_, $array, $where);
+        }
+    }
+    class Bussiness{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew($store, $price_buy, $delivery_fee, $discount, $vat){
+            $array = array(
+                'store' => $store,
+                'price_buy' => $price_buy,
+                'delivery_fee' => $delivery_fee,
+                'discount' => $discount,
+                'vat' => $vat
+            );
+                    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_bussiness";
+            $m->add($array);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_bussiness`',$GET,  $WHERE);
+        }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_bussiness`',$GET,  $WHERE);
+        }
+        public static function update($store, $price_buy, $delivery_fee, $discount, $vat, $where){
+            $array = array(
+                'store' => $store,
+                'price_buy' => $price_buy,
+                'delivery_fee' => $delivery_fee,
+                'discount' => $discount,
+                'vat' => $vat
+            );
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_bussiness";
+            $m->update($m->table_, $array, $where);
+        }
+    }
+////////API FOR POSITION:
+
+if(isset($_POST['new_setting_Position'])){
+    $result = Position::addNew($_POST['Form_new_setting_Position']);
+}
+if(isset($_POST['show_setting_Position'])){
+    $page = $_POST['page_Position'];
+    $offset = ($page - 1) * 10;
+    $search = $_POST['search_Position'];
+    if(isset($search) && $search!=null ){
+        $getAllROW = Position::getAll(' * ', " (sum LIKE '%" . $search . "%'  )");
+        $result = Position::getAll(' * ', " (sum LIKE '%" . $search . "%'  ) ORDER BY `id` DESC LIMIT $offset, 10 ");
+        echo  json_encode(array('data' => $result, 'allRow' => count($getAllROW)));
+    }else{
+        echo  json_encode(array('data' => Position::getAll(' * ', '  1 ORDER BY `id` DESC LIMIT '.$offset.', 10'), 'allRow' => count(Position::getAll(' * ', '  1 ORDER BY `id` DESC '))));
+    }
+
+}
+////////////////////////
+////////API FOR Classify:
+
+if(isset($_POST['new_setting_Classify'])){
+    $result = Classify::addNew($_POST['Form_new_setting_Classify']);
+}
+if(isset($_POST['show_setting_Classify'])){
+    $page = $_POST['page_Classify'];
+    $offset = ($page - 1) * 10;
+    $search = $_POST['search_Classify'];
+    if(isset($search) && $search!=null ){
+        $getAllROW = Classify::getAll(' * ', " (main_class LIKE '%" . $search . "%' OR sub_class LIKE '%" . $search . "%' OR note LIKE '%" . $search . "%' )");
+        $result = Classify::getAll(' * ', " (main_class LIKE '%" . $search . "%' OR sub_class LIKE '%" . $search . "%' OR note LIKE '%" . $search . "%' ) ORDER BY `id` DESC LIMIT $offset, 10 ");
+        echo  json_encode(array('data' => $result, 'allRow' => count($getAllROW)));
+    }else{
+        echo  json_encode(array('data' => Classify::getAll(' * ', '  1 ORDER BY `id` DESC LIMIT '.$offset.', 10'), 'allRow' => count(Classify::getAll(' * ', '  1 ORDER BY `id` DESC '))));
+    }
+}
+////////////////////////
 
     if (isset($_POST["type"])) {
         if($_POST["type"] == 'material'){
