@@ -745,3 +745,49 @@ input#img_Component {
     display: none;
     flex-direction: column;
 }
+
+.v {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.v button {
+    width: 40px;
+    background: tomato;
+    color: black;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    min-height: 0;
+    height: 40px !important;
+    border-radius: 50%;
+    padding: 0;
+}
+
+#modal_addNEW_prods {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: #00000065;
+}
+
+.modal_header {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 100%;
+}
+
+.modal_header button {
+    width: 40px;
+    min-height: 0;
+    height: 40px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    padding: 0;
+    margin: 0;
+}

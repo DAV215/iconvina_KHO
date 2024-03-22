@@ -71,6 +71,12 @@
             $m->table_ = "tbl_material";
             $m->update_($material,$where);
         }
+        public static function update_quantity( $quantity_more, $id){
+            include('config_DB_KHO.php');
+            $sql = "UPDATE `tbl_material` SET `quantity` =  `quantity` + $quantity_more WHERE `id` = $id ";
+            $query = mysqli_query($mysqli_kho, $sql);
+            if($query) return 1;
+        }
         function remove($where){
             $m = new DB_driver_KHO_Material;
             $m->table_ = "tbl_material";
@@ -82,7 +88,7 @@
         public $name;
         public $quantity;
 
-        public  static $baseDirectory =  __DIR__.'/..'.'/MEDIA/material/';
+        public  static $baseDirectory =  __DIR__.'/..'.'//MEDIA//material/';
 
         function __construct($id = null) {
             $this->id = $id;
@@ -118,7 +124,7 @@
             $newFolderPath =self::$baseDirectory . $folderName;
             // chmod($newFolderPath,0777);
             if (!is_dir($newFolderPath)) {
-                mkdir($newFolderPath, 0777);
+                mkdir($newFolderPath, 0777, true);
             }
             return $newFolderPath;
         }
@@ -779,6 +785,10 @@
                 $m->update($m->table_, $InfoSUM, "  id = $id ");
             }
         }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_position`',$GET,  $WHERE);
+        }
     }
     class Classify{
         private $var;
@@ -817,6 +827,10 @@
                 $m->update($m->table_, $InfoSUM, "  id = $id ");
             }
         }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_classify`',$GET,  $WHERE);
+        }
     }
     class Super_detail{
         private $var;
@@ -854,7 +868,7 @@
             $m->update($m->table_, $array, $where);
         }
     }
-    class Bussiness{
+    class Business{
         private $var;
         public function __construct( $var = null) {
             $this->var = $var;
@@ -869,16 +883,16 @@
             );
                     
             $m = new DB_driver_KHO_Material;
-            $m->table_ = "tbl_bussiness";
+            $m->table_ = "tbl_business";
             $m->add($array);
         }
         public static function getAll($GET, $WHERE){
             $db = new DB_driver_KHO_Material;
-            return $db->getAll_WHERE('`tbl_bussiness`',$GET,  $WHERE);
+            return $db->getAll_WHERE('`tbl_business`',$GET,  $WHERE);
         }
         public static function get_1row($GET, $WHERE){
             $db = new DB_driver_KHO_Material;
-            return $db->get_1row('`tbl_bussiness`',$GET,  $WHERE);
+            return $db->get_1row('`tbl_business`',$GET,  $WHERE);
         }
         public static function update($store, $price_buy, $delivery_fee, $discount, $vat, $where){
             $array = array(
@@ -889,10 +903,138 @@
                 'vat' => $vat
             );
             $m = new DB_driver_KHO_Material;
-            $m->table_ = "tbl_bussiness";
+            $m->table_ = "tbl_business";
             $m->update($m->table_, $array, $where);
         }
     }
+    class Record_KHO_SUPERDETAIL{
+        
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew($id_superDetail, $note, $addBy){
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $time  =  date("Y-m-d H:i:s");
+            $array = array(
+                'id_superDetail' => $id_superDetail,
+                'note' => $note,
+                'addBy' => $addBy,
+                'time' => $time
+            );
+                    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_lastupdate";
+            $m->add($array);
+        }
+        public static function check_DIFF($old, $new, $feild){
+            if($old != $new){
+                return '<br>'. $feild ." -- Cũ: $old - Mới: $new".'<br>'; 
+            }else return null;
+        }
+        public static function checkBus($store, $price_buy,$delivery_fee,$discount,$vat, $id_business){
+            $old = Business::get_1row('*', " `id` = $id_business  ");
+            $diff = '';
+            $array = array(
+                'store' => $store,
+                'price_buy' => $price_buy,
+                'delivery_fee' => $delivery_fee,
+                'discount' => $discount,
+                'vat' => $vat
+            );
+            // Compare each field with its corresponding old value
+            foreach ($array as $key => $value) {
+                // Remove the dollar sign ('$') from the key
+                $field = trim($key, '$');
+                if ($old[$field] !== $value) {
+                    $diff .= '<br>'.'Cũ: '.$field.' = '.$old[$field] .'-Mới: '. $field.' = '.$value .'<br>';
+                }
+            }
+            return $diff;
+        }
+        public static function checkCLassify($classify, $id_business){
+            $old = Classify::get_1row('*', " `id` = $id_business  ")['sum'];
+            return self::check_DIFF($old, $classify, 'Danh mục');
+        }
+        public static function checkPosition($Position, $id_position){
+            $old = Position::get_1row('*', " `id` = $id_position  ")['sum'];
+            return self::check_DIFF($old, $Position, 'Vị trí');
+        }
+        public static function checkQuantity_M($quantity, $id_material){
+            $old = material::get_info_Material($id_material)['quantity'];
+            return self::check_DIFF($old, $quantity, 'Số lượng');
+        }        
+        public static function checkQuantity_C($quantity, $id_material){
+            $old = info_Component::get_info_Component($id_material)['quantity'];
+            return self::check_DIFF($old, $quantity, 'Số lượng');
+        }     
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_lastupdate`',$GET,  $WHERE);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_lastupdate`',$GET,  $WHERE);
+        }
+    }
+    class import_material{
+        
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew($created_by,$name, $note){
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $date  =  date("Y-m-d H:i:s");
+            $array = array(
+                'created_by' => $created_by,
+                'date' => $date,
+                'note' => $note,
+                'name' => $name
+            );
+                    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_import";
+            $m->add($array);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_import`',$GET,  $WHERE);
+        }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_import`',$GET,  $WHERE);
+        }
+    }
+    class import_material_detail{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew2($id_import, $id_material, $quantity, $import_price){
+            $array = array(
+                'id_import' => $id_import,
+                'id_material' => $id_material,
+                'quantity' => $quantity,
+                'import_price' => $import_price
+            );
+                    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_import_detail";
+            $m->add($array);
+        }
+        public static function addNew( $array){          
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_import_detail";
+            $m->add($array);
+        }
+    }
+////////API REDORD:
+// -- Material:
+if(isset($_POST['Record_Material_Detail'])){
+    $id = $_POST['id_MDetail_Record'];
+    echo json_encode(Record_KHO_SUPERDETAIL::getAll('*', " id_SuperDetail = $id ORDER BY id DESC"));
+}
 ////////API FOR POSITION:
 
 if(isset($_POST['new_setting_Position'])){
@@ -1061,7 +1203,18 @@ if(isset($_POST['show_setting_Classify'])){
             }
         }
     }
+//////API IMPORT EXPORT
+if(isset($_POST['import'])){
+    if($_POST['add_NEW_PRODS']){
+        $m =  new material;
+        $name = $_POST['form_data']['name'];
+        $quantity = $_POST['form_data']['quantity'];
+        $m->addNew($name, $quantity);
+        $id_newest = $m->getMaterial_WHERE(" `name` =  '$name' AND quantity = $quantity")[0]['id'];
+        echo json_encode($id_newest);
 
+    }
+}
 
 // Function to export data from MySQL table to Excel
 require $_SERVER['DOCUMENT_ROOT']. '/ICONVINA_KHO/vendor/autoload.php'; // Include PhpSpreadsheet library

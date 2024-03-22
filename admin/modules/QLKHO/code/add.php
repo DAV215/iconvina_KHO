@@ -22,6 +22,7 @@
             $link_folder = $id_Material_New.'_'.$name;
             info_Material::upload_Files($link_folder, 'img_Material_New_fix');
             $info_Material->addNew($id_Material_New, $position_Material_New, $code_Material_New, $link_folder, $note_Material_New);
+            header('Location: admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material='.$id_Material_New.'');
         }
         if($_POST['type_relation'] == 'Component'){
             //Material
@@ -62,6 +63,8 @@
                     }
                 }
             }
+            header('Location: admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent='.$id_parent_ADD.'');
+
         }
     }
 ?>
@@ -89,8 +92,6 @@
                         
                         <!-- Tab content -->
                         <div id="common_info" class="tabcontent">
-                            <h3>Vị trí</h3>
-                            <input type="text" name="position_Material_New">
                             <h3>Số lượng</h3>
                             <input type="text" name="quantity_Material_New">
                         </div>
@@ -107,7 +108,7 @@
                                 <input type="file" name="img_Material_New_fix[]" id="img_Material_New" multiple
                                     onchange="preview_IMG(this, 'img_preview_Material_New')">
                                 <div class="preview_IMG" id="img_preview_Material_New">
-                                    <img src="" alt="">
+                              
                                 </div>
                             </div>
                         </div>
@@ -157,7 +158,7 @@
 
     </div>
 </form>
-
+<script src="../asset/js/KHO/settingKho.js"></script>
 <script>
 function hide_div_Material() {
     var type_relation = document.querySelector('select[name=type_relation]').value;

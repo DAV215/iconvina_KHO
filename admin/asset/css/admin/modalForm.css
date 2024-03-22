@@ -1,273 +1,42 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap");
-*,
-*:before,
-*:after {
-    /* box-sizing: border-box; */
-}
-
-
-/* Some basic CSS overrides */
-
-body {
-    line-height: 1.5;
-    min-height: 100vh;
-}
-
-
-/* End basic CSS override */
-
-* {
-    scrollbar-width: 0;
-}
-
-*::-webkit-scrollbar {
-    background-color: transparent;
-    width: 12px;
-}
-
-*::-webkit-scrollbar-thumb {
-    border-radius: 99px;
-    border: 4px solid #fff;
-}
-
-.modal {
+#modal_addNEW_prods {
+    width: 100%;
+    height: 100%;
     position: fixed;
     top: 0;
-    left: 0;
     right: 0;
+    left: 0;
     bottom: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 999999999999999999999999;
-    background: #00000094;
+    background: rgba(59, 59, 58, 0.379);
+    z-index: 9999999;
+    margin: 0;
 }
 
-.modal-container {
-    max-height: 90vh;
-    max-width: 90vh;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 15px 30px 0 rgba(#000, 0.25);
-    @media (max-width: 600px) {
-        width: 90%;
-    }
-}
-
-.modal-container-header {
-    padding: 16px 32px;
-    border-bottom: 1px solid #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.modal-container-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    line-height: 1;
-    font-weight: 700;
-    font-size: 1.125;
-    svg {
-        width: 32px;
-        height: 32px;
-        color: #750550;
-    }
-}
-
-.modal-container-body {
-    padding: 24px 32px 51px;
-    overflow-y: auto;
-}
-
-.modal-container-body img {
-    width: 100%;
-    height: auto;
-}
-
-.rtf {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        font-weight: 700;
-    }
-    h1 {
-        font-size: 1.5rem;
-        line-height: 1.125;
-    }
-    h2 {
-        font-size: 1.25rem;
-        line-height: 1.25;
-    }
-    h3 {
-        font-size: 1rem;
-        line-height: 1.5;
-    }
-    &>*+* {
-        margin-top: 1em;
-    }
-    &>*+ :is(h1,
-    h2,
-    h3) {
-        margin-top: 2em;
-    }
-    &> :is(h1,
-    h2,
-    h3)+* {
-        margin-top: 0.75em;
-    }
-    ul,
-    ol {
-        margin-left: 20px;
-        list-style-position: inside;
-    }
-    ol {
-        list-style: numeric;
-    }
-    ul {
-        list-style: disc;
-    }
-}
-
-.modal-container-footer {
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    border-top: 1px solid #ddd;
-    gap: 12px;
+.bodyofForm.modal_main {
+    position: fixed;
     position: relative;
-    &:after {
-        content: "";
-        display: block;
-        position: absolute;
-        top: -51px;
-        left: 24px;
-        right: 24px;
-        height: 50px;
-        flex-shrink: 0;
-        background-image: linear-gradient(to top, rgba(#fff, 0.75), transparent);
-        pointer-events: none;
-    }
+    width: 30%;
+    top: 20px;
+    right: 0;
+    left: 35%;
+    background: #2f3432;
+    padding: 20px;
+    color: #ccc;
 }
 
-.modal .button {
-    padding: 12px 20px;
-    border-radius: 8px;
-    background-color: transparent;
-    border: 0;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.15s ease;
-    &.is-ghost {
-        &:hover,
-        &:focus {
-            background-color: #dfdad7;
-        }
-    }
-    &.is-primary {
-        background-color: #750550;
-        color: #fff;
-        &:hover,
-        &:focus {
-            background-color: #4a0433;
-        }
-    }
+.bodyofForm.modal_main input {
+    width: 100%;
+    color: #ccc;
+    font-size: 1.25rem;
 }
 
-.modal-container-footer input[type=file] {
-    display: none;
-}
-
-label[for=file] {
-    display: grid;
-    grid-auto-flow: column;
-    grid-gap: .5em;
-    justify-items: center;
-    align-content: center;
-    color: #E91E63;
-    border: .2em solid #E91E63;
-    background: hsl(0 0 0/0);
-    padding: .85em 1.5em;
-    color: #E91E63;
-    border-radius: 2em;
-    transition: 1s;
-}
-
-label[for=file]:hover,
-label[for=file]:focus,
-label[for=file]:active {
-    background: #E91E63;
-    color: #fff;
-}
-
-.icon-button {
-    padding: 0;
-    border: 0;
-    background-color: transparent;
-    width: 40px;
-    height: 40px;
+.modal_footer {
+    width: 100%;
+    gap: 10%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: 0.15s ease;
-    svg {
-        width: 24px;
-        height: 24px;
-    }
-    &:hover,
-    &:focus {
-        background-color: #dfdad7;
-    }
 }
 
-
-/* CSS */
-
-.delete-button {
-    background: #FF4742;
-    border: 1px solid #FF4742;
-    border-radius: 6px;
-    box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
-    box-sizing: border-box;
-    color: #FFFFFF;
-    cursor: pointer;
-    display: inline-block;
-    font-family: nunito, roboto, proxima-nova, "proxima nova", sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    line-height: 16px;
-    min-height: 40px;
-    outline: 0;
-    padding: 12px 14px;
-    text-align: center;
-    text-rendering: geometricprecision;
-    text-transform: none;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    vertical-align: middle;
-}
-
-.delete-button:hover,
-.delete-button:active {
-    background-color: initial;
-    background-position: 0 0;
-    color: #FF4742;
-}
-
-.delete-button:active {
-    opacity: .5;
+.modal_footer button {
+    font-size: 1.25rem;
+    width: 45%;
+    background: tomato;
 }

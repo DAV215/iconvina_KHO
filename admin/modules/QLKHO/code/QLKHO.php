@@ -6,7 +6,6 @@
             include('add.php');
         }
         if($_GET['actionChild'] == 'import'){
-            include('thongke.php');
             include('import.php');
         }
         if($_GET['actionChild'] == 'export'){

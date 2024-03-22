@@ -322,3 +322,47 @@ function getPageClassify(button) {
     pagenumber_Classify = $(button).text();
 }
 show_setting_Classify();
+
+function showRecord(id_MDetail_Record) {
+    $.ajax({
+
+        url: "QLKHO/code/getdata_Kho.php",
+        data: {
+            Record_Material_Detail: 1,
+            id_MDetail_Record: id_MDetail_Record
+        }, // <-- send form data directly
+        dataType: 'JSON', // <-- what to expect back from the PHP script, if anything
+        type: 'post',
+        success: function(result) {
+            for (let i = 0; i < result.length; i++) {
+                let m = result[i];
+                let str = `
+                    <tr>
+                        <td>${i+1}</td>
+                        <td>${m['addBy']}</td>
+                        <td style="width:50%;">${m['note']}</td>
+                        <td>${m['time']}</td>
+                        <td class="tacvu">
+                            <a href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=${m['id']}">
+                                Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                `;
+                // Append the row to the tbody
+                $("#tbody_history_Material_Change").append(str);
+            }
+        },
+        error: function() {
+            alert('Error in AJAX request');
+        }
+    });
+}
+
+function toggleVisibility(id) {
+    if ($(id).css('display') === 'none') {
+        $(id).css('display', 'block');
+    } else {
+        $(id).css('display', 'none');
+    }
+}

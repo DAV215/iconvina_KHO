@@ -6,13 +6,15 @@
         $super_detail = Super_detail::getAll('*', " `id_material` = $id_material ")[0];
         $position_db = isset(Position::getAll('sum','`id` = '.$super_detail['id_position'].'')[0]['sum'])?Position::getAll('sum','`id` = '.$super_detail['id_position'].'')[0]['sum']:'';
         $classify_db = isset(Classify::getAll('sum','`id` = '.$super_detail['id_classify'].'')[0]['sum'])?Classify::getAll('sum','`id` = '.$super_detail['id_classify'].'')[0]['sum']:'';
-        $bussiness_db = isset(Bussiness::get_1row('*','`id` = '.$super_detail['id_business'].'')['id'])?Bussiness::get_1row('*','`id` = '.$super_detail['id_business'].''):'';
+        $business_db = isset(Business::get_1row('*','`id` = '.$super_detail['id_business'].'')['id'])?Business::get_1row('*','`id` = '.$super_detail['id_business'].''):'';
     }else{
         $super_detail = null;
         $position_db = null;
         $classify_db = null;
-        $bussiness_db = ['store'=>'', 'price_buy'=> '0', 'discount'=>'0', 'vat'=>'0', 'delivery_fee'=>'0'];
+        $business_db = ['store'=>'', 'price_buy'=> '0', 'discount'=>'0', 'vat'=>'0', 'delivery_fee'=>'0'];
     }
+
+
     if(isset($_POST['save_Modify'])){
         $name = $_POST['name'];
         $position_Material_New = $_POST['position_Material_New'];
@@ -26,7 +28,8 @@
             if($position_Material_New != null && $position_Material_New != 0){
                 $id_position = Position::getAll('`id`', " `sum` = '$position_Material_New' ")[0]['id'];
             }else{
-                $id_position = null;
+                $id_position = Position::getAll('`id`', " `sum` = 'Chưa xác định' ")[0]['id'];
+
             }
             if($classify != null && $classify != 0){
                 $id_classify = Classify::getAll('`id`', " `sum` = '$classify' ")[0]['id'];
@@ -38,7 +41,8 @@
             if($position_Material_New != null && $position_Material_New != 0){
                 $id_position = Position::getAll('`id`', " `sum` = '$position_Material_New' ")[0]['id'];
             }else{
-                $id_position = null;
+                $id_position = Position::getAll('`id`', " `sum` = 'Chưa xác định' ")[0]['id'];
+
             }
             if($classify != null && $classify != 0){
                 $id_classify = Classify::getAll('`id`', " `sum` = '$classify' ")[0]['id'];
@@ -54,14 +58,25 @@
         $vat = $_POST['vat'];
 
         if(!Super_detail::getAll('*', " `type` = 'Material' AND `id_material` = $id_material")){
-            Bussiness::addNew($store, $price_buy,$delivery_fee,$discount,$vat);
-            print_r( Bussiness::get_1row('MAX(Id)', '  1 '));
-            $id_bussiness = Bussiness::get_1row('MAX(Id)', '  1 ')['MAX(Id)'];
-            Super_detail::addNew('Material', $id_material, null, $id_classify, $id_position, $id_bussiness);
+            Business::addNew($store, $price_buy,$delivery_fee,$discount,$vat);
+            print_r( Business::get_1row('MAX(Id)', '  1 '));
+            $id_business = Business::get_1row('MAX(Id)', '  1 ')['MAX(Id)'];
+            Super_detail::addNew('Material', $id_material, null, $id_classify, $id_position, $id_business);
+            Record_KHO_SUPERDETAIL::addNew(Super_detail::getAll('*', " `id_material` = $id_material ")[0]['id'], " Thêm mới ", $_SESSION['userINFO']['fullname']);
         }else{
-            $id_bussiness = Bussiness::get_1row('MAX(Id)', '  1 ')['MAX(Id)'];
-            Bussiness::update($store, $price_buy,$delivery_fee,$discount,$vat, " `id` = $id_bussiness");
-            Super_detail::update('Material', $id_material, null, $id_classify, $id_position, $id_bussiness, " `id_material` =  $id_material");
+            $id_business = Business::get_1row('*', '  `id` = '.$business_db['id'].' ')['id'];
+            //Record
+            $R = new Record_KHO_SUPERDETAIL;
+            $R_Pos = $R::checkPosition($position_Material_New, $super_detail['id_position']);
+            $R_Class = $R::checkCLassify($classify, $super_detail['id_classify']);
+            $R_quantity = $R::checkQuantity_M($quantity_Material_New, $super_detail['id_material']);
+            $R_Business = Record_KHO_SUPERDETAIL::checkBus($store, $price_buy,$delivery_fee,$discount,$vat, $id_business);
+            if( $R_Pos || $R_Class || $R_Business || $R_quantity){
+                Record_KHO_SUPERDETAIL::addNew($super_detail['id'], "Sửa ".$R_Business . $R_Pos . $R_Class. $R_quantity, $_SESSION['userINFO']['fullname']);
+            }
+            //Done Record
+            Business::update($store, $price_buy,$delivery_fee,$discount,$vat, " `id` = $id_business");
+            Super_detail::update('Material', $id_material, null, $id_classify, $id_position, $id_business, " `id_material` =  $id_material");
 
         }
         //processing
@@ -184,36 +199,37 @@
                                 <div class="preview_IMG" id="img_preview_Material_New">
                                     <?php 
                                     if(isset($info_Material['link_folder']) && $info_Material['link_folder'] != null){
-                                        info_Material::createFolder($info_Material['link_folder']);
-                                        $images = array('jpg','png','jpeg','gif');
-                                        $path = 'QLKHO\MEDIA\material'.'/' .$info_Material['link_folder'].'/';
-                                        $files = scandir( $path);
-                                        foreach($files as $key => $value) {
-                                            if($value != '.' && $value != '..'){
-                                                $ext = pathinfo($value, PATHINFO_EXTENSION);
-                                                if(in_array($ext,$images)) {
-                                                    ?>
-                                    <div class="sub_preview_Img">
-                                        <img src="<?php echo $path.$value ?>" alt="">
-                                        <button type="button" class="delete_ITEM_CT"
-                                            onclick="del_Img_Material('<?php echo $info_Material['link_folder'].'/'.$value; ?>')">X</button>
-
-                                    </div>
-                                    <?php
-                                                }else{
-                                                    ?>
-                                    <div class="sub_preview_Img">
-                                        <a href="<?php echo $path . $value ?>" target="_blank"><?php echo $value ?></a>
-
-                                        <button type="button" class="delete_ITEM_CT"
-                                            onclick="del_Img_Material('<?php echo $info_Material['link_folder'].'/'.$value; ?>')">X</button>
-
-                                    </div>
-                                    <?php
-                                                }
-                                            }
+                                        if(is_dir('QLKHO/MEDIA/material'.'/' .$info_Material['link_folder'].'/')){
+                                            $images = array('jpg','png','jpeg','gif');
+                                            $path = 'QLKHO\MEDIA\material'.'/' .$info_Material['link_folder'].'/';
+                                            $files = scandir( $path);
+                                            foreach($files as $key => $value) {
+                                                if($value != '.' && $value != '..'){
+                                                    $ext = pathinfo($value, PATHINFO_EXTENSION);
+                                                    if(in_array($ext,$images)) {
+                                                        ?>
+                                        <div class="sub_preview_Img">
+                                            <img src="<?php echo $path.$value ?>" alt="">
+                                            <button type="button" class="delete_ITEM_CT"
+                                                onclick="del_Img_Material('<?php echo $info_Material['link_folder'].'/'.$value; ?>')">X</button>
     
-                                        }
+                                        </div>
+                                        <?php
+                                                    }else{
+                                                        ?>
+                                        <div class="sub_preview_Img">
+                                            <a href="<?php echo $path . $value ?>" target="_blank"><?php echo $value ?></a>
+    
+                                            <button type="button" class="delete_ITEM_CT"
+                                                onclick="del_Img_Material('<?php echo $info_Material['link_folder'].'/'.$value; ?>')">X</button>
+    
+                                        </div>
+                                        <?php
+                                                    }
+                                                }
+        
+                                            }
+                                        }   else  info_Material::createFolder($info_Material['link_folder']);
                                     }
 
                                     ?>
@@ -223,17 +239,17 @@
                         <div id="special_info" class="tabcontent">
                             <div class="sub " style="display:flex;">
                                 <h3>Xuất xứ</h3>
-                                <input type="text" name="store" placeholder="Xuất xứ" value="<?php echo checkNull($bussiness_db['store']) ?>">
+                                <input type="text" name="store" placeholder="Xuất xứ" value="<?php echo checkNull($business_db['store']) ?>">
                                 <h3>Giá vào</h3>
-                                <input type="text" name="price_buy" placeholder="Giá vào" value="<?php echo $bussiness_db['price_buy'] ?>">
+                                <input type="text" name="price_buy" placeholder="Giá vào" value="<?php echo $business_db['price_buy'] ?>">
                                 <h3>Phí vận chuyển về</h3>
-                                <input type="text" name="delivery_fee" placeholder="Phí vận chuyển về" value="<?php echo $bussiness_db['delivery_fee'] ?>">
+                                <input type="text" name="delivery_fee" placeholder="Phí vận chuyển về" value="<?php echo $business_db['delivery_fee'] ?>">
                                 <h3>% Có thể giảm</h3>
-                                <input type="text" name="discount" placeholder="% Có thể giảm" value="<?php echo $bussiness_db['discount'] ?>">
+                                <input type="text" name="discount" placeholder="% Có thể giảm" value="<?php echo $business_db['discount'] ?>">
                                 <h3>% VAT</h3>
-                                <input type="text" name="vat" placeholder="VAT" value="<?php echo $bussiness_db['vat'] ?>">
+                                <input type="text" name="vat" placeholder="VAT" value="<?php echo $business_db['vat'] ?>">
                             </div>
-                            <h3>Giá thành: <?php $noVat = $bussiness_db['price_buy']+$bussiness_db['delivery_fee']-$bussiness_db['discount']; echo number_format($noVat+$noVat*$bussiness_db['vat']) ?> </h3>
+                            <h3>Giá thành: <?php $noVat = $business_db['price_buy']+$business_db['delivery_fee']-$business_db['discount']; echo number_format($noVat+$noVat*$business_db['vat']/100) ?> </h3>
                         </div>
                     </div>
                 </div>
@@ -245,6 +261,47 @@
 
     </div>
 </form>
+
+<h3>Lịch sử thay đổi:</h3>
+<summary>
+<?php 
+        if(isset($super_detail['id'])){
+            $i = $super_detail['id'];
+            $v = Record_KHO_SUPERDETAIL::get_1row('*'," id_superDetail = $i  ");
+            echo $v['note'].' By:  '.$v['addBy']; 
+        }
+    ?>
+</summary>
+<div class="inforForm ">
+<button onclick="toggleVisibility('#history')"><?php echo isset($super_detail['id'])?'Xem lịch sử thay đổi':'Chưa tạo Super Detail'; ?></button>
+</div>
+<?php 
+        if(isset($super_detail['id'])){
+            ?>
+<div class="tableComponent" id="history" style="display:none;">
+    <table class="data_table">
+        <thead>
+            <tr class="headerTable">
+                <div class="rowTitle">
+                    <th>Số thứ tự</th>
+                    <th>Tên</th>
+                    <th>Note</th>
+                    <th>Thời gian</th>
+                    <th>Tác vụ</th>
+                </div>
+            </tr>
+        </thead>
+        <tbody id="tbody_history_Material_Change">
+
+        </tbody>
+    </table>
+    <div class="Pagination" id="">
+
+    </div>
+</div>
+            <?php
+        }
+    ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="../asset/js/KHO/settingKho.js"></script>
 <script>
@@ -323,5 +380,48 @@ function ADD_Img_Material(file) {
             alert('Error in AJAX request');
         }
     });
+}
+function showRecord(){
+    $.ajax({
+
+        url: "QLKHO/code/getdata_Kho.php",
+        data: {
+            Record_Material_Detail: 1,
+            id_MDetail_Record: <?php echo isset($super_detail['id'])?$super_detail['id']:'0' ?>
+        }, // <-- send form data directly
+        dataType: 'JSON', // <-- what to expect back from the PHP script, if anything
+        type: 'post',
+        success: function(result) {
+            for (let i = 0; i < result.length; i++) {
+                let m = result[i];
+                let str = `
+                    <tr>
+                        <td>${i+1}</td>
+                        <td>${m['addBy']}</td>
+                        <td style="width:50%;">${m['note']}</td>
+                        <td>${m['time']}</td>
+                        <td class="tacvu">
+                            <a href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=${m['id']}">
+                                Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                `;
+                // Append the row to the tbody
+                $("#tbody_history_Material_Change").append(str);
+            }
+        },
+        error: function() {
+            alert('Error in AJAX request');
+        }
+    });
+}
+showRecord();
+function toggleVisibility(id) {
+    if ($(id).css('display') === 'none') {
+        $(id).css('display', 'block');
+    } else {
+        $(id).css('display', 'none');
+    }
 }
 </script>

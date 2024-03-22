@@ -2,217 +2,149 @@
     $material = new material;
     $component = new component;
     $info_Material = new info_Material;
-    if(isset($_POST['addComponent'])){
-        $id_parent = $_POST['id_parent'];
-        $name_parent = $_POST['name_parent'];
-        $name = $_POST['name'];
-    }
-    if(isset($_POST['save'])){
-        if($_POST['type_relation'] == 'Material'){
-            $name = $_POST['name'];
-            $position_Material_New = $_POST['position_Material_New'];
-            $quantity_Material_New = $_POST['quantity_Material_New'];
-            $code_Material_New = $_POST['code_Material_New'];
-            $note_Material_New = $_POST['note_Material_New'];
-            $_FILES['img_Material_New_fix']['tmp_name'];
+    if(isset($_POST['save_import'])){
+        $all = [];
+        $name_import = isset($_POST['name_import'])?$_POST['name_import']:'';
+        $note = isset($_POST['note'])?$_POST['note']:'';
+        $created_by = $_SESSION['userINFO']['fullname'];
+        if(isset($_POST['id_material'])){
+        import_material::addNew($created_by, $name_import, $note);
+        $id_import = import_material::get_1row('*', " `name` = '$name_import' AND `created_by` = '$created_by'  ")['id'];
 
-            $material->addNew($name, $quantity_Material_New);
-            $sql = 'WHERE `name` = "'.$name.'" AND `quantity` = '.$quantity_Material_New.' ORDER BY `id` DESC';
-            $id_Material_New =  $material->get_1row_Material($sql)['id'];
-            $link_folder = $id_Material_New.'_'.$name;
-            info_Material::upload_Files($link_folder, 'img_Material_New_fix');
-            $info_Material->addNew($id_Material_New, $position_Material_New, $code_Material_New, $link_folder, $note_Material_New);
-        }
-        if($_POST['type_relation'] == 'Component'){
-            //Material
-            $quantity_Component_need = isset($_POST['quantity_Component_need'])?$_POST['quantity_Component_need']:0;
-            $name_Material = $_POST['name_Material'];
-            $quantity_Material_need = $_POST['quantity_Material_need'];
-            $id_material = $_POST['id_material'];
-            //get value Component 
-            $level_component = $_POST['level_component'];
-            $id_component = $_POST['id_component'];
-            $name_Component= $_POST['name_Component'];
-            $quantity_Component_need= $_POST['quantity_Component_need'];
-            //name of parent
-            $name =  $_POST['name'];
-            if( $name_Component[0] == null){
-                $component->addNew($name,0,0,1,0,0);
-                $id_parent = $component->get_Newest_Component($name,1);
-                foreach($name_Material as $key => $value){
-                    if($value != null){
-                        $component->addNew($value,$id_parent,$id_material[$key],0,$quantity_Material_need[$key],$name);
-                    }
-                }
-            }else{
-                var_dump(max($level_component));
-                $level_parent_ADD = max($level_component)+1;
-                $component->addNew($name,0,0,$level_parent_ADD,0,0);
-                $id_parent_ADD = $component->get_Newest_Component($name,$level_parent_ADD);
-                if($name_Material[0] != null){
-                    foreach($name_Material as $key => $value){
-                        if($value != null){
-                            $component->addNew($value,$id_parent_ADD,$id_material[$key],0,$quantity_Material_need[$key],$name);
-                        }
-                    }
-                }
-                foreach($name_Component as $key => $value){
-                    if($value != null){
-                        $component->addNew($value,$id_parent_ADD,$id_component[$key],$level_component[$key],$quantity_Component_need[$key],$name);
-                    }
-                }
+            foreach ($_POST['id_material'] as $key => $value) {
+                $all[] = ['id_import' => $id_import,'name' => $value, 'quantity' => $_POST['quantity_Material_need'][$key], 'price' => $_POST['price'][$key]];
+                import_material_detail::addNew2(  $id_import, $value, $_POST['quantity_Material_need'][$key], $_POST['price'][$key]);
+                material::update_quantity($_POST['quantity_Material_need'][$key], $value);
             }
         }
     }
+
+
 ?>
 <form action="" method="post" enctype="multipart/form-data">
     <div class="userFormm">
         <div class="mainForm">
             <div class="big inforForm">
-                <h2>Thêm</h2>
-                <div class="bodyofForm">
-                    <div class="inputHaveLable">
-                        <label for="" class="formLable"> Sản phẩm</label>
-                        <input type="text" name="name" placeholder="Tên sản phẩm" required>
-                    </div>
-                    <select name="type_relation" id="" onchange="hide_div_Material()">
-                        <option value="Material" selected>Material</option>
-                        <option value="Component">Component</option>
-                    </select>
-                    <div class="Info_tab">
-                        <div class="tab">
-                            <button type="button" class="tablinks" onclick="change_tab(event, 'common_info')"
-                                id="defaultOpen">Thông tin chung</button>
-                            <button type="button" class="tablinks" onclick="change_tab(event, 'detail_info')">Thông tin
-                                chi tiết</button>
-                        </div>
-                        
-                        <!-- Tab content -->
-                        <div id="common_info" class="tabcontent">
-                            <h3>Vị trí</h3>
-                            <input type="text" name="position_Material_New">
-                            <h3>Số lượng</h3>
-                            <input type="text" name="quantity_Material_New">
-                        </div>
-
-                        <div id="detail_info" class="tabcontent">
-                            <div class="part">
-                                <h3>Code</h3>
-                                <input type="text" name="code_Material_New">
-                                <h3>Ghi chú</h3>
-                                <input type="text" name="note_Material_New">
-                            </div>
-                            <div class="part">
-                                <label for="img_Material_New"> Thêm File đính kèm</label>
-                                <input type="file" name="img_Material_New_fix[]" id="img_Material_New" multiple
-                                    onchange="preview_IMG(this, 'img_preview_Material_New')">
-                                <div class="preview_IMG" id="img_preview_Material_New">
-                                    <img src="" alt="">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <h2>Nhập kho
+                </h2>
                 <div class="bodyofForm Material" id="table_material_CT">
-                    <h3>Vật liệu thô</h3>
                     <div class="item_CT">
                         <input type="text" name="name_Material[]" placeholder="Sản phẩm con"
                             onkeydown="addROW_(event,'item_CT','table_material_CT')"
-                            onchange="show_value_Storage_Material(this, getdata_Material())"
-                            list="ALL_data_material">
+                            onchange="show_value_Storage_Material(this, getdata_Material()); "
+                            oninput="hide_add_new_products_btn();" list="ALL_data_material">
                         <datalist id="ALL_data_material">
 
                         </datalist>
+
                         <input type="number" name="quantity_Material_need[]" placeholder="Số lượng"
                             onkeydown="addROW_(event,'item_CT','table_material_CT')">
+                        
+                            <input type="number" name="price[]" placeholder="Giá tiền"
+                            onkeydown="addROW_(event,'item_CT','table_material_CT')">    
+                        <input type="hidden" name="id_material[]">
                         <input type="number" name="quantity_Component_inStorage" placeholder="Số lượng trong kho"
                             onkeydown="addROW_(event, 'component_CT', 'table_component_CT')" disabled>
-                        <input type="hidden" name="id_material[]">
                         <button type="button" name="delete_ITEM_CT" onclick="delROW_(this, '.item_CT')">X</button>
                     </div>
-                </div>
-                <div class="bodyofForm Material" id="table_component_CT">
-                    <h3>Component</h3>
-                    <div class="component_CT">
-                        <input type="text" name="name_Component[]" placeholder="Sản phẩm con" list="ALL_data_Component"
-                            onkeydown="addROW_(event, 'component_CT', 'table_component_CT')"
-                            onchange="show_value_Storage_Component(this)">
-                        <datalist id="ALL_data_Component">
 
-                        </datalist>
-                        <input type="number" name="quantity_Component_need[]" placeholder="Số lượng"
-                            onkeydown="addROW_(event, 'component_CT', 'table_component_CT')">
-                        <input type="number" name="quantity_Component_inStorage" placeholder="Số lượng trong kho"
-                            onkeydown="addROW_(event, 'component_CT', 'table_component_CT')">
-                        <input type="hidden" name="id_component[]">
-                        <input type="hidden" name="level_component[]">
-                        <button type="button" name="delete_ITEM_CT" onclick="delROW_(this, '.component_CT')">X</button>
+                </div>
+                <div class="bodyofForm">
+                    <div class="v " id="add_new_products" style="display:none;">
+                        <button type="button" class="circle_button" onclick="toggleVisibility('#modal_addNEW_prods')"><i
+                                class="fa-solid fa-plus"></i></button>
+                        <label for="">New prods</label>
                     </div>
                 </div>
-                <button type="submit" name="save">Lưu</button>
+                <div class="bodyofForm Material">
+                    <div class="sub " style="display:flex;     width: 50%;">
+                    <h3>Tiêu đề nhập kho:</h3>
+                        <input type="text" name="name_import" id="">
+                        <h3>Ghi chú:</h3>
+                        <input type="text" placeholder="note">
+                    </div>
+                    <div class="sub " style="display:flex;     width: 50%;">
+                    <button name = "save_import">Lưa phiếu nhập</button>
+                    </div>
+                </div>
 
             </div>
 
         </div>
-
-    </div>
 </form>
-
+<div class="big inforForm" id="modal_addNEW_prods" style="display: none;">
+    <div class="bodyofForm modal_main">
+        <div class="modal_header">
+            Thêm sản phẩm mới
+            <button type = "button" onclick="resetInputsAndClearDiv(); toggleVisibility('#modal_addNEW_prods') "><i
+                    class="fa-regular fa-circle-xmark"></i></button>
+        </div>
+        <div class="Info_tab">
+            <div id="add_NEW_prods" class="tabcontent">
+                <h3>Tên</h3>
+                <input type="text" name="name_prods_New">
+                <h3>Số lượng</h3>
+                <input type="text" name="quantity_prods_New">
+            </div>
+        </div>
+        <div class="modal_footer">
+            <button onclick="add_new_prods_todb(this,'add_NEW_prods');"> Lưu
+            </button>
+            <button type = "button"  onclick="toggleVisibility('#modal_addNEW_prods')"> Hủy </button>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="../asset/js/KHO/settingKho.js"></script>
 <script>
-function hide_div_Material() {
-    var type_relation = document.querySelector('select[name=type_relation]').value;
-    let div_Material = document.querySelectorAll('.Material');
-    if (type_relation == 'Component') {
-        for (i = 0; i < div_Material.length; i++) {
-            div_Material[i].style.display = 'flex';
-        }
-        document.querySelector('.Info_tab').style.display = 'none';
-
+function toggleVisibility(id) {
+    if ($(id).css('display') === 'none') {
+        $(id).css('display', 'block');
     } else {
-        for (i = 0; i < div_Material.length; i++) {
-            div_Material[i].style.display = 'none';
+        $(id).css('display', 'none');
+    }
+}
+//////////////////đang làm modal
+function add_new_prods_todb(button, id) {
+    let container = document.getElementById(id);
+    let form = {
+        name: container.querySelector('input[name="name_prods_New"]').value,
+        quantity: container.querySelector('input[name="quantity_prods_New"]').value,
+    };
+    $.ajax({
+        type: "POST",
+        url: "QLKHO/code/getdata_Kho.php",
+        dataType: "JSON",
+        data: {
+            import: 1,
+            add_NEW_PRODS: 1,
+            form_data: form
+        },
+        success: function(data) {
+            alert('Thêm thành công, hãy bổ sung thông tin chi tiết');
+            let a = document.createElement("a");
+            let id = data;
+            a.href = 'admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=' + id;
+            a.text = 'Bổ sung thông tin'
+            a.target = "_blank";
+            container.appendChild(a);
         }
-        document.querySelector('.Info_tab').style.display = 'flex';
 
-    }
+    });
 }
 
-function change_tab(event, nameTab) {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = 'none';
-    }
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace("active", "");
-    }
-    document.getElementById(nameTab).style.display = "block";
-    event.currentTarget.className += " active";
-}
-
-function addROW(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); // Prevent the default Enter key behavior
-
-        // Clone the last item_CT div
-        var newItemCal = document.querySelector(".item_CT:last-child").cloneNode(true);
-
-        // Clear the input values in the cloned div
-        newItemCal.querySelectorAll("input").forEach(function(input) {
-            input.value = "";
+function resetInputsAndClearDiv() {
+    // Reset input values
+    let container = document.getElementById('add_NEW_prods');
+    if (container) {
+        let inputFields = container.querySelectorAll('input[type="text"]');
+        inputFields.forEach(function(input) {
+            input.value = ''; // Clear input value
         });
-
-        // Get the container element by ID
-        var container = document.getElementById("table_CT");
-
-        // Check if the container element exists before appending
-        if (container) {
-            // Append the cloned div to the container
-            container.appendChild(newItemCal);
-        } else {
-            console.error("Container element not found");
-        }
+    }
+    if (container.querySelector('a')) {
+        container.querySelector('a').remove();
     }
 }
 
@@ -245,15 +177,6 @@ function addROW_(event, class_Append, Id_container) {
     }
 }
 
-function delROW(button) {
-    let s = document.querySelectorAll('.item_CT');
-    if (s.length > 1) {
-        $(button).closest('.item_CT').remove();
-    } else {
-        alert('Không cần xóa');
-    }
-}
-
 function delROW_(button, classname) {
     let s = document.querySelectorAll(classname);
     if (s.length > 1) {
@@ -262,35 +185,33 @@ function delROW_(button, classname) {
         alert('Không cần xóa');
     }
 }
-document.getElementById("defaultOpen").click();
-hide_div_Material();
 
 var timeoutId;
-var data_Material ;
+var data_Material;
+
 function getdata_Material() {
 
-        $.ajax({
-            type: "POST",
-            url: "QLKHO/code/getdata_Kho.php",
-            dataType: "JSON",
-            data: {
-                type: 'material'
-            },
-            success: function(data) {
-                // Assuming input is a datalist element
-                data_Material = data;
-                var datalist = document.getElementById('ALL_data_material');
-                datalist.innerHTML = ""; // Clear existing options
-                // Populate the datalist with the "name" values from the materials
-                for (var count = 0; count < data.length; count++) {
-                    var option = document.createElement("option");
-                    option.value = data[count].name;
-                    datalist.appendChild(option);
-                }
-
+    $.ajax({
+        type: "POST",
+        url: "QLKHO/code/getdata_Kho.php",
+        dataType: "JSON",
+        data: {
+            type: 'material'
+        },
+        success: function(data) {
+            // Assuming input is a datalist element
+            data_Material = data;
+            var datalist = document.getElementById('ALL_data_material');
+            datalist.innerHTML = ""; // Clear existing options
+            // Populate the datalist with the "name" values from the materials
+            for (var count = 0; count < data.length; count++) {
+                var option = document.createElement("option");
+                option.value = data[count].name;
+                datalist.appendChild(option);
             }
-        });
-   
+
+        }
+    });
     return data_Material;
 }
 
@@ -307,71 +228,6 @@ function show_value_Storage_Material(input, data) {
     } else {
         storageInput.val(""); // Clear the value if the chosen name is not found
         idInput.val(""); // Clear the id value as well
-    }
-}
-
-// show_Result('component','ALL_data_Component');
-
-function show_value_Storage(input, className, idInputName, saveROW_data, data) {
-    let storageInput = $(input).closest(className).find('input[name="quantity_Component_inStorage"]');
-    let idInput = $(input).closest(className).find('input[name="' + idInputName + '"]');
-    let Rowdata = $(input).closest(className).find('input[name="' + saveROW_data + '"]');
-    let chooseName = data.find(item => item.name === input.value);
-
-    if (chooseName) {
-        storageInput.val(chooseName.quantity);
-        idInput.val(chooseName.id);
-        Rowdata.val(chooseName);
-    } else {
-        storageInput.val(""); // Clear the value if the chosen name is not found
-        idInput.val(""); // Clear the id value as well
-        Rowdata.val("");
-    }
-}
-var returnData;
-
-function getdata_COMPONENT() {
-
-    // Clear the previous timeout (if any)
-
-        $.ajax({
-            type: "POST",
-            url: "QLKHO/code/getdata_Kho.php",
-            dataType: "JSON",
-            data: {
-                type: 'component'
-            },
-            success: function(data) {
-                // Assuming input is a datalist element
-                let datalist = document.getElementById('ALL_data_Component');
-                returnData = data;
-                datalist.innerHTML = ""; // Clear existing options
-                // Populate the datalist with the "name" values from the materials
-
-                for (var count = 0; count < data.length; count++) {
-                    var option = document.createElement("option");
-                    option.value = data[count].name;
-                    datalist.appendChild(option);
-                }
-            }
-        });
-        return returnData;
-}
-getdata_COMPONENT();
-
-function show_value_Storage_Component(input) {
-    let idInput = $(input).closest('.component_CT').find('input[name="id_component[]"]');
-    let level = $(input).closest('.component_CT').find('input[name="level_component[]"]');
-    let quantity = $(input).closest('.component_CT').find('input[name="quantity_Component_inStorage"]');
-    let data = getdata_COMPONENT() ;
-    let chooseName = data.find(item => item.name === input.value);
-    if (chooseName) {
-        idInput.val(chooseName.id);
-        level.val(chooseName.level);
-        quantity.val(chooseName.quantity);
-    } else {
-        idInput.val("0"); // Clear the id value as well
-        quantity.val("0"); // Clear the id value as well
     }
 }
 
@@ -428,4 +284,18 @@ function getIconForFileType(fileName) {
             return 'file'; // Default icon for other file types
     }
 }
-</script>e
+
+function hide_add_new_products_btn() {
+    let inputs = document.querySelectorAll('input[name="name_Material[]"]');
+    let val_input = inputs[inputs.length - 1].value.toLowerCase(); // Corrected to use .value instead of .val()
+    let options = document.getElementById('ALL_data_material').querySelectorAll('option');
+    let isInDatalist = Array.from(options).some(option => option.value.toLowerCase().includes(val_input));
+
+    if (isInDatalist) {
+        document.getElementById('add_new_products').style.display = 'none';
+    } else {
+        document.getElementById('add_new_products').style.display = 'flex';
+    }
+
+}
+</script>
