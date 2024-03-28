@@ -366,3 +366,392 @@ function toggleVisibility(id) {
         $(id).css('display', 'none');
     }
 }
+
+
+function getdataStaff(id_container) {
+    $.ajax({
+        type: "POST",
+        url: "API/API_USER.php",
+        data: {
+            getdataStaff: 1
+        },
+        success: function(data) {
+            let container = document.getElementById(id_container);
+            let jsonData = JSON.parse(data);
+            $(id_container).empty();
+            console.log(jsonData.length);
+            for (let i = 0; i < jsonData.length; i++) {
+                let temp = jsonData[i];
+                let option = $("<option>").val(temp.fullname).text(temp.fullname);
+                $(id_container).append(option);
+
+                // console.log(jsonData[i]);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching data:", error);
+            // Optionally handle the error here
+        }
+    });
+}
+getdataStaff('#staff');
+
+function getAll_import_note() {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            getAll_import_note: 1,
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            data = response.data;
+            total = response.total;
+            $('#table_import_listed').DataTable({
+                pagingType: 'simple_numbers',
+                scrollX: true,
+                data: data,
+                total: total,
+                "bDestroy": true,
+                columnDefs: [{
+                        targets: [0],
+                        orderData: [0, 1]
+                    },
+                    {
+                        targets: [1],
+                        orderData: [1, 0]
+                    },
+                    {
+                        targets: [4],
+                        orderData: [4, 0]
+                    }
+                ],
+                order: [
+                    [3, 'desc']
+                ],
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            // Trả về số thứ tự tăng dần bắt đầu từ 1
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'name' },
+                    { data: 'created_by' },
+                    { data: 'date' },
+                    {
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            // Lấy giá trị tổng tương ứng với chỉ mục hàng
+                            var index = meta.row;
+                            var sumTotal = total[index];
+                            return sumTotal.toLocaleString();
+                        }
+                    },
+                    {
+                        data: 'id',
+                        render: function(data, type, row) {
+                            return '<a href="admin.php?job=QLKHO&action=thongke_imp_exp&actionChild=imp_exp_detail&id_imp_exp=' + data + '">Chi tiết</a>';
+                        }
+                    }
+                ],
+                "pageLength": 10
+            });
+
+        }
+    });
+}
+
+function get_import_note_detail(id) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            get_import_note_detail: 1,
+            id_imp_deatail: id
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            let total = 0;
+            data = response;
+            $('#table_imp_detail').DataTable({
+                pagingType: 'simple_numbers',
+                scrollX: true,
+                data: data,
+                "bDestroy": true,
+                columnDefs: [{
+
+                        className: 'dt-body-center'
+                    },
+                    {
+                        targets: [0],
+                        orderData: [0, 1]
+                    },
+                    {
+                        targets: [1],
+                        orderData: [1, 0]
+                    },
+                    {
+                        targets: [4],
+                        orderData: [4, 0]
+                    }
+                ],
+                order: [
+                    [3, 'desc']
+                ],
+
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            // Trả về số thứ tự tăng dần bắt đầu từ 1
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'name' },
+                    { data: 'quantity' },
+                    { data: 'price' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            total += row.quantity * row.price;
+                            return (row.quantity * row.price).toLocaleString();
+                        }
+                    },
+                    {
+                        data: 'id',
+                        render: function(data, type, row) {
+                            return '<a href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=' + data + '">Chi tiết</a>';
+
+                        }
+                    }
+                ],
+
+                "pageLength": 10
+            });
+            $("#total").text('Tổng: ' + (total / 3).toLocaleString());
+        }
+    });
+}
+
+function getALL_prod_cmd(id_datalist) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            getALL_prod_cmd: 1,
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            // Xóa dữ liệu cũ của phần tử datalist
+            $(id_datalist).empty();
+
+            // Lặp qua dữ liệu và thêm các tùy chọn vào phần tử datalist
+            $.each(response.data, function(index, item) {
+                let value = item.id + ' - ' + item.name;
+                $(id_datalist).append($('<option>', {
+                    value: value
+                }));
+            });
+        }
+    });
+}
+
+function getAll_export_note() {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            getAll_export_note: 1,
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            data = response.data;
+            total = response.total;
+            $('#table_export_listed').DataTable({
+                pagingType: 'simple_numbers',
+                scrollX: true,
+                data: data,
+                total: total,
+                "bDestroy": true,
+                columnDefs: [{
+                        targets: [0],
+                        orderData: [0, 1]
+                    },
+                    {
+                        targets: [1],
+                        orderData: [1, 0]
+                    },
+                    {
+                        targets: [4],
+                        orderData: [4, 0]
+                    }
+                ],
+                order: [
+                    [3, 'desc']
+                ],
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            // Trả về số thứ tự tăng dần bắt đầu từ 1
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'name' },
+                    { data: 'purpose' },
+                    { data: 'created_by' },
+                    { data: 'date' },
+                    {
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            // Lấy giá trị tổng tương ứng với chỉ mục hàng
+                            var index = meta.row;
+                            var sumTotal = total[index];
+                            return sumTotal.toLocaleString();
+                        }
+                    },
+                    {
+                        data: 'id',
+                        render: function(data, type, row) {
+                            return '<a href="admin.php?job=QLKHO&action=thongke_imp_exp&actionChild=exp_detail&id_exp=' + data + '">Chi tiết</a>';
+                        }
+                    }
+                ],
+                "pageLength": 10
+            });
+
+        }
+    });
+}
+
+function get_export_note_detail(id) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            get_export_note_detail: 1,
+            id_exp_detail: id
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            let total = 0;
+            data = response.data;
+            $('#table_exp_detail').DataTable({
+                pagingType: 'simple_numbers',
+                scrollX: true,
+                data: data,
+                "bDestroy": true,
+                columnDefs: [{
+
+                        className: 'dt-body-center'
+                    },
+                    {
+                        targets: [0],
+                        orderData: [0, 1]
+                    },
+                    {
+                        targets: [1],
+                        orderData: [1, 0]
+                    },
+                    {
+                        targets: [4],
+                        orderData: [4, 0]
+                    }
+                ],
+                order: [
+                    [3, 'desc']
+                ],
+
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            // Trả về số thứ tự tăng dần bắt đầu từ 1
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'name' },
+                    { data: 'type' },
+                    { data: 'quantity' },
+                    { data: 'price' },
+                    { data: 'into_money' },
+                    {
+                        render: function(data, type, row) {
+                            if (row.type == 'Material') {
+                                return '<a href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=' + row.id + '">Chi tiết</a>';
+                            } else {
+                                return '<a href="admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=' + row.id + '">Chi tiết</a>';
+
+                            }
+
+                        }
+                    }
+                ],
+
+                "pageLength": 10
+            });
+            $("#total").text('Tổng: ' + (response.total).toLocaleString());
+        }
+    });
+}
+
+function exportTableToExcel(tableID, filename = '') {
+    var downloadLink;
+    var dataType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'; // MIME type for .xlsx
+    var tableSelect = document.getElementById(tableID);
+
+    // Check if tableSelect is valid
+    if (!tableSelect) {
+        console.error("Table with ID '" + tableID + "' not found.");
+        return;
+    }
+
+    // Create a new Excel workbook
+    var wb = XLSX.utils.book_new();
+
+    // Convert table to worksheet
+    var ws = XLSX.utils.table_to_sheet(tableSelect);
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Generate Excel file in binary string
+    var wbout = XLSX.write(wb, {
+        bookType: 'xlsx',
+        type: 'binary'
+    });
+
+    // Specify file name
+    filename = filename ? filename.replace(/\.[^.]+$/, '') + '.xlsx' :
+        'excel_data.xlsx'; // Update default filename to .xlsx
+
+    // Create download link element
+    downloadLink = document.createElement("a");
+    document.body.appendChild(downloadLink);
+
+    // Convert binary string to Blob
+    var blob = new Blob([s2ab(wbout)], {
+        type: dataType
+    });
+
+    // Create object URL for Blob
+    var url = window.URL.createObjectURL(blob);
+
+    // Create a link to the file
+    downloadLink.href = url;
+
+    // Setting the file name
+    downloadLink.download = filename;
+
+    // Trigger the download
+    downloadLink.click();
+
+    // Clean up
+    window.URL.revokeObjectURL(url);
+}
+
+// Utility function to convert string to array buffer
+function s2ab(s) {
+    var buf = new ArrayBuffer(s.length);
+    var view = new Uint8Array(buf);
+    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+    return buf;
+}

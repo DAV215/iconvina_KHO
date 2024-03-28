@@ -38,6 +38,20 @@
             FROM tbl_material LEFT JOIN tbl_info_material ON tbl_material.id = tbl_info_material.id_item ".$moreSQL;
             return $db->overview($sql);
         }
+        
+        public static function SUPER_join_With_Info($moreSQL){
+            $db = new DB_driver_KHO_Material;
+            $sql = "SELECT
+            tbl_material.*,
+            tbl_info_material.*,
+            tbl_business.total
+        FROM
+            tbl_material
+        LEFT JOIN tbl_info_material ON tbl_material.id = tbl_info_material.id_item
+        LEFT JOIN tbl_super_detail ON tbl_material.id = tbl_super_detail.id_material
+        LEFT JOIN tbl_business ON tbl_super_detail.id_business = tbl_business.id".$moreSQL;
+            return $db->overview($sql);
+        }
         public static function get_1row_Material($where){
             include('config_DB_KHO.php');
             $sql = "SELECT `id`,`name`, `quantity` FROM `tbl_material`";
@@ -359,6 +373,10 @@
             $m->table_ = "tbl_component_ct";
             $m->remove($where);
         }
+        public static function get_info($id){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_component_ct`','*',"  `id` =  $id AND (id_parent = 0 AND (name_parent = 0 OR name_parent IS NULL))");
+        }
         function get_component(){
             include('config_DB_KHO.php');
             $sql = "SELECT tbl_component_CT.*, tbl_info_component.quantity
@@ -383,6 +401,30 @@
             LEFT JOIN tbl_info_component ON tbl_component_ct.id = tbl_info_component.id_component
             WHERE
                 (tbl_component_ct.id_parent = 0 AND (tbl_component_ct.name_parent = 0 OR tbl_component_ct.name_parent IS NULL))
+                " . $WHERE . " "; // Ensure space after WHERE clause
+            // $sql .= "ORDER BY tbl_component_ct.id DESC"; 
+
+            $db = new DB_driver_KHO_Material;
+            return $db->overview($sql);
+        }
+        public static function SUPER_Component_Join_Info($WHERE){
+            $sql = "SELECT
+            tbl_component_ct.id,
+            tbl_component_ct.name,
+            tbl_component_ct.level,
+            tbl_info_component.*,
+            tbl_business.total
+        FROM
+            tbl_component_ct
+        LEFT JOIN tbl_info_component ON tbl_component_ct.id = tbl_info_component.id_component
+        LEFT JOIN tbl_super_detail ON tbl_info_component.id_component = tbl_super_detail.id_component
+        LEFT JOIN tbl_business ON tbl_business.id = tbl_super_detail.id_business
+        WHERE
+            (
+                tbl_component_ct.id_parent = 0 AND(
+                    tbl_component_ct.name_parent = 0 OR tbl_component_ct.name_parent IS NULL
+                )
+            )
                 " . $WHERE . " "; // Ensure space after WHERE clause
             // $sql .= "ORDER BY tbl_component_ct.id DESC"; 
 
@@ -583,7 +625,54 @@
                                     $data = $this->testDEQUY_thongke($row['id_child'],$indent + 1,$data);
                                 }
                             }
-                            else $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'quantity'=> $row['quantity_ofChild']);
+                            else {
+                                $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'quantity'=> $row['quantity_ofChild']);
+
+                            }
+                        }
+                    }
+                }else{
+                    foreach ($container_Parent as $row) {
+                
+                        $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'code' => $row['code'],'quantity'=> $row['quantity_ofChild']);
+                    }
+                }
+                return $data;
+            }
+        }
+        function testDEQUY_thongke_in_CMD($id_parent, $indent = 0, $data = [], $id_prod_cmd){
+            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+            if(count($get_DMNL_Component)!=0){
+                $container_Parent  = $this->getChild_ofParent($id_parent);
+                if($this->get_oneRow_Onecomponent('level',$id_parent)['level']>0){
+                    $level=[];
+                    foreach ($container_Parent as $row) {
+                        $level[] = $row['level'];
+                    }
+                    $lv = max($level);
+                    for($i = 0; $i <= $lv; $i++){ // Concatenate additional '--' for each iteration
+                        foreach ($this->getChild_ofParent_FL_Level($id_parent,$i) as $row) {
+                    
+                            if($row['level']>0){
+                                for($i_ = 0; $i_ < $row['quantity_ofChild']; $i_++){
+                                    $data = $this->testDEQUY_thongke($row['id_child'],$indent + 1,$data);
+                                }
+                            }
+                            else {
+
+                                $id_export = export_material::getAll('*', " id_prod_cmd =  $id_prod_cmd ")['id'];
+                                $quantity_geted = 0;
+                                for($i = 0; $i < count($id_export); $i++){
+                                    $v = export_material_detail::getAll('*', "id_export = $id_export");
+                                    foreach ($v as $row_material) {
+                                        if($row_material['id_material'] == $row['id_child'] ){
+                                            $quantity_geted += $row_material['quantity'];
+                                        }
+                                    }
+                                }
+                                $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'quantity'=> $row['quantity_ofChild'],'quantity_geted' => $quantity_geted);
+
+                            }
                         }
                     }
                 }else{
@@ -601,13 +690,43 @@
                 $id = $item['id'];
                 $name = $item['name'];
                 $code = isset(info_Material::get_info_Material($id)['code'])?info_Material::get_info_Material($id)['code']:0;
-                // $code = $item['code'];
                 $quantity = $item['quantity'];
         
                 if (isset($result[$name])) {
                     $result[$name]['quantity'] += $quantity;
                 } else {
                     $result[$name] = ['id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity];
+                }
+            }
+        
+            return array_values($result); 
+        }
+        
+        function thongke_Vattu_Component_in_ProdCMD($data, $id_prod_cmd){
+            $result = [];
+            $id_export = [];
+            foreach(export_material::getAll('*', " id_prod_cmd =  $id_prod_cmd ") as $row){
+                $id_export[] = $row['id'];
+            }
+            foreach ($data as $item) {
+                $id = $item['id'];
+                $name = $item['name'];
+                $code = isset(info_Material::get_info_Material($id)['code'])?info_Material::get_info_Material($id)['code']:0;
+                $quantity = $item['quantity'];
+
+                $quantity_geted = 0;
+                for($i = 0; $i < count($id_export); $i++){
+                    $v = export_material_detail::getAll('*', "id_export = $id_export[$i]");
+                    foreach ($v as $row_material) {
+                        if($row_material['id_material'] == $id ){
+                            $quantity_geted += $row_material['quantity'];
+                        }
+                    }
+                }
+                if (isset($result[$name])) {
+                    $result[$name]['quantity'] += $quantity;
+                } else {
+                    $result[$name] = ['id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity, 'quantity_geted' => $quantity_geted];
                 }
             }
         
@@ -647,6 +766,13 @@
             $m->table_ = "tbl_info_component";
             $m->update($m->table_, $Info_material, $where);
         }
+        public static function update_quantity($quantity, $id){
+            include('config_DB_KHO.php');
+            $sql = "UPDATE `tbl_info_component` SET `quantity` =  `quantity` + $quantity WHERE `id_component` = $id ";
+            $query = mysqli_query($mysqli_kho, $sql);
+            if($query) return 1;
+        }
+
         function remove($where){
             $m = new DB_driver_KHO_Material;
             $m->table_ = "tbl_info_material";
@@ -913,12 +1039,14 @@
         public function __construct( $var = null) {
             $this->var = $var;
         }
-        public static function addNew($id_superDetail, $note, $addBy){
+        public static function addNew($id_superDetail, $area ,$old, $new,$addBy){
             date_default_timezone_set('Asia/Ho_Chi_Minh');
             $time  =  date("Y-m-d H:i:s");
             $array = array(
                 'id_superDetail' => $id_superDetail,
-                'note' => $note,
+                'area' => $area,
+                'old' => $old,
+                'new' => $new,
                 'addBy' => $addBy,
                 'time' => $time
             );
@@ -927,14 +1055,14 @@
             $m->table_ = "tbl_lastupdate";
             $m->add($array);
         }
-        public static function check_DIFF($old, $new, $feild){
+        public static function check_DIFF($old, $new, $area){
             if($old != $new){
-                return '<br>'. $feild ." -- Cũ: $old - Mới: $new".'<br>'; 
+                return array('old' => $old, 'new' => $new, $area); 
             }else return null;
         }
         public static function checkBus($store, $price_buy,$delivery_fee,$discount,$vat, $id_business){
             $old = Business::get_1row('*', " `id` = $id_business  ");
-            $diff = '';
+            $diff = [];
             $array = array(
                 'store' => $store,
                 'price_buy' => $price_buy,
@@ -947,7 +1075,7 @@
                 // Remove the dollar sign ('$') from the key
                 $field = trim($key, '$');
                 if ($old[$field] !== $value) {
-                    $diff .= '<br>'.'Cũ: '.$field.' = '.$old[$field] .'-Mới: '. $field.' = '.$value .'<br>';
+                    $diff[] = self::check_DIFF($old[$field], $value, $field);
                 }
             }
             return $diff;
@@ -964,8 +1092,8 @@
             $old = material::get_info_Material($id_material)['quantity'];
             return self::check_DIFF($old, $quantity, 'Số lượng');
         }        
-        public static function checkQuantity_C($quantity, $id_material){
-            $old = info_Component::get_info_Component($id_material)['quantity'];
+        public static function checkQuantity_C($quantity, $id_component){
+            $old = info_Component::get_info_Component($id_component)['quantity'];
             return self::check_DIFF($old, $quantity, 'Số lượng');
         }     
         public static function get_1row($GET, $WHERE){
@@ -975,6 +1103,58 @@
         public static function getAll($GET, $WHERE){
             $db = new DB_driver_KHO_Material;
             return $db->getAll_WHERE('`tbl_lastupdate`',$GET,  $WHERE);
+        }
+        public static function result_diff($R_Pos , $R_Class , $R_Business , $R_quantity){
+            $all_DIFF = [$R_Pos, $R_Class, $R_quantity, $R_Business];
+            $all = [];
+            foreach ($all_DIFF as $row) {
+                if (!empty($row)) {
+                    $temp = [];
+                    foreach ($row as $value) {
+                        if(is_array($value)){
+                            $all[] = self::getChild_2D_Array($value);
+                        }else{
+                            $temp[] = $value;
+                        }
+                    }
+                    if(count($temp) == 3){
+                        $total['old'] = $temp[0];
+                        $total['new'] = $temp[1];
+                        $total['area'] = $temp[2];
+                        //Không check sẽ bị dư 1 giá trị mảng rỗng khởi tạo
+                        if(!self::checkallNull($total)){
+                            $all[] = $total;
+                        }
+                    }
+                    
+                }
+            }
+            return $all;
+        }
+        public static function getChild_2D_Array($a){
+            $total = [];
+            $temp = [];
+            foreach($a as $value){
+                if(is_array($value)){
+                    $total = array_merge($total, self::getChild_2D_Array($value));
+                }else{
+                    $temp[] = $value;
+                }
+            }
+            // Construct the associative array outside the loop
+            $total['old'] = $temp[0];
+            $total['new'] = $temp[1];
+            $total['area'] = $temp[2];
+            return $total;
+        }
+        public static function checkallNull($a){
+            $i = 0;
+            foreach($a as $value){
+                if( isset($value)){
+                    $i++;
+                }
+            }
+            return $i>3? true:false;
         }
     }
     class import_material{
@@ -1000,6 +1180,13 @@
         public static function getAll($GET, $WHERE){
             $db = new DB_driver_KHO_Material;
             return $db->getAll_WHERE('`tbl_import`',$GET,  $WHERE);
+        }
+        public static function total($id){
+            $total = 0;
+            foreach(import_material_detail::getAll('*', "id_import =  $id") as $row){
+                $total += $row['quantity']*$row['import_price'];
+            }
+            return $total;
         }
         public static function get_1row($GET, $WHERE){
             $db = new DB_driver_KHO_Material;
@@ -1027,6 +1214,150 @@
             $m = new DB_driver_KHO_Material;
             $m->table_ = "tbl_import_detail";
             $m->add($array);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_import_detail`',$GET,  $WHERE);
+        }
+    }
+    class export_material{
+        
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew($created_by,$name, $note, $purpose, $id_prod_cmd){
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $date  =  date("Y-m-d H:i:s");
+            $array = array(
+                'created_by' => $created_by,
+                'date' => $date,
+                'note' => $note,
+                'name' => $name,
+                'purpose' => $purpose,
+                'id_prod_cmd' => $id_prod_cmd
+            );
+                    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_export";
+            $m->add($array);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_export`',$GET,  $WHERE);
+        }
+        public static function total($id){
+            $total = 0;
+            foreach(export_material_detail::getAll('*', "id_export =  $id") as $row){
+                $total += $row['quantity']*$row['price'];
+            }
+            return $total;
+        }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_export`',$GET,  $WHERE);
+        }
+    }
+    class export_material_detail{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew2($id_export, $type_prod, $id_material, $id_component, $quantity, $price){
+            $array = array(
+                'id_export' => $id_export,
+                'type_prod' => $type_prod,
+                'id_material' => $id_material,
+                'id_component' => $id_component,
+                'quantity' => $quantity,
+                'price' => $price
+            );
+                    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_export_detail";
+            $m->add($array);
+        }
+        public static function addNew( $array){          
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_export_detail";
+            $m->add($array);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_export_detail`',$GET,  $WHERE);
+        }
+    }
+    class production_cmd{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew( $id_component, $name, $deadline, $progress_realtime, $addBy, $receiver, $note, $member, $priority) {
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $time = date("Y-m-d H:i:s");
+        
+            $array = array(
+                'id_component' => $id_component,
+                'name' => $name,
+                'deadline' => $deadline,
+                'progress_realtime' => $progress_realtime,
+                'addBy' => $addBy,
+                'receiver' => $receiver,
+                'note' => $note,
+                'member' => $member,
+                'priority' => $priority,
+                'time' => $time
+            );
+        
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_production_cmd";
+            $m->add($array);
+        }
+        
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_production_cmd`',$GET,  $WHERE);
+        }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_production_cmd`',$GET,  $WHERE);
+        }
+        public static function update($array, $where){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_production_cmd";
+            $m->update($m->table_, $array, $where);
+        }
+    }
+    
+    class chat_prod_cmd{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNewChat($id_production_cmd, $id_user, $comment, $progress, $file) {
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $time = date("Y-m-d H:i:s");
+            $array = array(
+                'id_production_cmd' => $id_production_cmd,
+                'id_user' => $id_user,
+                'comment' => $comment,
+                'progress' => $progress,
+                'time' => $time,
+                'file' => $file
+            );
+        
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_chat_prod_cmd";
+            $m->add($array);
+        }
+        
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_chat_prod_cmd`',$GET,  $WHERE);
+        }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_chat_prod_cmd`',$GET,  $WHERE);
         }
     }
 ////////API REDORD:
@@ -1163,6 +1494,12 @@ if(isset($_POST['show_setting_Classify'])){
             return $c->remove(' `id_parent` = '.$id_parent.' AND `id_child` = '.$id_component.' ');
         }
     }
+    if(isset($_POST['getAll_Info_Material'])){
+        echo json_encode(  material::SUPER_join_With_Info('' ));
+    }
+    if(isset($_POST['getAll_Info_Component'])){
+        echo json_encode(  component::SUPER_Component_Join_Info('' ));
+    }
     if(isset($_POST['thongke'])){
         if($_POST['thongke']  == 'material'){
             if(isset($_POST['search']) && $_POST['search']!=null ){
@@ -1215,6 +1552,10 @@ if(isset($_POST['import'])){
 
     }
 }
+///////API EXPORT
+
+
+
 
 // Function to export data from MySQL table to Excel
 require $_SERVER['DOCUMENT_ROOT']. '/ICONVINA_KHO/vendor/autoload.php'; // Include PhpSpreadsheet library
@@ -1254,4 +1595,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
         $data = $m->testDEQUY_5($id_parent);
         echo json_encode($data);
     }
+    function getaaaaa(){
+        var_dump(getAllPersonnel());
+    }
+    // require_once('..\..\QLNS\getdataUser.php');
 ?>

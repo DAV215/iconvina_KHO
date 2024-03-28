@@ -246,18 +246,33 @@ ob_start();
         <div href="" class="sideMenu-Item">
             <div class="Main-sideMenu">
                 <div class="sideMenu-icon-title">
-                    <span class="sideMenu-icon"> <i class="fa-solid fa-list"></i></i></i></span>
+                    <span class="sideMenu-icon"> <i class="fa-solid fa-warehouse"></i></span>
                     <span class="sideMenu-Title">Kho vận</span>
                 </div>
                 <button onclick="toggleSubMenu(this)"><i class="fa-solid fa-angle-right"></i></button>
             </div>
             <div class="sub-sideMenu ">
                 <ul>
-                    <li><a href="admin.php?job=QLKHO&action=thongke" onclick="changeActive(this)">Thống kê </a></li>
+                    <li><a href="admin.php?job=QLKHO&action=thongke" onclick="changeActive(this)">Thống kê sản phẩm</a></li>
+                    <li><a href="admin.php?job=QLKHO&action=thongke_imp_exp" onclick="changeActive(this)">Thống kê nhập xuất</a></li>
                     <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=addFILE_ADD" onclick="changeActive(this)">Thêm sản phẩm</a></li>
                     <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=import" onclick="changeActive(this)">Nhập kho</a></li>
                     <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=export" onclick="changeActive(this)">Xuất kho</a></li>
                     <li><a href="admin.php?job=QLKHO&action=thongke&actionChild=setting" onclick="changeActive(this)">Thông tin kho</a></li>
+                </ul>
+            </div>
+        </div>
+        <div href="" class="sideMenu-Item">
+            <div class="Main-sideMenu">
+                <div class="sideMenu-icon-title">
+                    <span class="sideMenu-icon"> <i class="fa-solid fa-puzzle-piece"></i></span>
+                    <span class="sideMenu-Title">Lệnh sản xuất</span>
+                </div>
+                <button onclick="toggleSubMenu(this)"><i class="fa-solid fa-angle-right"></i></button>
+            </div>
+            <div class="sub-sideMenu ">
+                <ul>
+                    <li><a href="admin.php?job=QL_Production_CMD&action=thongke" onclick="changeActive(this)">Thống kê </a></li>
                 </ul>
             </div>
         </div>

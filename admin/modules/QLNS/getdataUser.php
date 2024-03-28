@@ -4,7 +4,143 @@
 
     $sqlUserAll = "SELECT * FROM `tbl_user`";
     $queryALL = mysqli_query($mysqli, $sqlUserAll);
+    class DB_driver_THUCHI extends DB_driver_THUCHI_root{
+        public $table_ ='';
+        private $id;
 
+        function add($data){
+            return parent::insert($this->table_, $data);
+        }
+        function update_($data, $where){
+            return parent::update($this->table_, $data, $where);
+        }
+        function remove($where){
+            return parent::delete($this->table_, $where);
+        }
+        function getAll($table){
+            return parent::getALL($table);
+        }
+        function get_1row($table, $select, $where){
+            return parent::get_1row($table, $select, $where);
+        }
+        function getALL_WHERE($table, $select, $where){
+            return parent::getALL_WHERE($table, $select, $where);
+        }
+        function overview($sql){
+            return parent::overview($sql);
+        }
+    }
+    class DB_driver_THUCHI_root{
+        private $__conn;
+        private $table;
+        function connection(){
+            if(!$this->__conn){
+                $mysqli_kho = new mysqli("127.0.0.1:3307","root","","iconvina_thuchi");
+                $this->__conn = $mysqli_kho;
+            }
+            mysqli_query($this->__conn, "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'");
+        }
+        function insert($tb, $data){
+            $this->connection();
+        
+            // Lưu trữ danh sách field
+            $field_list = '';
+            // Lưu trữ danh sách giá trị tương ứng với field
+            $value_list = '';
+        
+            foreach ($data as $key => $value){
+                $field_list .= "$key,";
+                $value_list .= "'".mysqli_real_escape_string($this->__conn, $value)."',";
+            }
+        
+            // Vì sau vòng lặp các biến $field_list và $value_list sẽ thừa một dấu , nên ta sẽ dùng hàm trim để xóa đi
+            $sql = 'INSERT INTO '.$tb. '('.trim($field_list, ',').') VALUES ('.trim($value_list, ',').')';
+            return mysqli_query($this->__conn, $sql);
+        }
+        function update($table, $data, $where){
+            $this->connection();
+            $sql = '';
+            foreach($data as $key => $value){
+                $sql .= " $key = '".mysqli_real_escape_string($this->__conn, $value)."', ";
+            }
+            //Xóa , ở vị trí cuối cùng của chuỗi SQL
+            $sql = rtrim($sql, ', ');
+            $sql = 'UPDATE '.$table. ' SET '.$sql.' WHERE '.$where;
+            return mysqli_query($this->__conn, $sql);
+        }
+        function delete($table,$where){
+            $this->connection();
+            $sql = "DELETE FROM `$table` WHERE $where";
+            // echo $sql;
+            return mysqli_query($this->__conn, $sql);
+        }
+        function getALL($table){
+            $this->connection();
+            $sql = "SELECT * FROM ".$table;
+            $query = mysqli_query($this-> __conn, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data[] = $row;
+            }
+            return $data;
+        }
+        function getALL_WHERE($table,$sql_GET, $sql_WHERE){
+            $this->connection();
+            $sql = "SELECT " .$sql_GET." FROM ".$table . " WHERE " .$sql_WHERE;
+            // echo $sql;
+            $query = mysqli_query($this-> __conn, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data[] = $row;
+            }
+            return $data;
+        }
+        function getALL_WHERE_assoc($table,$sql_GET, $sql_WHERE){
+            $this->connection();
+            $sql = "SELECT " .$sql_GET." FROM ".$table . " WHERE " .$sql_WHERE;
+            // echo $sql;
+            $query = mysqli_query($this-> __conn, $sql);
+            // $data = [];
+            while ($row = mysqli_fetch_assoc($query)){
+                $data[] = $row;
+            }
+            return $data;
+        }
+        function overview($sql){
+            $this->connection();
+            $query = mysqli_query($this-> __conn, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data[] = $row;
+            }
+            return $data;
+        }
+        function get_1row($table,$select,$where){
+            $this->connection();
+            $sql = "SELECT " . $select." FROM " . $table ." WHERE ". $where;
+            $query = mysqli_query($this-> __conn, $sql);
+            $data = [];
+            while ($row = mysqli_fetch_array($query)){
+                $data = $row;
+            }
+            return $data;
+        }
+        
+    }
+    class user{
+        private $id;
+
+        function __construct($id = null) {
+            $this->id = $id;
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_THUCHI_root;
+            return $db->getALL_WHERE_assoc('`tbl_user`',$GET,  $WHERE);
+        }
+    }
+    //////API user;
+    
+    //////
     function getDepartment(){
         include('../config/configDb.php');
         $sql = "SELECT * FROM `tbl_department`";
@@ -624,4 +760,5 @@
     
         return $ipaddress;
     }
+
 ?>

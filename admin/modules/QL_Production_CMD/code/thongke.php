@@ -1,0 +1,31 @@
+
+<h1>Lệnh sản xuất:</h1>
+<div class="tableComponent" style="width:90%;">
+    <table  class="stripe hover order-column row-border  "  style="width:100%" id="table3">
+    <thead>
+    <tr class="">
+               
+                    <th>STT</th>
+                    <th>Tên lệnh</th>
+                    <th>Bắt đầu</th>
+                    <th>Thời hạn</th>
+                    <th>Tiến độ</th>
+                    <th>Quản lý</th>
+                    <th>Mức độ ưu tiên</th>
+                    <th>Tác vụ</th>
+
+            </tr>
+        </thead>
+        <tbody >
+
+        </tbody>
+</table>
+</div>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css">
+
+<script src="../asset/js/KHO/settingKho.js"></script>
+<script src="../asset/js/KHO/prod_cmd.js"></script>

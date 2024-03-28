@@ -791,3 +791,152 @@ input#img_Component {
     padding: 0;
     margin: 0;
 }
+
+.input_class {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin-top: 50px;
+}
+
+.input_class fieldset {
+    border: none;
+    transition: all 0.5s;
+    margin: 15px 0;
+}
+
+.input_class fieldset:hover {
+    border-width: 1px;
+    border-style: groove;
+    border-color: rgb(192, 192, 192);
+    color: tomato;
+    font-weight: bolder;
+    margin: 25px 0;
+}
+
+.input_class input {
+    display: flex;
+    width: 100%;
+    border: none;
+    border-bottom: solid 1px #ccc;
+    outline: none;
+    margin: 10px 0;
+}
+
+button.btn_common {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: tomato;
+    color: white;
+    font-weight: bolder;
+}
+
+button.btn_common:hover {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.detail {
+    display: flex;
+    flex-direction: row;
+}
+
+.info {
+    width: 45%;
+    gap: 10%;
+}
+
+.info .input_class {
+    width: 100%;
+    gap: 10%;
+}
+
+.dataTables_wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.dataTables_scroll {
+    width: 100%;
+}
+
+.dataTables_paginate {
+    display: flex;
+    gap: 20px;
+}
+
+.dataTables_paginate span a {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    margin: 0 5px;
+    border-radius: 2px;
+}
+
+.paginate_button.current {
+    background-color: tomato;
+}
+
+table.dataTable>thead>tr>th {
+    padding: 10px;
+    text-align: center;
+}
+
+table.dataTable td {
+    justify-content: center;
+    text-align: center;
+}
+
+table.dataTable {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+table.dataTable th {
+    color: white;
+    background-color: #2f3640;
+    height: 40px;
+}
+
+table.dataTable th,
+table.dataTable td {
+    color: white;
+    font-size: 1.25rem;
+}
+
+table.dataTable td {
+    max-width: 10% !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+table.dataTable a {
+    text-decoration: none;
+    color: tomato;
+    font-weight: bolder;
+    margin: 0 5px;
+}
+
+table.dataTable tr:last-child {
+    border: none;
+}
+
+.item_CT.header input {
+    border: none;
+    font-size: 1.25rem;
+    color: #d3460d !important;
+    font-weight: bolder;
+}
+
+.item_CT.header input::placeholder {
+    border: none;
+    font-size: 1rem;
+    color: #d3460d !important;
+    font-weight: bolder;
+    font-family: 'Quicksand', sans-serif !important;
+}

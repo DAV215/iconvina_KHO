@@ -9,6 +9,11 @@ html {
     scroll-behavior: smooth;
 }
 
+@font-face {
+    font-family: "Batman";
+    src: url("../../font/Batman.otf");
+}
+
 .container {
     position: absolute;
     width: 100%;

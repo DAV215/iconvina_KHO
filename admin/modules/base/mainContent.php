@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="../asset/css/admin/table.css">
 <link rel="stylesheet" href="../asset/css/admin/formInfo.css">
 <link rel="stylesheet" href="../asset/css/admin/modalForm.css">
+<link rel="stylesheet" href="../asset/css/admin/chatbox.css">
 <script src="../asset/js/modal.js"></script>
 <div class="mainContent">
     <?php 
@@ -40,6 +41,9 @@
                 }
                 if($job=="QLKHO"){
                     if($action == 'thongke') include('QLKHO/code/QLKHO.php');  
+                    if($action == 'thongke_imp_exp') include('QLKHO/code/QLKHO.php');  
+                }if($job=="QL_Production_CMD"){
+                    if($action == 'thongke') include('QL_Production_CMD/code/QL_Production_CMD.php');  
                 }
             }else{
                 include('QLDXM/buysuggest.php');

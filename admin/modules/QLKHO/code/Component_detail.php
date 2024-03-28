@@ -1,15 +1,11 @@
 <?php 
     $id_Component_parent =  $_GET['id_Component_parent'] ;
-    // $material = material::get_info_Material($id_material);
-    // $info_Material = info_Material::get_info_Material($id_material);
-    print_r($_SESSION['userINFO']['fullname']);
     $component_parent = new component;
     $info_component = info_Component::get_info_Component($id_Component_parent);
 
     $component_parent_basicInfo = $component_parent->get_1row(' `id` = '.$id_Component_parent.'')[0];
     $get_DMNL_Material = $component_parent->getALL_Child(' `level` = 0 AND `id_parent` = '.$component_parent_basicInfo['id'].'');
     $get_DMNL_Component = $component_parent->getALL_Child(' `level` > 0 AND `id_parent` = '.$component_parent_basicInfo['id'].' ORDER BY `id` DESC');
-
 
     if(Super_detail::getAll('*', " `id_component` = $id_Component_parent ")){
         $super_detail = Super_detail::getAll('*', " `id_component` = $id_Component_parent ")[0];
@@ -67,29 +63,30 @@
 
         if(!Super_detail::getAll('*', " `type` = 'Component' AND `id_component` = $id_Component_parent")){
             Business::addNew($store, $price_buy,$delivery_fee,$discount,$vat);
-            print_r( Business::get_1row('MAX(Id)', '  1 '));
             $id_business = Business::get_1row('MAX(Id)', '  1 ')['MAX(Id)'];
             Super_detail::addNew('Component',  null, $id_Component_parent, $id_classify, $id_position, $id_business);
-            Record_KHO_SUPERDETAIL::addNew($super_detail['id'], " Thêm mới ", $_SESSION['userINFO']['fullname']);
+            Record_KHO_SUPERDETAIL::addNew($super_detail['id'], " Thêm mới ", '','',$_SESSION['userINFO']['fullname']);
         
         }else{
-            $id_business = Business::get_1row('MAX(Id)', '  1 ')['MAX(Id)'];
-
+            $id_business = Super_detail::getAll('*', " `type` = 'Component ' AND `id_component` = $id_Component_parent ")[0]['id_business'];
             $R = new Record_KHO_SUPERDETAIL;
             $R_Pos = $R::checkPosition($position_Component, $super_detail['id_position']);
             $R_Class = $R::checkCLassify($classify, $super_detail['id_classify']);
-            $R_quantity = $R::checkQuantity_M($quantity_Component, $super_detail['id_material']);
+            $R_quantity = $R::checkQuantity_C($quantity_Component, $id_Component_parent);
             $R_Business = Record_KHO_SUPERDETAIL::checkBus($store, $price_buy,$delivery_fee,$discount,$vat, $id_business);
-            if( $R_Pos || $R_Class || $R_Business || $R_quantity){
-                Record_KHO_SUPERDETAIL::addNew($super_detail['id'], "Sửa ".$R_Business . $R_Pos . $R_Class. $R_quantity, $_SESSION['userINFO']['fullname']);
+            $all = [];
+            $all = $R::result_diff($R_Pos, $R_Class, $R_quantity, $R_Business );
+            foreach($all as $row){
+                Record_KHO_SUPERDETAIL::addNew($super_detail['id'],$row['area'], $row['old'], $row['new'], $_SESSION['userINFO']['fullname']);
+
             }
 
             Business::update($store, $price_buy,$delivery_fee,$discount,$vat, " `id` = $id_business");
             Super_detail::update('Component',  null, $id_Component_parent, $id_classify, $id_position, $id_business, " `id_component` =  $id_Component_parent");
 
         }
-        //processing
-        //name & quantity
+    //     //processing
+    //     //name & quantity
 
         //detail Info
         $info_modify = new info_Component;
@@ -143,7 +140,7 @@
                 }
             }
         }
-        Record_KHO_SUPERDETAIL::addNew($super_detail['id'], " Sửa đinh mức nguyên liệu ", $_SESSION['userINFO']['fullname']);
+        Record_KHO_SUPERDETAIL::addNew($super_detail['id'], " Sửa đinh mức nguyên liệu ", '','', $_SESSION['userINFO']['fullname']);
 
         echo "<meta http-equiv='refresh' content='0'>";
         
@@ -152,7 +149,7 @@
         $data = $component->thongke_Vattu_Component($component->testDEQUY_thongke($id_Component_parent));
         echo exportToExcel($data, 'T1'); 
     }
-    
+
 ?>
 
 <form action="" method="post" enctype="multipart/form-data">
@@ -170,7 +167,8 @@
                         <div class="tab">
                             <button type="button" class="tablinks" onclick="change_tab(event, 'common_info')"
                                 id="defaultOpen">Thông tin chung</button>
-                                <button type="button" class="tablinks" onclick="change_tab(event, 'detail_info')">Thông tin chi tiết</button>
+                            <button type="button" class="tablinks" onclick="change_tab(event, 'detail_info')">Thông tin
+                                chi tiết</button>
                             <button type="button" class="tablinks" onclick="change_tab(event, 'tbl_dmnl')">Định mức
                                 nguyên liệu</button>
                             <button type="button" class="tablinks" onclick="change_tab(event, 'tbl_taolenhsanxuat')">Tạo
@@ -181,51 +179,54 @@
                         <div id="common_info" class="tabcontent">
                             <div class="part">
                                 <h3>Vị trí</h3>
-                                <input type="text" name="position_Component" list="getPosition_KHO" 
-                                value="<?php echo $position_db; ?>"
-                                    id="inputPosition"
+                                <input type="text" name="position_Component" list="getPosition_KHO"
+                                    value="<?php echo $position_db; ?>" id="inputPosition"
                                     oninput="dataList_setting_Position($('#inputPosition').val(), '#getPosition_KHO')">
                                 <datalist id="getPosition_KHO"> </datalist>
                                 <button type="button"
-                                style="width: 60px; max-height: 60px !important; border-radius: 50%; padding: 0; margin: 0; transform: scale(0.8);"
-                                onclick="$('.sub.NewPosition').css('display', 'flex');">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
+                                    style="width: 60px; max-height: 60px !important; border-radius: 50%; padding: 0; margin: 0; transform: scale(0.8);"
+                                    onclick="$('.sub.NewPosition').css('display', 'flex');">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
 
-                            <div class="sub NewPosition">
-                                <input type="text" name="storage" placeholder="Kho">
-                                <input type="text" name="row" placeholder="Hàng">
-                                <input type="text" name="col" placeholder="Cột">
-                                <input type="text" name="shelf_level" placeholder="Vị trí trên kệ">
-                                <summary>*Cách điền vị trí tương đối: Kho 1, hàng Ngoài sân => Lưu</summary>
-                                <button type="button" style="width: 20%;" onclick="new_setting_Position_2(this, '.NewPosition');$('.sub.NewPosition').css('display', 'none');">Lưu
-                                    vị trí mới</button>
-                            </div>
-                            <h3>Phân loại</h3>
+                                <div class="sub NewPosition">
+                                    <input type="text" name="storage" placeholder="Kho">
+                                    <input type="text" name="row" placeholder="Hàng">
+                                    <input type="text" name="col" placeholder="Cột">
+                                    <input type="text" name="shelf_level" placeholder="Vị trí trên kệ">
+                                    <summary>*Cách điền vị trí tương đối: Kho 1, hàng Ngoài sân => Lưu</summary>
+                                    <button type="button" style="width: 20%;"
+                                        onclick="new_setting_Position_2(this, '.NewPosition');$('.sub.NewPosition').css('display', 'none');">Lưu
+                                        vị trí mới</button>
+                                </div>
+                                <h3>Phân loại</h3>
                                 <input type="text" name="classify" id="inputClassify" list="getClassify_KHO"
-                                value="<?php echo $classify_db ?>"
+                                    value="<?php echo $classify_db ?>"
                                     oninput="dataList_setting_Classify($('#inputClassify').val(), '#getClassify_KHO')">
                                 <datalist id="getClassify_KHO">
 
                                 </datalist>
                                 <button type="button"
-                                style="width: 60px; max-height: 60px !important; border-radius: 50%; padding: 0; margin: 0; transform: scale(0.8);"
-                                onclick="$('.sub.NewClassify').css('display', 'flex');">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
+                                    style="width: 60px; max-height: 60px !important; border-radius: 50%; padding: 0; margin: 0; transform: scale(0.8);"
+                                    onclick="$('.sub.NewClassify').css('display', 'flex');">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
 
-                            <div class="sub NewClassify">
-                                <input type="text" name="mainClass" placeholder="Danh mục chính">
-                                <input type="text" name="subClass" placeholder="Danh mục phụ">
-                                <input type="text" name="note" placeholder="Ghi chú">
-                                <summary>*Cách điền vị trí tương đối: Kho 1, hàng Ngoài sân => Lưu</summary>
-                                <button type="button" style="width: 20%;" onclick="new_setting_Classify_2(this, '.NewClassify'); $('.sub.NewClassify').css('display', 'none');">Lưu
-                                    danh mục mới</button>
-                            </div>
+                                <div class="sub NewClassify">
+                                    <input type="text" name="mainClass" placeholder="Danh mục chính">
+                                    <input type="text" name="subClass" placeholder="Danh mục phụ">
+                                    <input type="text" name="note" placeholder="Ghi chú">
+                                    <summary>*Cách điền vị trí tương đối: Kho 1, hàng Ngoài sân => Lưu</summary>
+                                    <button type="button" style="width: 20%;"
+                                        onclick="new_setting_Classify_2(this, '.NewClassify'); $('.sub.NewClassify').css('display', 'none');">Lưu
+                                        danh mục mới</button>
+                                </div>
                                 <h3>Code</h3>
-                                <input type="text" name="code_Component"  value="<?php echo isset($info_component['code'])?$info_component['code']:'';  ?>">
+                                <input type="text" name="code_Component"
+                                    value="<?php echo isset($info_component['code'])?$info_component['code']:'';  ?>">
                                 <h3>Ghi chú</h3>
-                                <input type="text" name="note_Component"  value="<?php echo isset($info_component['note'])?$info_component['note']:'';  ?>">
+                                <input type="text" name="note_Component"
+                                    value="<?php echo isset($info_component['note'])?$info_component['note']:'';  ?>">
                             </div>
                             <div class="part">
                                 <label for="img_Component"> Thêm File đính kèm</label>
@@ -244,20 +245,22 @@
                                                 $ext = pathinfo($value, PATHINFO_EXTENSION);
                                                 if(in_array($ext,$images)) {
                                                     ?>
-                                                    <div class="sub_preview_Img">
-                                                        <img src="<?php echo $path.$value ?>" alt="">
-                                                        <button type="button" class="delete_ITEM_CT" onclick="del_Img_Component('<?php echo $info_component['link_folder'].'/'.$value; ?>')">X</button>
+                                    <div class="sub_preview_Img">
+                                        <img src="<?php echo $path.$value ?>" alt="">
+                                        <button type="button" class="delete_ITEM_CT"
+                                            onclick="del_Img_Component('<?php echo $info_component['link_folder'].'/'.$value; ?>')">X</button>
 
-                                                    </div>
-                                                    <?php
+                                    </div>
+                                    <?php
                                                 }else{
                                                     ?>
-                                                    <div class="sub_preview_Img">
-                                                        <a href="<?php echo $path . $value ?>" target="_blank"><?php echo $value ?></a>
-                                                        <button type = "button" class="delete_ITEM_CT" onclick="del_Img_Component('<?php echo $info_component['link_folder'].'/'.$value; ?>')">X</button>
+                                    <div class="sub_preview_Img">
+                                        <a href="<?php echo $path . $value ?>" target="_blank"><?php echo $value ?></a>
+                                        <button type="button" class="delete_ITEM_CT"
+                                            onclick="del_Img_Component('<?php echo $info_component['link_folder'].'/'.$value; ?>')">X</button>
 
-                                                    </div>
-                                                    <?php
+                                    </div>
+                                    <?php
                                                 }
                                             }
     
@@ -271,21 +274,28 @@
                             <button type="submit" name="save_component_Modify">Lưu</button>
                         </div>
                         <div id="detail_info" class="tabcontent">
-                        <div class="sub " style="display:flex;">
+                            <div class="sub " style="display:flex;">
                                 <h3>Xuất xứ</h3>
-                                <input type="text" name="store" placeholder="Xuất xứ" value="<?php echo $business_db['store'] ?>">
+                                <input type="text" name="store" placeholder="Xuất xứ"
+                                    value="<?php echo $business_db['store'] ?>">
                                 <h3>Giá vào</h3>
-                                <input type="text" name="price_buy" placeholder="Giá vào" value="<?php echo $business_db['price_buy'] ?>">
+                                <input type="text" name="price_buy" placeholder="Giá vào"
+                                    value="<?php echo $business_db['price_buy'] ?>">
                                 <h3>Phí vận chuyển về</h3>
-                                <input type="text" name="delivery_fee" placeholder="Phí vận chuyển về" value="<?php echo $business_db['delivery_fee'] ?>">
+                                <input type="text" name="delivery_fee" placeholder="Phí vận chuyển về"
+                                    value="<?php echo $business_db['delivery_fee'] ?>">
                                 <h3>% Có thể giảm</h3>
-                                <input type="text" name="discount" placeholder="% Có thể giảm" value="<?php echo $business_db['discount'] ?>">
+                                <input type="text" name="discount" placeholder="% Có thể giảm"
+                                    value="<?php echo $business_db['discount'] ?>">
                                 <h3>% VAT</h3>
-                                <input type="text" name="vat" placeholder="VAT" value="<?php echo $business_db['vat'] ?>">
+                                <input type="text" name="vat" placeholder="VAT"
+                                    value="<?php echo $business_db['vat'] ?>">
                             </div>
-                            <h3>Giá thành: <?php $noVat = $business_db['price_buy']+$business_db['delivery_fee']-$business_db['discount']; echo number_format($noVat+$noVat*$business_db['vat']/100) ?> </h3>
+                            <h3>Giá thành:
+                                <?php $noVat = $business_db['price_buy']+$business_db['delivery_fee']-$business_db['discount']; echo number_format($noVat+$noVat*$business_db['vat']/100) ?>
+                            </h3>
                             <button type="submit" name="save_component_Modify">Lưu</button>
-                       
+
                         </div>
                     </div>
 
@@ -392,63 +402,129 @@
 </form>
 
 <div id="tbl_taolenhsanxuat" class="tableComponent tabcontent">
-                    <?php
+    <?php
                     $component = new component;
                         $component->testDEQUY_2($id_Component_parent); 
                         echo "<h1>Thống kê vật tư:</h1>";
                         ?>
-                            <table class="data_table" id = "tbl_BOM">
-                                <thead>
-                                    <tr class="headerTable">
-                                        <div class="rowTitle">
-                                            <th>Số thứ tự</th>
-                                            <th>Tên</th>
-                                            <th>Code</th>
-                                            <th>Số lượng</th>
-                                            <th>Tác vụ</th>
-                                        </div>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody_Component">
-                                    <?php 
+    <table class="data_table" id="tbl_BOM">
+        <thead>
+            <tr class="headerTable">
+                <div class="rowTitle">
+                    <th>Số thứ tự</th>
+                    <th>Tên</th>
+                    <th>Code</th>
+                    <th>Số lượng</th>
+                    <th>Số lượng trong kho</th>
+                    <th>Tác vụ</th>
+                </div>
+            </tr>
+        </thead>
+        <tbody id="tbody_Component">
+            <?php 
                                         $i = 0;
                                         foreach ($component->thongke_Vattu_Component($component->testDEQUY_thongke($id_Component_parent)) as $row) {
                                             // echo $row['id'] . $row['name'] . '-SL:' . $row['quantity'] . '</br>';
                                             $i++;
+                                            $quantity_need = $row['quantity'];
+                                            $quantity_exist = material::get_info_Material($row['id'])['quantity'];
+                                            $diff = 1-floatval(($quantity_need / $quantity_exist));
+                                            switch ($diff) {
+                                                case ($diff< 0.1):
+                                                    $color_background = 'red';
+                                                    $color_text = 'black';
+                                                    break;
+                                                case ( $diff < 0.3):
+                                                    $color_background = 'yellow';
+                                                    $color_text = 'black';
+                                                    break;
+                                                default:
+                                                    $color_text = 'ccc';
+                                                    $color_background = 'rgba(0, 0, 0, 0.2)';
+                                                    break;
+                                            }
                                             ?>
-                                                <tr>
-                                                    <td><?php echo $i ?></td>
-                                                    <td><?php echo $row['name']  ?></td>
-                                                    <td><?php echo $row['code']  ?></td>
-                                                    <td><?php echo $row['quantity']  ?></td>
-                                                    <td class="tacvu">
-                                                        <a href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=<?php echo $row['id']  ?>">
-                                                            Chi tiết
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            <?php
+            <tr style="background: <?php echo $color_background ?>  ; color: <?php echo $color_text ?>  ;"
+                <?php echo $diff?>>
+                <td><?php echo $i ?></td>
+                <td><?php echo $row['name']  ?></td>
+                <td><?php echo $row['code']  ?></td>
+                <td><?php echo $quantity_need  ?></td>
+                <td><?php echo $quantity_exist  ?></td>
+                <td class="tacvu">
+                    <a
+                        href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=<?php echo $row['id']  ?>">
+                        Chi tiết
+                    </a>
+                </td>
+            </tr>
+            <?php
                                         }
                                     ?>
-                                    
-                                </tbody>
-                            </table>
-                            <button onclick="exportTableToExcel('tbl_BOM', '<?php echo 'BOM_'.$component_parent_basicInfo['name'] ?>')">Xuất EXCEL</button>
-                        <?
+
+        </tbody>
+    </table>
+    <button onclick="exportTableToExcel('tbl_BOM', '<?php echo 'BOM_'.$component_parent_basicInfo['name'] ?>')">Xuất
+        EXCEL</button>
+    <?
                     ?>
+    <div class="input_class">
+        <form action="" method="post" id="production_cmd_form">
+            <input type="hidden" name="id_component" value="<?php echo $id_Component_parent ?>">
+            <input type="hidden" name="addBy" value="<?php echo $_SESSION['userINFO']['fullname'] ?>">
+            <fieldset>
+                <legend>Tên lệnh sản xuất:</legend>
+                <input required type="text" name="name_production_cmd" id="">
+            </fieldset>
+            <fieldset>
+                <legend>Mức độ ưu tiên:</legend>
+                <input required type="range" min="0" max="5" name="priority_range" id="">
+            </fieldset>
+            <fieldset>
+                <legend>Người phụ trách:</legend>
+                <input required type="text" name="manager" list="staff">
+                <datalist id="staff">
+
+                </datalist>
+            </fieldset>
+            <fieldset>
+                <legend>Người cùng tham gia:</legend>
+                <input  type="search" name="" id="searchStaff" list="staff">
+                <button type="button" class="btn_common" onclick="addMember()"><i class="fa-solid fa-plus"></i></button>
+                <input required type="text" name="member[]" list="staff" id="member">
+            </fieldset>
+            <fieldset>
+                <legend>DeadLine:</legend>
+                <input required type="datetime-local" name="deadline">
+            </fieldset>
+            <fieldset>
+                <legend>Ghi chú:</legend>
+                <textarea name="note_production_cmd" id="" cols="30" rows="10" style="width:99%;">note</textarea>
+            </fieldset>
+            <button class="btn_common" style="width:auto; border-radius: 10px;" type="button" onclick="create_cmd()">Tạo lệnh</button>
+        </form>
+
+    </div>
 </div>
+
 <h3>Lịch sử thay đổi:</h3>
 <summary>
-<?php 
-        if(isset($super_detail['id'])){
+    <?php 
+        if(isset($super_detail['id']) ){
             $i = $super_detail['id'];
             $v = Record_KHO_SUPERDETAIL::get_1row('*'," id_superDetail = $i  ");
-            echo $v['note'].' By:  '.$v['addBy']; 
+            if( $v) {
+                echo $v['area'] . '<br>' .
+                'Cũ: '.(is_numeric($v['old']) ? number_format($v['old']) : $v['old']) . '<br>' .
+                'Mới: '.(is_numeric($v['new']) ? number_format($v['new']) : $v['new']) . '<br>' .
+                ' By: ' . $v['addBy'];
+            }
         }
     ?>
 </summary>
 <div class="inforForm ">
-<button onclick="toggleVisibility('#history')"><?php echo isset($super_detail['id'])?'Xem lịch sử thay đổi':'Chưa tạo Super Detail'; ?></button>
+    <button
+        onclick="toggleVisibility('#history')"><?php echo isset($super_detail['id'])?'Xem lịch sử thay đổi':'Chưa tạo Super Detail'; ?></button>
 </div>
 <?php 
         if(isset($super_detail['id'])){
@@ -460,9 +536,10 @@
                 <div class="rowTitle">
                     <th>Số thứ tự</th>
                     <th>Tên</th>
-                    <th>Note</th>
+                    <th>Vùng thay đổi</th>
+                    <th>Cũ</th>
+                    <th>Mới</th>
                     <th>Thời gian</th>
-                    <th>Tác vụ</th>
                 </div>
             </tr>
         </thead>
@@ -474,16 +551,53 @@
 
     </div>
 </div>
-            <?php
+<?php
         }
     ?>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="../asset/js/KHO/settingKho.js"></script>
+<script  src="../asset/js/KHO/settingKho.js"></script>
 
 <script>
-    function showRecord(id_MDetail_Record) {
+function create_cmd() {
+    let form = $('#production_cmd_form');
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: form.serialize(), // Send form data directly
+        dataType: 'json', // Expect JSON response from the PHP script
+        type: 'post',
+        success: function(response) {
+            // Handle success response if needed
+            alert(response);
+        },
+        error: function(xhr, status, error) {
+            // Handle error
+            console.error(xhr, status, error);
+        }
+    });
+}
+
+function addMember() {
+    // Get the input element and the selected value
+    var searchInput = document.getElementById('searchStaff');
+    var selectedValue = searchInput.value.trim(); // Trim whitespace from the input
+    
+    // Check if the value is not empty
+    if (selectedValue !== '') {
+        // Select the member input element by name attribute
+        var memberInput = document.querySelector('input[name="member[]"]');
+        
+        // Append the selected value to the existing value of the member input
+        memberInput.value += (memberInput.value ? ', ' : '') + selectedValue;
+        
+        // Clear the search input
+        searchInput.value = '';
+    }
+}
+
+
+function showRecord(id_MDetail_Record) {
     $.ajax({
 
         url: "QLKHO/code/getdata_Kho.php",
@@ -497,16 +611,13 @@
             for (let i = 0; i < result.length; i++) {
                 let m = result[i];
                 let str = `
-                    <tr>
+                <tr>
                         <td>${i+1}</td>
                         <td>${m['addBy']}</td>
-                        <td style="width:50%;">${m['note']}</td>
+                        <td style="width:10%;">${m['area']}</td>
+                        <td style="width:25%;">${!isNaN(parseFloat(m['old'])) && isFinite(m['old']) ? parseFloat(m['old']).toLocaleString() : m['old']}</td>
+                        <td style="width:25%;">${!isNaN(parseFloat(m['new'])) && isFinite(m['new']) ? parseFloat(m['new']).toLocaleString() : m['new']}</td>
                         <td>${m['time']}</td>
-                        <td class="tacvu">
-                            <a href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=${m['id']}">
-                                Chi tiết
-                            </a>
-                        </td>
                     </tr>
                 `;
                 // Append the row to the tbody
@@ -518,6 +629,7 @@
         }
     });
 }
+
 function toggleVisibility(id) {
     if ($(id).css('display') === 'none') {
         $(id).css('display', 'block');
@@ -526,8 +638,9 @@ function toggleVisibility(id) {
     }
 }
 
-    let id_superDetail = <?php echo isset($super_detail['id'])?$super_detail['id']:'0' ?>;
+let id_superDetail = <?php echo isset($super_detail['id'])?$super_detail['id']:'0' ?>;
 showRecord(id_superDetail);
+
 function change_tab(event, nameTab) {
     var i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
@@ -616,6 +729,7 @@ function getdata_COMPONENT() {
     return returnData;
 }
 getdata_COMPONENT();
+
 function show_value_Storage_Component(input) {
     let idInput = $(input).closest('.component_CT').find('input[name="id_component[]"]');
     let level = $(input).closest('.component_CT').find('input[name="level_component[]"]');
@@ -727,7 +841,7 @@ function deleteComponent(button) {
 
 
 
-function del_Img_Component(path_Component_Img_DEL){
+function del_Img_Component(path_Component_Img_DEL) {
     $.ajax({
         type: "POST",
         url: "QLKHO/code/getdata_Kho.php",
@@ -737,7 +851,8 @@ function del_Img_Component(path_Component_Img_DEL){
         },
         success: function(data) {
             alert(data);
-            if (<?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>) {
+            if (
+                <?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>) {
                 location.reload();
             }
 
@@ -747,31 +862,34 @@ function del_Img_Component(path_Component_Img_DEL){
         }
     });
 }
+
 function ADD_new_FILE(file) {
-    let file_data = [];  
-    let form_data = new FormData();      
-    form_data.append('name_folder_component_modify', '<?php echo $component_parent_basicInfo['id'].'_'.$component_parent_basicInfo['name'] ; ?>');
+    let file_data = [];
+    let form_data = new FormData();
+    form_data.append('name_folder_component_modify',
+        '<?php echo $component_parent_basicInfo['id'].'_'.$component_parent_basicInfo['name'] ; ?>');
     form_data.append('id_component', '<?php echo $component_parent_basicInfo['id']; ?>');
     form_data.append('name_component', '<?php echo $component_parent_basicInfo['name']; ?>');
 
     for (let i = 0; i < $('#img_Component').prop('files').length; i++) {
         file_data.push($('#img_Component').prop('files')[i]);
         form_data.append('file_component_add[]', file_data[i]);
-    } 
+    }
 
     $.ajax({
         url: "QLKHO/code/getdata_Kho.php",
-        data: form_data,  // <-- send form data directly
-        dataType: 'text',  // <-- what to expect back from the PHP script, if anything
+        data: form_data, // <-- send form data directly
+        dataType: 'text', // <-- what to expect back from the PHP script, if anything
         cache: false,
         contentType: false,
         processData: false,
         type: 'post',
-        success: function(php_script_response){
-            alert(php_script_response); 
-            if (<?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>) {
-    location.reload();
-}
+        success: function(php_script_response) {
+            alert(php_script_response);
+            if (
+                <?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>) {
+                location.reload();
+            }
 
         },
         error: function() {
@@ -779,6 +897,7 @@ function ADD_new_FILE(file) {
         }
     });
 }
+
 function exportTableToExcel(tableID, filename = '') {
     var downloadLink;
     var dataType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'; // MIME type for .xlsx
@@ -792,29 +911,35 @@ function exportTableToExcel(tableID, filename = '') {
 
     // Create a new Excel workbook
     var wb = XLSX.utils.book_new();
-    
+
     // Convert table to worksheet
     var ws = XLSX.utils.table_to_sheet(tableSelect);
-    
+
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
     // Generate Excel file in binary string
-    var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    var wbout = XLSX.write(wb, {
+        bookType: 'xlsx',
+        type: 'binary'
+    });
 
     // Specify file name
-    filename = filename ? filename.replace(/\.[^.]+$/, '') + '.xlsx' : 'excel_data.xlsx'; // Update default filename to .xlsx
-    
+    filename = filename ? filename.replace(/\.[^.]+$/, '') + '.xlsx' :
+    'excel_data.xlsx'; // Update default filename to .xlsx
+
     // Create download link element
     downloadLink = document.createElement("a");
     document.body.appendChild(downloadLink);
 
     // Convert binary string to Blob
-    var blob = new Blob([s2ab(wbout)], { type: dataType });
+    var blob = new Blob([s2ab(wbout)], {
+        type: dataType
+    });
 
     // Create object URL for Blob
     var url = window.URL.createObjectURL(blob);
-    
+
     // Create a link to the file
     downloadLink.href = url;
 
@@ -835,7 +960,4 @@ function s2ab(s) {
     for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
     return buf;
 }
-
-
-
 </script>

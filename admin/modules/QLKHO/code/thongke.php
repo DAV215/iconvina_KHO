@@ -190,7 +190,6 @@ function Litsed_Component() {
             $("#tbody_Component").empty();
             $('#pagination_Component').empty();
             let page_quantity = Math.ceil(allPage / 5);;
-            console.log(page_quantity);
             for (let i = 0; i < page_quantity; i++) {
                 let str = `<button onclick="getPageComponent(this); Litsed_Component()">${i + 1}</button>`;
                 $('#pagination_Component').append(str);

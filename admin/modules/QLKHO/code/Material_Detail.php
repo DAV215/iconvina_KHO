@@ -61,26 +61,44 @@
             Business::addNew($store, $price_buy,$delivery_fee,$discount,$vat);
             print_r( Business::get_1row('MAX(Id)', '  1 '));
             $id_business = Business::get_1row('MAX(Id)', '  1 ')['MAX(Id)'];
+
             Super_detail::addNew('Material', $id_material, null, $id_classify, $id_position, $id_business);
-            Record_KHO_SUPERDETAIL::addNew(Super_detail::getAll('*', " `id_material` = $id_material ")[0]['id'], " Thêm mới ", $_SESSION['userINFO']['fullname']);
+            Record_KHO_SUPERDETAIL::addNew(Super_detail::getAll('*', " `id_material` = $id_material ")[0]['id'], ' ',' '," Thêm mới ", $_SESSION['userINFO']['fullname']);
         }else{
             $id_business = Business::get_1row('*', '  `id` = '.$business_db['id'].' ')['id'];
-            //Record
-            $R = new Record_KHO_SUPERDETAIL;
-            $R_Pos = $R::checkPosition($position_Material_New, $super_detail['id_position']);
-            $R_Class = $R::checkCLassify($classify, $super_detail['id_classify']);
-            $R_quantity = $R::checkQuantity_M($quantity_Material_New, $super_detail['id_material']);
-            $R_Business = Record_KHO_SUPERDETAIL::checkBus($store, $price_buy,$delivery_fee,$discount,$vat, $id_business);
-            if( $R_Pos || $R_Class || $R_Business || $R_quantity){
-                Record_KHO_SUPERDETAIL::addNew($super_detail['id'], "Sửa ".$R_Business . $R_Pos . $R_Class. $R_quantity, $_SESSION['userINFO']['fullname']);
+            if($business_db['id'] == 39){
+                Business::addNew($store, $price_buy,$delivery_fee,$discount,$vat);
+                print_r( Business::get_1row('MAX(Id)', '  1 '));
+                $id_business = Business::get_1row('MAX(Id)', '  1 ')['MAX(Id)'];
+                Record_KHO_SUPERDETAIL::addNew(Super_detail::getAll('*', " `id_material` = $id_material ")[0]['id'], ' ',' '," Thêm mới ", $_SESSION['userINFO']['fullname']);
+
+                Business::update($store, $price_buy,$delivery_fee,$discount,$vat, " `id` = $id_business");
+                Super_detail::update('Material', $id_material, null, $id_classify, $id_position, $id_business, " `id_material` =  $id_material");
+            }else{
+                //Record
+                $R = new Record_KHO_SUPERDETAIL;
+                $R_Pos = $R::checkPosition($position_Material_New, $super_detail['id_position']);
+                $R_Class = $R::checkCLassify($classify, $super_detail['id_classify']);
+                $R_quantity = $R::checkQuantity_M($quantity_Material_New, $super_detail['id_material']);
+                $R_Business = $R::checkBus($store, $price_buy,$delivery_fee,$discount,$vat, $id_business);
+                $all_DIFF = [$R_Pos, $R_Class, $R_quantity, $R_Business];
+                $all = [];
+                $all = $R::result_diff($R_Pos, $R_Class, $R_quantity, $R_Business );
+
+                foreach($all as $row){
+                    if(!empty($row) && checkallNull($row)){
+                        Record_KHO_SUPERDETAIL::addNew($super_detail['id'],$row['area'], $row['old'], $row['new'], $_SESSION['userINFO']['fullname']);
+                    }
+                }
+
+                Business::update($store, $price_buy,$delivery_fee,$discount,$vat, " `id` = $id_business");
+                Super_detail::update('Material', $id_material, null, $id_classify, $id_position, $id_business, " `id_material` =  $id_material");
             }
-            //Done Record
-            Business::update($store, $price_buy,$delivery_fee,$discount,$vat, " `id` = $id_business");
-            Super_detail::update('Material', $id_material, null, $id_classify, $id_position, $id_business, " `id_material` =  $id_material");
+
 
         }
-        //processing
-        //name & quantity
+        // processing
+        // name & quantity
         $material_modify = new material;
         $material_modify->update($name, $quantity_Material_New, ' `id` = '.$id_material.' ');
         //detail Info
@@ -109,7 +127,33 @@
     function checkNull($x) {
         return isset($x) ? $x : '';
     }
+    function check($a){
+        $total = [];
+        $temp = [];
+        foreach($a as $value){
+            if(is_array($value)){
+                $total = array_merge($total, check($value)); // Concatenate the result of check($value) with $total
+            }else{
+                $temp[] = $value;
+            }
+        }
+        // Construct the associative array outside the loop
+        $total['old'] = $temp[0];
+        $total['new'] = $temp[1];
+        $total['area'] = $temp[2];
+        return $total;
+    }
+    function checkallNull($a){
+        $i = 0;
+        foreach($a as $value){
+            if( isset($value)){
+                $i++;
+            }
+        }
+        return $i>2? true:false;
+    }
     
+
     
 ?>
 
@@ -268,7 +312,11 @@
         if(isset($super_detail['id'])){
             $i = $super_detail['id'];
             $v = Record_KHO_SUPERDETAIL::get_1row('*'," id_superDetail = $i  ");
-            echo $v['note'].' By:  '.$v['addBy']; 
+            echo $v['area'] . '<br>' .
+            'Cũ: '.(is_numeric($v['old']) ? number_format($v['old']) : $v['old']) . '<br>' .
+            'Mới: '.(is_numeric($v['new']) ? number_format($v['new']) : $v['new']) . '<br>' .
+            ' By: ' . $v['addBy'];
+       
         }
     ?>
 </summary>
@@ -285,9 +333,11 @@
                 <div class="rowTitle">
                     <th>Số thứ tự</th>
                     <th>Tên</th>
-                    <th>Note</th>
+                    <th>Vùng thay đổi</th>
+                    <th>Cũ</th>
+                    <th>Mới</th>
                     <th>Thời gian</th>
-                    <th>Tác vụ</th>
+        
                 </div>
             </tr>
         </thead>
@@ -398,14 +448,13 @@ function showRecord(){
                     <tr>
                         <td>${i+1}</td>
                         <td>${m['addBy']}</td>
-                        <td style="width:50%;">${m['note']}</td>
+                        <td style="width:10%;">${m['area']}</td>
+                        <td style="width:25%;">${!isNaN(parseFloat(m['old'])) && isFinite(m['old']) ? parseFloat(m['old']).toLocaleString() : m['old']}</td>
+                        <td style="width:25%;">${!isNaN(parseFloat(m['new'])) && isFinite(m['new']) ? parseFloat(m['new']).toLocaleString() : m['new']}</td>
                         <td>${m['time']}</td>
-                        <td class="tacvu">
-                            <a href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=${m['id']}">
-                                Chi tiết
-                            </a>
-                        </td>
                     </tr>
+
+
                 `;
                 // Append the row to the tbody
                 $("#tbody_history_Material_Change").append(str);

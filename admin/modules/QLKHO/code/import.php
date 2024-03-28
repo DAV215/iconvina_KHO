@@ -12,9 +12,14 @@
         $id_import = import_material::get_1row('*', " `name` = '$name_import' AND `created_by` = '$created_by'  ")['id'];
 
             foreach ($_POST['id_material'] as $key => $value) {
-                $all[] = ['id_import' => $id_import,'name' => $value, 'quantity' => $_POST['quantity_Material_need'][$key], 'price' => $_POST['price'][$key]];
                 import_material_detail::addNew2(  $id_import, $value, $_POST['quantity_Material_need'][$key], $_POST['price'][$key]);
                 material::update_quantity($_POST['quantity_Material_need'][$key], $value);
+                if(!isset(Super_detail::getAll('*', " `id_material` = $value ")[0]['id'])){
+                    //Material - id_material - 0 - Class chưa phân loại - Vị trí chưa xác định - info kinh doanh chưa nhập;
+                    Super_detail::addNew('Material', $value, 0, 12, 17, 39);
+                }
+                Record_KHO_SUPERDETAIL::addNew(Super_detail::getAll('*', " `id_material` = $value ")[0]['id'], 'Nhập thêm',' ',"  ", $_SESSION['userINFO']['fullname']);
+
             }
         }
     }
@@ -61,7 +66,7 @@
                     <h3>Tiêu đề nhập kho:</h3>
                         <input type="text" name="name_import" id="">
                         <h3>Ghi chú:</h3>
-                        <input type="text" placeholder="note">
+                        <input type="text" placeholder="note" name="note">
                     </div>
                     <div class="sub " style="display:flex;     width: 50%;">
                     <button name = "save_import">Lưa phiếu nhập</button>
