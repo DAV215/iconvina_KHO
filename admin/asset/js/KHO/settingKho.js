@@ -367,6 +367,14 @@ function toggleVisibility(id) {
     }
 }
 
+function toggleVisibility_flex(id) {
+    if ($(id).css('display') === 'none') {
+        $(id).css('display', 'flex');
+    } else {
+        $(id).css('display', 'none');
+    }
+}
+
 
 function getdataStaff(id_container) {
     $.ajax({

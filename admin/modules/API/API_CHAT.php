@@ -7,7 +7,7 @@
         $content = $_POST['data']['content'];
         $progress = $_POST['data']['progress'];
         chat_prod_cmd::addNewChat($id_Prod_CMD, $id_user, $content, $progress, null);
-        production_cmd::update(array('progress_realtime' => $progress), "  `id` = $id_Prod_CMD");
+        // production_cmd::update(array('progress_realtime' => $progress), "  `id` = $id_Prod_CMD");
     }
     if(isset($_POST['getdata_chat_prod_cmd'])){
         $id_Prod_CMD = $_POST['id_Prod_CMD'];

@@ -669,6 +669,25 @@ textarea::placeholder {
     width: 100%;
 }
 
+button.tablinks.button2 {
+    background-color: #ccc;
+    border-radius: 0;
+    width: 40%;
+    color: black;
+    height: 40px;
+    outline: none;
+    border: none;
+    font-size: 1.05rem;
+    font-family: 'Quicksand', sans-serif !important;
+}
+
+button.tablinks.button2.active {
+    background-color: black;
+    border-radius: 0;
+    color: white;
+    width: 50%;
+}
+
 .tab {
     display: flex;
     flex-direction: row;
@@ -803,14 +822,14 @@ input#img_Component {
     border: none;
     transition: all 0.5s;
     margin: 15px 0;
+    color: tomato;
+    font-weight: bolder;
 }
 
 .input_class fieldset:hover {
     border-width: 1px;
     border-style: groove;
     border-color: rgb(192, 192, 192);
-    color: tomato;
-    font-weight: bolder;
     margin: 25px 0;
 }
 
@@ -843,13 +862,17 @@ button.btn_common:hover {
 }
 
 .info {
-    width: 45%;
-    gap: 10%;
+    /* width: 45%;
+    gap: 10%; */
 }
 
 .info .input_class {
     width: 100%;
     gap: 10%;
+}
+
+.input_class input {
+    color: #000000;
 }
 
 .dataTables_wrapper {

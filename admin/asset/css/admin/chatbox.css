@@ -14,6 +14,23 @@ html {
     src: url("../../font/Batman.otf");
 }
 
+.chat_box_parrent {
+    position: fixed;
+    bottom: 50px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 30%;
+}
+
+.chat_box_parrent button {
+    background: none;
+    outline: none;
+    border: none;
+    backdrop-filter: blur(20px);
+}
+
 .chatbox {
     width: 90%;
     height: 500px;
@@ -24,6 +41,8 @@ html {
     flex-direction: column;
     justify-content: flex-end;
     position: relative;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    transition: all 0.5s;
 }
 
 .chatbox-container {
@@ -40,7 +59,7 @@ html {
     bottom: 0;
     display: flex;
     gap: 10px;
-    padding: 0 20px;
+    padding: 10px 20px;
 }
 
 .chatbox-actionbar button {
@@ -53,6 +72,7 @@ html {
 .chatbox-actionbar input {
     border-radius: 10px;
     padding: 0 10px;
+    margin: 10px 0;
 }
 
 .chat-element {
@@ -102,5 +122,5 @@ html {
 
 #progress_PCMD {
     font-family: "Batman", sans-serif;
-    font-size: 100px;
+    font-size: 80px;
 }

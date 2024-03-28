@@ -1,5 +1,6 @@
 <?php 
     $id_Prod_CMD = $_GET['id_cmd'];
+    //PCMD production command 
     $PCMD_BasicInfo = production_cmd::get_1row('*', "id = $id_Prod_CMD");
     $id_Component_parent = $PCMD_BasicInfo['id_component'];
 ?>
@@ -71,57 +72,95 @@
 
         </tbody>
     </table>
-    <button onclick="exportTableToExcel('tbl_BOM', '<?php echo 'BOM_'.$component_parent_basicInfo['name'] ?>')">Xuất
+    <button onclick="export_excel('#tbl_BOM')">Xuất
         EXCEL</button>
     <h1>Thông tin lệnh</h1>
     <div class="detail">
-        <fieldset class="info">
+        <fieldset class="info" style="width: 60%;">
             <legend>Thông tin cơ bản</legend>
-            <div class="input_class">
-                <form action="" method="post" id="production_cmd_form_update">
-                    <input type="hidden" name="id_component" value="<?php echo $id_Component_parent ?>">
-                    <input type="hidden" name="addBy" value="<?php echo $_SESSION['userINFO']['fullname'] ?>">
-                    <fieldset>
-                        <legend>Tên lệnh sản xuất:</legend>
-                        <input required type="text" name="name_production_cmd" id=""
-                            value="<?php echo $PCMD_BasicInfo['name']  ?>" disabled>
-                    </fieldset>
-                    <fieldset>
-                        <legend>Mức độ ưu tiên: <?php echo $PCMD_BasicInfo['priority']?></legend>
-                        <input required type="range" min="0" max="5" name="priority_range" id="" value =" <?php echo $PCMD_BasicInfo['priority']?>">
-                    </fieldset>
-                    <fieldset>
-                        <legend>Người phụ trách:</legend>
-                        <input required type="text" name="manager" list="staff"
-                            value="<?php echo $PCMD_BasicInfo['receiver']  ?>" disabled>
-                        <datalist id="staff">
+            <div class="Info_tab">
+                <div class="tab">
+                    <button type="button" class="tablinks button2" onclick="change_tab(event, 'info_PROD_CMD_Detail')"
+                        id="defaultOpen">Thông tin chi tiết</button>
+                    <button type="button" class="tablinks button2" onclick="change_tab(event, 'job_divison')">Phân chia
+                        công việc</button>
+                </div>
+                <div class="input_class tab_container" id="info_PROD_CMD_Detail">
+                    <form action="" method="post" id="production_cmd_form_update">
+                        <input type="hidden" name="id_component" value="<?php echo $id_Component_parent ?>">
+                        <input type="hidden" name="addBy" value="<?php echo $_SESSION['userINFO']['fullname'] ?>">
+                        <fieldset>
+                            <legend>Tên lệnh sản xuất:</legend>
+                            <input required type="text" name="name_production_cmd" id=""
+                                value="<?php echo $PCMD_BasicInfo['name']  ?>" disabled>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Mức độ ưu tiên: <?php echo $PCMD_BasicInfo['priority']?></legend>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Người phụ trách:</legend>
+                            <input required type="text" name="manager" list="staff"
+                                value="<?php echo $PCMD_BasicInfo['receiver']  ?>" disabled>
+                            <datalist id="staff">
 
-                        </datalist>
-                    </fieldset>
-                    <fieldset>
-                        <legend>Người cùng tham gia:</legend>
-                        <input type="search" name="" id="searchStaff" list="staff">
-                        <button type="button" class="btn_common" onclick="addMember()"><i
-                                class="fa-solid fa-plus"></i></button>
-                        <input required type="text" name="member[]" list="staff" id="member"
-                            value="<?php echo implode(", ", json_decode($PCMD_BasicInfo['member'], true)); ?>">
-                    </fieldset>
-                    <fieldset>
-                        <legend>DeadLine:</legend>
-                        <input required type="datetime-local" name="deadline"
-                            value="<?php echo $PCMD_BasicInfo['deadline']  ?>">
-                    </fieldset>
-                    <fieldset>
-                        <legend>Ghi chú:</legend>
-                        <textarea name="note_production_cmd" id="" cols="30" rows="10"
-                            style="width:99%;">note</textarea>
-                    </fieldset>
-                    <button class="btn_common" style="min-width:120px; border-radius: 10px;" type="button" onclick="update_cmd()">Update</button>
-                </form>
+                            </datalist>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Người cùng tham gia:</legend>
+                            <input type="search" name="" id="searchStaff" list="staff">
+                            <button type="button" class="btn_common" onclick="addMember()"><i
+                                    class="fa-solid fa-plus"></i></button>
+                            <input required type="text" name="member[]" list="staff" id="member"
+                                value="<?php echo implode(", ", json_decode($PCMD_BasicInfo['member'], true)); ?>">
+                        </fieldset>
+                        <fieldset>
+                            <legend>DeadLine:</legend>
+                            <input required type="datetime-local" name="deadline"
+                                value="<?php echo $PCMD_BasicInfo['deadline']  ?>">
+                        </fieldset>
+                        <fieldset>
+                            <legend>Ghi chú:</legend>
+                            <textarea name="note_production_cmd" id="" cols="30" rows="10"
+                                style="width:99%;">note</textarea>
+                        </fieldset>
+                        <button class="btn_common" style="min-width:120px; border-radius: 10px;" type="button"
+                            onclick="update_cmd()">Update</button>
+                    </form>
 
+                </div>
+                <div class="input_class tab_container" id="job_divison">
+                    Phân chia công việc
+                    <div class="big inforForm">
+                        <div class="bodyofForm Material" id="table_material_CT">
+                            <div class="item_CT">
+                                <input type="text" name="name_staff" placeholder="Tên nhân viên"
+                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
+                                <datalist id="ALL_data_material">
+
+                                </datalist>
+
+                                <input type="text" name="name_job[]" placeholder="Tên công việc"
+                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
+
+                                <input type="datetime-local" name="start[]" placeholder="Bắt đầu"
+                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
+                                    <input type="datetime-local" name="finish[]" placeholder="Kết thúc"
+                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
+                                    <input type="text" name="percent_ofall[]" placeholder="% của tổng"
+                                    style = "width: 10%;"
+                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
+                                <button type="button" name="delete_ITEM_CT"
+                                    onclick="delROW_(this, '.item_CT')">X</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
+
         </fieldset>
-        <fieldset class="info">
+        <fieldset class="info" style="width: 25%;">
             <legend>Thông tin chi tiết</legend>
             <div class="input_class" style="    align-items: center;">
                 <div class="h" style="display: flex; justify-content: space-around; align-items: center; width: 90%;">
@@ -130,140 +169,107 @@
                         id="progress_PCMD"><?php echo isset($PCMD_BasicInfo['progress_realtime'])?$PCMD_BasicInfo['progress_realtime']:0;  ?>
                         %</span>
                 </div>
-                <div class="chatbox">
-                    <div class="chatbox-container" >
-                        <div class="chat-element ofuser">
-                            <div class="chat-info">
-                                <span>Name - 12:33:00 23-09-2024</span>
-                            </div>
-                            <div class="chat-comment">
-                                <div class="chat-content">
-                                    Tỷ số dễ xảy ra nhất cho chiến thắng của Việt Nam là 1-0, xác suất 11,34%", trang
-                                    thể thao Anh nhận định. "Sau đó cũng là các tỷ số nghiêng về chủ nhà như 2-1
-                                    (9,49%), hay 2-0 (9,06%).
-                                </div>
-                                <div class="progress">
-                                    Tiến độ: 90%
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chat-element">
-                            <div class="chat-info">
-                                <span>Name - 12:33:00 23-09-2024</span>
-                            </div>
-                            <div class="chat-comment">
-                                <div class="chat-content">
-                                    Tỷ số dễ xảy ra nhất cho chiến thắng của Việt Nam là 1-0, xác suất 11,34%", trang
-                                    thể thao Anh nhận định. "Sau đó cũng là các tỷ số nghiêng về chủ nhà như 2-1
-                                    (9,49%), hay 2-0 (9,06%).
-                                </div>
-                                <div class="progress">
-                                    Tiến độ: 90%
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chat-element">
-                            <div class="chat-info">
-                                <span>Name - 12:33:00 23-09-2024</span>
-                            </div>
-                            <div class="chat-comment">
-                                <div class="chat-content">
-                                    Tỷ số dễ xảy ra nhất cho chiến thắng của Việt Nam là 1-0, xác suất 11,34%", trang
-                                    thể thao Anh nhận định. "Sau đó cũng là các tỷ số nghiêng về chủ nhà như 2-1
-                                    (9,49%), hay 2-0 (9,06%).
-                                </div>
-                                <div class="progress">
-                                    Tiến độ: 90%
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chatbox-actionbar">
-
-                        <input type="hidden" name="id_Prod_CMD" value="<?php echo $id_Prod_CMD ?>">
-                        <input type="hidden" name="id_user" value="<?php echo $_SESSION['userINFO']['id'] ?>">
-                        <input name="content" type="text" placeholder="Nội dung">
-                        <input name="progress" type="number" placeholder="Tiến độ" style="width: 20%">
-                        <button type="submit" onclick="chat_send(this,'.chatbox-actionbar' ); chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>, <?php echo $_SESSION['userINFO']['id'] ?>)"><i
-                                class="fa-solid fa-paper-plane"></i></button>
-                                <button onclick=" chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>,<?php echo $_SESSION['userINFO']['id'] ?> )">Refesh</button>
-                    </div>
-                </div>
-
+            </div>
+            <div class="input_class">
+                Tiến độ công việc
             </div>
         </fieldset>
     </div>
 </div>
+
+<div class="chat_box_parrent">
+    <button onclick="toggleVisibility_flex('#chat')"><img width="48" height="48"
+            src="https://img.icons8.com/color/48/facebook-messenger--v1.png" alt="facebook-messenger--v1" /></button>
+    <div class="chatbox" style="display:none;" id="chat">
+        <div class="chatbox-container">
+            <div class="chat-element ofuser">
+                <div class="chat-info">
+                    <span>Name - 12:33:00 23-09-2024</span>
+                </div>
+                <div class="chat-comment">
+                    <div class="chat-content">
+                        Tỷ số dễ xảy ra nhất cho chiến thắng của Việt Nam là 1-0, xác suất 11,34%", trang
+                        thể thao Anh nhận định. "Sau đó cũng là các tỷ số nghiêng về chủ nhà như 2-1
+                        (9,49%), hay 2-0 (9,06%).
+                    </div>
+                    <div class="progress">
+                        Tiến độ: 90%
+                    </div>
+                </div>
+            </div>
+            <div class="chat-element">
+                <div class="chat-info">
+                    <span>Name - 12:33:00 23-09-2024</span>
+                </div>
+                <div class="chat-comment">
+                    <div class="chat-content">
+                        Tỷ số dễ xảy ra nhất cho chiến thắng của Việt Nam là 1-0, xác suất 11,34%", trang
+                        thể thao Anh nhận định. "Sau đó cũng là các tỷ số nghiêng về chủ nhà như 2-1
+                        (9,49%), hay 2-0 (9,06%).
+                    </div>
+                    <div class="progress">
+                        Tiến độ: 90%
+                    </div>
+                </div>
+            </div>
+            <div class="chat-element">
+                <div class="chat-info">
+                    <span>Name - 12:33:00 23-09-2024</span>
+                </div>
+                <div class="chat-comment">
+                    <div class="chat-content">
+                        Tỷ số dễ xảy ra nhất cho chiến thắng của Việt Nam là 1-0, xác suất 11,34%", trang
+                        thể thao Anh nhận định. "Sau đó cũng là các tỷ số nghiêng về chủ nhà như 2-1
+                        (9,49%), hay 2-0 (9,06%).
+                    </div>
+                    <div class="progress">
+                        Tiến độ: 90%
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chatbox-actionbar">
+
+            <input type="hidden" name="id_Prod_CMD" value="<?php echo $id_Prod_CMD ?>">
+            <input type="hidden" name="id_user" value="<?php echo $_SESSION['userINFO']['id'] ?>">
+            <input name="content" type="text" placeholder="Nội dung" style="width: 80%">
+            <input name="progress" type="hidden" placeholder="Tiến độ" style="width: 20%">
+            <button type="submit"
+                onclick="chat_send(this,'.chatbox-actionbar' ); chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>, <?php echo $_SESSION['userINFO']['id'] ?>)"><i
+                    class="fa-solid fa-paper-plane"></i></button>
+            <button
+                onclick=" chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>,<?php echo $_SESSION['userINFO']['id'] ?> )">Refesh</button>
+        </div>
+    </div>
+</div>
 <script src="admin/asset/js/KHO/prod_cmd.js"></script>
+<script src="../asset/js/export_excel.js"></script>
+<script src="../asset/js/ex/src/jquery.table2excel.js"></script>
+
+
 <script>
 setInterval(function() {
     chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>, <?php echo $_SESSION['userINFO']['id'] ?>);
 }, 2500);
 chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>, <?php echo $_SESSION['userINFO']['id'] ?>)
 scrollToBottom(document.querySelector('.chatbox-container'));
+
 function scrollToBottom(div) {
     div.scrollTop = div.scrollHeight;
 }
-function exportTableToExcel(tableID, filename = '') {
-    var downloadLink;
-    var dataType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'; // MIME type for .xlsx
-    var tableSelect = document.getElementById(tableID);
+document.getElementById("defaultOpen").click();
 
-    // Check if tableSelect is valid
-    if (!tableSelect) {
-        console.error("Table with ID '" + tableID + "' not found.");
-        return;
+function change_tab(event, nameTab) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tab_container");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = 'none';
     }
-
-    // Create a new Excel workbook
-    var wb = XLSX.utils.book_new();
-
-    // Convert table to worksheet
-    var ws = XLSX.utils.table_to_sheet(tableSelect);
-
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-    // Generate Excel file in binary string
-    var wbout = XLSX.write(wb, {
-        bookType: 'xlsx',
-        type: 'binary'
-    });
-
-    // Specify file name
-    filename = filename ? filename.replace(/\.[^.]+$/, '') + '.xlsx' :
-    'excel_data.xlsx'; // Update default filename to .xlsx
-
-    // Create download link element
-    downloadLink = document.createElement("a");
-    document.body.appendChild(downloadLink);
-
-    // Convert binary string to Blob
-    var blob = new Blob([s2ab(wbout)], {
-        type: dataType
-    });
-
-    // Create object URL for Blob
-    var url = window.URL.createObjectURL(blob);
-
-    // Create a link to the file
-    downloadLink.href = url;
-
-    // Setting the file name
-    downloadLink.download = filename;
-
-    // Trigger the download
-    downloadLink.click();
-
-    // Clean up
-    window.URL.revokeObjectURL(url);
-}
-
-// Utility function to convert string to array buffer
-function s2ab(s) {
-    var buf = new ArrayBuffer(s.length);
-    var view = new Uint8Array(buf);
-    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-    return buf;
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace("active", "");
+    }
+    document.getElementById(nameTab).style.display = "block";
+    event.currentTarget.className += " active";
 }
 </script>

@@ -148,9 +148,6 @@ function chat_get_prod_cmd(id_Prod_CMD, id_user) {
                         <div class="chat-content">
                         ${m['comment']}
                         </div>
-                        <div class="progress">
-                            Tiến độ: ${m['progress']} %
-                        </div>
                     </div>
                 </div>`;
                 if (m['id_user'] == id_user) {
@@ -163,16 +160,12 @@ function chat_get_prod_cmd(id_Prod_CMD, id_user) {
                             <div class="chat-content">
                             ${m['comment']}
                             </div>
-                            <div class="progress">
-                                Tiến độ: ${m['progress']} %
-                            </div>
+ 
                         </div>
                     </div>`;
                 }
                 $(".chatbox-container").append(str);
                 $("#progress_PCMD").text(response.progress + '%');
-
-
             }
 
         }
