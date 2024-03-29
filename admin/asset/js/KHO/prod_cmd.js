@@ -12,37 +12,11 @@ function getALL_prod_cmd() {
         success: function(response) {
             data = response.data;
             quantity_el = response.quantity_el;
-            // $("#tbody_Prod_CMD").empty();
-            // $("#pagination_Prod_CMD").empty();
-            // let page_quantity = Math.ceil(quantity_el / 5);
-            // for (let i = 0; i < data.length; i++) {
-            //     m = data[i];
-            //     let str = `
-            //     <tr>
-            //         <td>${i + (pagenumber_Prods_cmd-1)*5}</td>
-            //         <td>${m['name']}</td>
-            //         <td>${m['time']}</td>
-            //         <td>${m['deadline']}</td>
-            //         <td>${m['progress_realtime']}</td>
-            //         <td>${m['receiver']}</td>
-            //         <td>${m['priority']}</td>
-            //         <td class="tacvu">
-            //             <a href="admin.php?job=QL_Production_CMD&action=thongke&actionChild=CMD_Detail&id_cmd=${m['id']}">
-            //                 Chi tiết
-            //             </a>
-            //         </td>
-            //     </tr>
-            // `;
-            //     $("#tbody_Prod_CMD").append(str);
-            // }
-            // for (let i = 0; i < page_quantity; i++) {
-            //     let str = `<button onclick="getPage_Prod_cmd(this); getALL_prod_cmd()">${i + 1}</button>`;
-            //     $('#pagination_Prod_CMD').append(str);
-            // }
             $('#table3').DataTable({
                 pagingType: 'simple_numbers',
                 scrollX: true,
                 data: data,
+                retrieve: true,
                 columnDefs: [{
                         targets: [0],
                         orderData: [0, 1]
@@ -165,7 +139,6 @@ function chat_get_prod_cmd(id_Prod_CMD, id_user) {
                     </div>`;
                 }
                 $(".chatbox-container").append(str);
-                $("#progress_PCMD").text(response.progress + '%');
             }
 
         }
@@ -227,5 +200,150 @@ function update_cmd(button) {
             // Handle error
             console.error(xhr, status, error);
         }
+    });
+}
+
+function getALL_prod_cmd_jobchild(id_prod_cmd) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            getALL_prod_cmd_jobchild: 1,
+            id_prod_cmd: id_prod_cmd
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            data = response;
+            $('#table_jobchild').DataTable({
+                pagingType: 'simple_numbers',
+                scrollX: true,
+                data: data,
+                retrieve: true,
+                columnDefs: [{
+                        targets: [0],
+                        orderData: [0, 1]
+                    },
+                    {
+                        targets: [1],
+                        orderData: [1, 0]
+                    },
+                    {
+                        targets: [4],
+                        orderData: [4, 0]
+                    }
+                ],
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            // Trả về số thứ tự tăng dần bắt đầu từ 1
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'name' },
+                    { data: 'name_staff' },
+                    { data: 'start' },
+                    { data: 'finish' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            let startTime = new Date(row.start);
+                            let finishTime = new Date(row.finish);
+                            let now = new Date();
+                            let timeDiff = 0;
+
+                            if (now > startTime) {
+                                timeDiff = finishTime.getTime() - startTime.getTime();
+                            } else {
+                                timeDiff = finishTime.getTime() - startTime.getTime() - (now.getTime() - startTime.getTime());
+                            }
+
+                            // Chuyển đổi thành giờ và làm tròn đến 2 chữ số thập phân
+                            let hoursDiff = (timeDiff / (1000 * 60 * 60)).toFixed(2);
+                            return hoursDiff + ' giờ';
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return row.percent_ofall + '%';
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return row.progress + '%';
+                        }
+                    }
+                ],
+
+                "pageLength": 5
+            });
+
+        }
+    });
+}
+
+function getALL_division_job(id_prod_cmd) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            getALL_prod_cmd_jobchild: 1,
+            id_prod_cmd: id_prod_cmd
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            data = response;
+            let all_progress = 0;
+            for (let i = 0; i < data.length; i++) {
+                let t = data[i];
+                let str = str_division_job(t.id_jobchild, t.name_staff, t.name, t.start, t.finish, t.percent_ofall);
+                $("#table_division_job").append(str); // Sửa đổi ở đây
+                all_progress += t.percent_ofall * (t.progress) / 100;
+            }
+            $("#table_division_job").append(str_division_job('', '', '', '', '', ''));
+            $("#progress_PCMD").text(all_progress + '%');
+
+        }
+    });
+}
+
+function str_division_job(id_jobchild, name_staff, name_job, start, finish, percent_ofall) {
+    let str = `
+    <div class="item_CT">
+        <input type="text" name="name_staff[]" placeholder="Tên nhân viên"
+            onkeydown="addROW_(event,'item_CT','table_division_job')"
+            style="max-width: 150px;" list="ALL_member_in_prod_cmd"
+            value="${name_staff}" required>
+        <input type="hidden" name="id_jobchild[]" value="${id_jobchild}">
+        <input type="text" name="name_job[]" placeholder="Tên công việc"
+            onkeydown="addROW_(event,'item_CT','table_division_job')"
+            style="max-width: 150px;" value="${name_job}" required>
+        <input type="datetime-local" name="start[]" placeholder="Bắt đầu"
+            onkeydown="addROW_(event,'item_CT','table_division_job')"
+            style="min-width: 200px;" value="${start}" required>
+        <input type="datetime-local" name="finish[]" placeholder="Kết thúc"
+            onkeydown="addROW_(event,'item_CT','table_division_job')"
+            style="min-width: 200px;" value="${finish}" required>
+        <input type="text" name="percent_ofall[]" placeholder="% của tổng"
+            style="min-width: 50px;"
+            onkeydown="addROW_(event,'item_CT','table_division_job')" value="${percent_ofall} %" required>
+        <button type="button" name="delete_ITEM_CT" onclick="delROW_(this, '.item_CT'); del_jobchild(${id_jobchild})"
+            style="min-width: 50px;">X</button>
+    </div>
+`;
+    return str;
+}
+
+function del_jobchild(id_jobchild) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            del_jobchild: 1,
+            id_jobchild: id_jobchild
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {}
     });
 }

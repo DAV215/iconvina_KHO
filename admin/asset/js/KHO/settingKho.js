@@ -763,3 +763,30 @@ function s2ab(s) {
     for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
     return buf;
 }
+
+function update_member_prod_cmd(id_member_container, id_prod_cmd) {
+    let member = $(id_member_container).val();
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            update_member_prod_cmd: 1,
+            id_prod_cmd: id_prod_cmd,
+            member: member
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            alert('okl');
+        }
+    });
+}
+
+function fillmember_list_divJOB(id_container, id_datalist) {
+    let members = $("#member").val();
+    $(id_datalist).empty();
+    members = members.split(',').map(member => member.trim());
+    for (let i = 0; i < members.length; i++) {
+        let option = $("<option>").val(members[i]).text(members[i]);
+        $(id_datalist).append(option);
+    }
+}

@@ -145,10 +145,7 @@
         echo "<meta http-equiv='refresh' content='0'>";
         
     }
-    if(isset($_POST['downloadExcel'])){
-        $data = $component->thongke_Vattu_Component($component->testDEQUY_thongke($id_Component_parent));
-        echo exportToExcel($data, 'T1'); 
-    }
+
 
 ?>
 

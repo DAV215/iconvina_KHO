@@ -1328,7 +1328,57 @@
             $m->update($m->table_, $array, $where);
         }
     }
-    
+    class prod_cmd_job_child{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew($id_production_cmd, $name, $id_manager, $id_staff, $start, $finish, $percent_ofall, $progress) {
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $time = date("Y-m-d H:i:s");
+        
+            $array = array(
+                'id_production_cmd' => $id_production_cmd,
+                'name' => $name,
+                'id_manager' => $id_manager,
+                'id_staff' => $id_staff,
+                'start' => $start,
+                'finish' => $finish,
+                'percent_ofall' => $percent_ofall,
+                'progress' => $progress,
+                
+            );
+        
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_prod_cmd_job_child";
+            $m->add($array);
+        }
+        
+        
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_prod_cmd_job_child`',$GET,  $WHERE);
+        }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_prod_cmd_job_child`',$GET,  $WHERE);
+        }
+        public static function update($array, $where){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_prod_cmd_job_child";
+            $m->update($m->table_, $array, $where);
+        }
+        public static function check_exist($id){
+            if(self::getAll('*', " id = $id")){
+                return true;
+            }else false;
+        }
+        public static function delete( $where){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_prod_cmd_job_child";
+            $m->delete($m->table_, $where);
+        }
+    }
     class chat_prod_cmd{
         private $var;
         public function __construct( $var = null) {
@@ -1557,38 +1607,7 @@ if(isset($_POST['import'])){
 
 
 
-// Function to export data from MySQL table to Excel
-require $_SERVER['DOCUMENT_ROOT']. '/ICONVINA_KHO/vendor/autoload.php'; // Include PhpSpreadsheet library
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-// Function to export data to Excel
-    function exportToExcel($data, $filename) {
-        // Create a new PhpSpreadsheet object
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet
-        ->setCellValue('A1', 'STT')
-        ->setCellValue('B1', 'Tên')
-        ->setCellValue('C1', 'Code')
-        ->setCellValue('D1', 'Số lượng');
-        // Set data to the worksheet
-        $rowCount = 2;
-        foreach ($data as $key => $value) {
-            $sheet->setCellValue('A'.$rowCount, $rowCount-1); 
-            $sheet->setCellValue('B'.$rowCount, $value['name']);
-            $sheet->setCellValue('C'.$rowCount, $value['code']);
-            $sheet->setCellValue('D'.$rowCount, $value['quantity']);
-            // $sheet->setCellValue('E'.$rowCount, $value->nguoi);
-            $rowCount++;
-        }
-        // ob_end_clean();
-        $writer = new Xlsx($spreadsheet);
-        $writer->setOffice2003Compatibility(true);
-        $filename=time().".xlsx";
-        return realpath($filename);
-    }
     if(isset($_POST['TREEDATA'])){
         $id_parent = $_POST['id_parent'];
         $m =  new component;

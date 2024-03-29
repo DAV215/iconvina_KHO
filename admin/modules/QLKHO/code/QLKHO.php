@@ -31,7 +31,7 @@
                 include('Material_Detail.php');
             }elseif($_GET['actionChild'] == 'ComponentDetail'){
                 include('thongke.php');
-                include('Component_Detail.php');
+                include('Component_detail.php');
             }
         }else{
             include('thongke.php');

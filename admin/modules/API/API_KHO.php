@@ -40,6 +40,43 @@
         $quantity_el = count($all);
         echo json_encode(array('data' => $all_eachPage, 'quantity_el' => $quantity_el));
     }
+    ////UPDATE MEMBER _PRO
+    if(isset($_POST['update_member_prod_cmd'])){
+        $members = [];
+        $members[] = isset($_POST['member']) ? $_POST['member'] : array(); 
+        $members_json = !empty($members) ? json_encode($members, JSON_UNESCAPED_UNICODE) : '[]';
+        $id_prod_cmd = isset($_POST['id_prod_cmd']) ? $_POST['id_prod_cmd'] : ''; // Get the member array
+        production_cmd::update(array('member' => $members_json), " id = $id_prod_cmd");
+    }
+    //getALL_prod_cmd_jobchild
+    if(isset($_POST['getALL_prod_cmd_jobchild'])){
+        $id = $_POST['id_prod_cmd'];
+        $temp_all = prod_cmd_job_child::getAll('*', " id_production_cmd = $id ");
+        $all = [];
+        foreach($temp_all as $row){
+            $id_staff = $row['id_staff'];
+            $name_staff = user::getAll('*', " `id`  = $id_staff")[0]['fullname'];
+
+            $all[] = array(
+                'id_jobchild' => $row['id'],
+                'id_production_cmd' => $row['id_production_cmd'],
+                'name' => $row['name'],
+                'name_staff' => $name_staff,
+                'id_manager' => $row['id_manager'],
+                'id_staff' => $row['id_staff'],
+                'start' => $row['start'],
+                'finish' => $row['finish'],
+                'percent_ofall' => $row['percent_ofall'],
+                'progress' => $row['progress'],
+            );
+        }
+        echo json_encode($all);                                             
+    }
+    //del job child
+    if(isset($_POST['del_jobchild'])){
+        $id  = $_POST['id_jobchild'];
+        prod_cmd_job_child::delete("id = $id");
+    }
     //API IMPORT
     if(isset($_POST['getAll_import_note'])){
         $all = import_material::getAll('*', " 1 ");

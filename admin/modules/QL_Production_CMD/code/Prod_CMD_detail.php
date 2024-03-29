@@ -3,6 +3,39 @@
     //PCMD production command 
     $PCMD_BasicInfo = production_cmd::get_1row('*', "id = $id_Prod_CMD");
     $id_Component_parent = $PCMD_BasicInfo['id_component'];
+    $manager = $PCMD_BasicInfo['receiver'];
+    if (isset($_POST['save_jobfor_member'])) {
+        foreach ($_POST['name_staff'] as $index => $nameStaff) {
+            if($nameStaff != '' && isset($nameStaff )){
+                $nameJob = $_POST['name_job'][$index];
+                $id_jobchild = $_POST['id_jobchild'][$index];
+                $id_staff = user::getAll(' * ', "fullname  = '$nameStaff' ")[0]['id'];
+                $start = $_POST['start'][$index];
+                $finish = $_POST['finish'][$index];
+                $percentOfAll = preg_replace('/%/', '', $_POST['percent_ofall'][$index]);
+                if(isset($id_jobchild) && $id_jobchild != ''){
+                    if(prod_cmd_job_child::check_exist($id_jobchild)){
+                        $array = array(
+                            'name' => $nameJob,
+                            'id_staff' => $id_staff,
+                            'start' => $start,
+                            'finish' => $finish,
+                            'percent_ofall' => $percentOfAll,
+                            
+                        );
+                        prod_cmd_job_child::update($array, "id = $id_jobchild");
+                    }else 
+                    prod_cmd_job_child::addNew($id_Prod_CMD, $nameJob, $manager, $id_staff, $start, $finish, $percentOfAll, 0);
+                    
+                }else{
+                    prod_cmd_job_child::addNew($id_Prod_CMD, $nameJob, $manager, $id_staff, $start, $finish, $percentOfAll, 0);
+                }
+            }
+        }
+        echo "<meta http-equiv='refresh' content='0'>";
+
+    }
+
 ?>
 
 <div id="tbl_taolenhsanxuat" class="tableComponent tabcontent">
@@ -76,6 +109,31 @@
         EXCEL</button>
     <h1>Thông tin lệnh</h1>
     <div class="detail">
+        <fieldset class="info" style="width: 85%; padding: 28px;">
+            <legend>Tiến độ chi tiết:</legend>
+            <table class="stripe hover display order-column row-border  " style="width:100%" id="table_jobchild">
+                <thead>
+                    <tr class="">
+
+                        <th>STT</th>
+                        <th>Tên việc</th>
+                        <th>Nhân viên</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Thời gian còn lại</th>
+                        <th>Tỷ lệ chiếm dụng</th>
+                        <th>Tiến độ</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+
+        </fieldset>
+    </div>
+    <div class="detail">
         <fieldset class="info" style="width: 60%;">
             <legend>Thông tin cơ bản</legend>
             <div class="Info_tab">
@@ -105,55 +163,41 @@
 
                             </datalist>
                         </fieldset>
-                        <fieldset>
-                            <legend>Người cùng tham gia:</legend>
-                            <input type="search" name="" id="searchStaff" list="staff">
-                            <button type="button" class="btn_common" onclick="addMember()"><i
-                                    class="fa-solid fa-plus"></i></button>
-                            <input required type="text" name="member[]" list="staff" id="member"
-                                value="<?php echo implode(", ", json_decode($PCMD_BasicInfo['member'], true)); ?>">
-                        </fieldset>
+
                         <fieldset>
                             <legend>DeadLine:</legend>
                             <input required type="datetime-local" name="deadline"
-                                value="<?php echo $PCMD_BasicInfo['deadline']  ?>">
+                                value="<?php echo $PCMD_BasicInfo['deadline']  ?>" disabled>
                         </fieldset>
                         <fieldset>
                             <legend>Ghi chú:</legend>
                             <textarea name="note_production_cmd" id="" cols="30" rows="10"
-                                style="width:99%;">note</textarea>
+                                style="width:99%; background:#ccc; color:black;" disabled>note</textarea>
                         </fieldset>
-                        <button class="btn_common" style="min-width:120px; border-radius: 10px;" type="button"
-                            onclick="update_cmd()">Update</button>
                     </form>
 
                 </div>
                 <div class="input_class tab_container" id="job_divison">
+                    <fieldset>
+                        <legend>Người cùng tham gia:</legend>
+                        <input type="search" name="" id="searchStaff" list="staff">
+                        <button type="button" class="btn_common" onclick="addMember()"><i
+                                class="fa-solid fa-plus"></i></button>
+                        <input required type="text" name="member[]" list="staff" id="member"
+                            value="<?php echo implode(", ", json_decode($PCMD_BasicInfo['member'], true)); ?>">
+                        <button onclick="update_member_prod_cmd('#member', '<?php echo $id_Prod_CMD ?>')">Save</button>
+                    </fieldset>
                     Phân chia công việc
-                    <div class="big inforForm">
-                        <div class="bodyofForm Material" id="table_material_CT">
-                            <div class="item_CT">
-                                <input type="text" name="name_staff" placeholder="Tên nhân viên"
-                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
-                                <datalist id="ALL_data_material">
+                    <div class="big inforForm" style="justify-content:center; margin: 0;">
+                        <form action="" method="post">
+                            <div class="bodyofForm Material" id="table_division_job">
 
-                                </datalist>
-
-                                <input type="text" name="name_job[]" placeholder="Tên công việc"
-                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
-
-                                <input type="datetime-local" name="start[]" placeholder="Bắt đầu"
-                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
-                                    <input type="datetime-local" name="finish[]" placeholder="Kết thúc"
-                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
-                                    <input type="text" name="percent_ofall[]" placeholder="% của tổng"
-                                    style = "width: 10%;"
-                                    onkeydown="addROW_(event,'item_CT','table_material_CT')">
-                                <button type="button" name="delete_ITEM_CT"
-                                    onclick="delROW_(this, '.item_CT')">X</button>
                             </div>
+                            <datalist id="ALL_member_in_prod_cmd">
+                            </datalist>
+                            <button style="min-width: 200px; width: 50%;" name="save_jobfor_member">Lưu</button>
 
-                        </div>
+                        </form>
                     </div>
 
                 </div>
@@ -163,15 +207,16 @@
         <fieldset class="info" style="width: 25%;">
             <legend>Thông tin chi tiết</legend>
             <div class="input_class" style="    align-items: center;">
-                <div class="h" style="display: flex; justify-content: space-around; align-items: center; width: 90%;">
-                    <h2>Tiến độ</h2>
+            <h2>Tiến độ tổng:</h2>
+                <div class="h" style="display: flex; justify-content: space-around; align-items: center; width: 90%; flex-direction:column;">
                     <span
                         id="progress_PCMD"><?php echo isset($PCMD_BasicInfo['progress_realtime'])?$PCMD_BasicInfo['progress_realtime']:0;  ?>
                         %</span>
                 </div>
             </div>
             <div class="input_class">
-                Tiến độ công việc
+                <h4>Update tiến độ của bản thân:</h4>
+                <input type="number" name="process_ofself">
             </div>
         </fieldset>
     </div>
@@ -242,7 +287,7 @@
         </div>
     </div>
 </div>
-<script src="admin/asset/js/KHO/prod_cmd.js"></script>
+<script src="../asset/js/KHO/prod_cmd.js"></script>
 <script src="../asset/js/export_excel.js"></script>
 <script src="../asset/js/ex/src/jquery.table2excel.js"></script>
 
@@ -251,6 +296,9 @@
 setInterval(function() {
     chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>, <?php echo $_SESSION['userINFO']['id'] ?>);
 }, 2500);
+setInterval(function() {
+    getALL_prod_cmd_jobchild(<?php echo $id_Prod_CMD ?>);
+}, 10000);
 chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>, <?php echo $_SESSION['userINFO']['id'] ?>)
 scrollToBottom(document.querySelector('.chatbox-container'));
 
@@ -272,4 +320,7 @@ function change_tab(event, nameTab) {
     document.getElementById(nameTab).style.display = "block";
     event.currentTarget.className += " active";
 }
+fillmember_list_divJOB('#member', '#ALL_member_in_prod_cmd');
+getALL_prod_cmd_jobchild(<?php echo $id_Prod_CMD ?>)
+getALL_division_job(<?php echo $id_Prod_CMD ?>)
 </script>
