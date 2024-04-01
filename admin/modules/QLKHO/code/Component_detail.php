@@ -28,31 +28,16 @@
 
         //superDetail
         $classify = $_POST['classify'];
-        if($super_detail){
-            if($position_Component != null && $position_Component != 0){
-                $id_position = Position::getAll('`id`', " `sum` = '$position_Component' ")[0]['id'];
-            }else{
-                $id_position = Position::getAll('`id`', " `sum` = 'Chưa xác định' ")[0]['id'];
+        if($position_Component != null && $position_Component != 0){
+            $id_position = Position::getAll('`id`', " `sum` = '$position_Component' ")[0]['id'];
+        }else{
+            $id_position = Position::getAll('`id`', " `sum` = 'Chưa xác định' ")[0]['id'];
 
-            }
-            if($classify != null && $classify != 0){
-                $id_classify = Classify::getAll('`id`', " `sum` = '$classify' ")[0]['id'];
-            }else{
-                $id_classify = Classify::getAll('`id`', " `sum` = 'Không phân loại' ")[0]['id'];
-            }
         }
-        else{
-            if($position_Component != null && $position_Component != 0){
-                $id_position = Position::getAll('`id`', " `sum` = '$position_Component' ")[0]['id'];
-            }else{
-                $id_position = Position::getAll('`id`', " `sum` = 'Chưa xác định' ")[0]['id'];
-
-            }
-            if($classify != null && $classify != 0){
-                $id_classify = Classify::getAll('`id`', " `sum` = '$classify' ")[0]['id'];
-            }else{
-                $id_classify = Classify::getAll('`id`', " `sum` = 'Không phân loại' ")[0]['id'];
-            }
+        if($classify != null && $classify != 0){
+            $id_classify = Classify::getAll('`id`', " `sum` = '$classify' ")[0]['id'];
+        }else{
+            $id_classify = Classify::getAll('`id`', " `sum` = 'Không phân loại' ")[0]['id'];
         }
         //Business
         $store = $_POST['store'];
@@ -75,7 +60,7 @@
             $R_quantity = $R::checkQuantity_C($quantity_Component, $id_Component_parent);
             $R_Business = Record_KHO_SUPERDETAIL::checkBus($store, $price_buy,$delivery_fee,$discount,$vat, $id_business);
             $all = [];
-            $all = $R::result_diff($R_Pos, $R_Class, $R_quantity, $R_Business );
+            $all = $R::result_diff($R_Pos, $R_Class, null, $R_Business );
             foreach($all as $row){
                 Record_KHO_SUPERDETAIL::addNew($super_detail['id'],$row['area'], $row['old'], $row['new'], $_SESSION['userINFO']['fullname']);
 
