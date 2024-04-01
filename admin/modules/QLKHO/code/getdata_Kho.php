@@ -11,7 +11,7 @@
         function getALL_material(){
             include('config_DB_KHO.php');
             $sql = "SELECT * FROM `tbl_material`";
-            $query = mysqli_query($mysqli_kho, $sql);
+            $query = mysqli_query($mysqli, $sql);
             $data = [];
             while ($row = mysqli_fetch_array($query)){
                 $data[] = $row;
@@ -315,7 +315,7 @@
         }
         function getALL_(){
             include('config_DB_KHO.php');
-            $sql = "SELECT * FROM `tbl_component_CT`";
+            $sql = "SELECT * FROM `tbl_component_ct`";
             $query = mysqli_query($mysqli_kho, $sql);
             $data = [];
             while ($row = mysqli_fetch_array($query)){
@@ -326,15 +326,15 @@
         
         function getALL_Child($sql_WHERE){
             $db = new DB_driver_KHO_Material;
-            return $db->getALL_WHERE('`tbl_component_CT`', '*', $sql_WHERE);
+            return $db->getALL_WHERE('`tbl_component_ct`', '*', $sql_WHERE);
         }
         function getALL_Parent(){
             $db = new DB_driver_KHO_Material;
-            return $db->getALL_WHERE('`tbl_component_CT`', '*', '`id_parent` = 0 AND (`name_parent`  = 0  || `name_parent` IS NULL) ORDER BY `id` DESC');
+            return $db->getALL_WHERE('`tbl_component_ct`', '*', '`id_parent` = 0 AND (`name_parent`  = 0  || `name_parent` IS NULL) ORDER BY `id` DESC');
         }
          function get_1row($sql_WHERE){
             $db = new DB_driver_KHO_Material;
-            return $db->getALL_WHERE('`tbl_component_CT`', '*',$sql_WHERE);
+            return $db->getALL_WHERE('`tbl_component_ct`', '*',$sql_WHERE);
         }
         function addNew($name, $id_parent, $id_child, $level,  $quantity_ofChild, $name_parent){
             // $material = array($name, $quantity);
@@ -347,7 +347,7 @@
                 'name'=>$name
             );
             $m = new DB_driver_KHO_Material;
-            $m->table_ = "tbl_component_CT";
+            $m->table_ = "tbl_component_ct";
             $m->add($material);
         }
         function addNew_Component_Info($id_component, $code, $quantity, $link_folder, $note){
@@ -365,7 +365,7 @@
         }
         function update($data, $where){
             $m = new DB_driver_KHO_Material;
-            $m->table_ = "tbl_component_CT";
+            $m->table_ = "tbl_component_ct";
             $m->update_($data,$where);
         }
         function remove($where){
@@ -379,9 +379,9 @@
         }
         function get_component(){
             include('config_DB_KHO.php');
-            $sql = "SELECT tbl_component_CT.*, tbl_info_component.quantity
-            FROM tbl_component_CT
-            JOIN tbl_info_component ON tbl_component_CT.id = tbl_info_component.id_component;
+            $sql = "SELECT tbl_component_ct.*, tbl_info_component.quantity
+            FROM tbl_component_ct
+            JOIN tbl_info_component ON tbl_component_ct.id = tbl_info_component.id_component;
             ;";
             $query = mysqli_query($mysqli_kho, $sql);
             $data = [];
@@ -433,13 +433,13 @@
         }
         function get_oneRow_Onecomponent($type,$id){
             include('config_DB_KHO.php');
-            $sql = "SELECT $type FROM `tbl_component_CT` WHERE `id` = $id";
+            $sql = "SELECT $type FROM `tbl_component_ct` WHERE `id` = $id";
             $query = mysqli_query($mysqli_kho, $sql);
             return mysqli_fetch_assoc($query);
         }
         function get_Newest_Component($name, $level){
             include('config_DB_KHO.php');
-            $sql = "SELECT `id` FROM `tbl_component_CT` WHERE `id_parent` = 0 AND `level` = '$level' AND `name` = '$name'  ";
+            $sql = "SELECT `id` FROM `tbl_component_ct` WHERE `id_parent` = 0 AND `level` = '$level' AND `name` = '$name'  ";
             $query = mysqli_query($mysqli_kho, $sql);
             if (!$query) {
                 die('Error: ' . mysqli_error($mysqli_kho));
@@ -450,7 +450,7 @@
         }
         function getChild_ofParent($id_parent){
             include('config_DB_KHO.php');
-            $sql = "SELECT * FROM `tbl_component_CT` WHERE `id_parent` = '$id_parent';";
+            $sql = "SELECT * FROM `tbl_component_ct` WHERE `id_parent` = '$id_parent';";
             $query = mysqli_query($mysqli_kho, $sql);
             $data = [];
             while ($row = mysqli_fetch_assoc($query)){
@@ -461,7 +461,7 @@
         
         function getChild_ofParent_FL_Level($id_parent,$level_ofChild){
             include('config_DB_KHO.php');
-            $sql = "SELECT * FROM `tbl_component_CT` WHERE `id_parent` = '$id_parent' AND `level` = '$level_ofChild';";
+            $sql = "SELECT * FROM `tbl_component_ct` WHERE `id_parent` = '$id_parent' AND `level` = '$level_ofChild';";
             $query = mysqli_query($mysqli_kho, $sql);
             $data = [];
             while ($row = mysqli_fetch_array($query)){

@@ -223,7 +223,9 @@
 </div>
 
 <div class="chat_box_parrent">
-    <button onclick="toggleVisibility_flex('#chat')"><img width="48" height="48"
+    <button onclick="toggleVisibility_flex('#chat'); 
+scrollToBottom(document.querySelector('.chatbox-container'));
+    "><img width="48" height="48"
             src="https://img.icons8.com/color/48/facebook-messenger--v1.png" alt="facebook-messenger--v1" /></button>
     <div class="chatbox" style="display:none;" id="chat">
         <div class="chatbox-container">
@@ -300,7 +302,6 @@ setInterval(function() {
     getALL_prod_cmd_jobchild(<?php echo $id_Prod_CMD ?>);
 }, 10000);
 chat_get_prod_cmd(<?php echo $id_Prod_CMD ?>, <?php echo $_SESSION['userINFO']['id'] ?>)
-scrollToBottom(document.querySelector('.chatbox-container'));
 
 function scrollToBottom(div) {
     div.scrollTop = div.scrollHeight;

@@ -245,7 +245,7 @@
                                     if(isset($info_Material['link_folder']) && $info_Material['link_folder'] != null){
                                         if(is_dir('QLKHO/MEDIA/material'.'/' .$info_Material['link_folder'].'/')){
                                             $images = array('jpg','png','jpeg','gif');
-                                            $path = 'QLKHO\MEDIA\material'.'/' .$info_Material['link_folder'].'/';
+                                            $path = 'QLKHO/MEDIA/material'.'/' .$info_Material['link_folder'].'/';
                                             $files = scandir( $path);
                                             foreach($files as $key => $value) {
                                                 if($value != '.' && $value != '..'){

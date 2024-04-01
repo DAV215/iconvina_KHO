@@ -39,6 +39,7 @@
                 $this->__conn = $mysqli_kho;
             }
             mysqli_query($this->__conn, "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'");
+            $mysqli_kho->set_charset("utf8");
         }
         function insert($tb, $data){
             $this->connection();
@@ -83,7 +84,7 @@
                 $data[] = $row;
             }
             return $data;
-        }
+        }        
         function getALL_WHERE($table,$sql_GET, $sql_WHERE){
             $this->connection();
             $sql = "SELECT " .$sql_GET." FROM ".$table . " WHERE " .$sql_WHERE;
@@ -135,7 +136,7 @@
         }
         public static function getAll($GET, $WHERE){
             $db = new DB_driver_THUCHI_root;
-            return $db->getALL_WHERE_assoc('`tbl_user`',$GET,  $WHERE);
+            return $db->getALL_WHERE('`tbl_user`',$GET,  $WHERE);
         }
     }
     //////API user;
