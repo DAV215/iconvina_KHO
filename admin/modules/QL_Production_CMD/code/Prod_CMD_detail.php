@@ -38,13 +38,11 @@
 
 ?>
 
-<div id="tbl_taolenhsanxuat" class="tableComponent tabcontent">
+<div id="tbl_taolenhsanxuat" class="tableComponent tabcontent" style="padding-right:10%;">
     <?php
-                    $component = new component;
-                        $component->testDEQUY_2($id_Component_parent); 
                         echo "<h1>Thống kê vật tư:</h1>";
                         ?>
-    <table  class="stripe hover display order-column row-border  " style="width:90%; margin: 0;" id="tbl_BOM_PROD_CMD">
+    <table  class="stripe hover display order-column row-border  " style="width:100%; margin: 0;" id="tbl_BOM_PROD_CMD">
         <thead>
             <tr class="">
                 <div class="">
@@ -64,11 +62,11 @@
 
         </tbody>
     </table>
-    <button onclick="export_excel('#tbl_BOM')">Xuất
+    <button onclick="export_excel('#tbl_BOM_PROD_CMD')">Xuất
         EXCEL</button>
     <h1>Thông tin lệnh</h1>
     <div class="detail">
-        <fieldset class="info" style="width: 85%; padding: 28px;">
+        <fieldset class="info" style="width: 100%; padding: 28px;">
             <legend>Tiến độ chi tiết:</legend>
             <table class="stripe hover display order-column row-border  " style="width:100%" id="table_jobchild">
                 <thead>
@@ -163,7 +161,7 @@
             </div>
 
         </fieldset>
-        <fieldset class="info" style="width: 25%;">
+        <fieldset class="info" style="width: 40%;">
             <legend>Thông tin chi tiết</legend>
             <div class="input_class" style="    align-items: center;">
             <h2>Tiến độ tổng:</h2>
