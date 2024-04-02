@@ -151,8 +151,7 @@ function fill_suggset_CMD(){
     $('input[name="name_export"]').val('');
     let selectedValue = $('select[name="purpose"]').val();
     if(selectedValue == 'Sản xuất nội bộ'){
-        getALL_prod_cmd('#ALL_data_PROD_CMD');
-
+        getALL_prod_cmd_datalist('#ALL_data_PROD_CMD');
     }
 }
 function toggleVisibility(id) {
@@ -306,59 +305,7 @@ function show_value_Storage_Component(input) {
         idInput.val(""); // Clear the id value as well
     }
 }
-function preview_IMG(input, id_Container) {
-    let container = document.getElementById(id_Container);
-    container.innerHTML = '';
 
-    for (let i = 0; i < input.files.length; i++) {
-
-        if (getIconForFileType(input.files[i].name) == 'image') {
-            let image = document.createElement('img');
-            image.src = URL.createObjectURL(input.files[i]);
-            image.style.maxWidth = '30%'; // Optional: Set max width for the preview
-            container.appendChild(image);
-        } else {
-            let filenameElement = document.createElement('span');
-            filenameElement.textContent = input.files[i].name;
-            // Make the filename clickable to open the file
-            filenameElement.style.cursor = 'pointer';
-            filenameElement.onclick = function() {
-                window.open(URL.createObjectURL(input.files[i]), '_blank');
-            };
-            container.appendChild(filenameElement);
-        }
-
-    }
-}
-
-function getIconForFileType(fileName) {
-    let extension = fileName.split('.').pop().toLowerCase();
-
-    // Add more file type mappings as needed
-    switch (extension) {
-        case 'pdf':
-            return 'pdf';
-        case 'doc':
-        case 'docx':
-            return 'word';
-        case 'xls':
-        case 'xlsx':
-            return 'excel';
-        case 'ppt':
-        case 'pptx':
-            return 'powerpoint';
-        case 'zip':
-        case 'rar':
-            return 'archive';
-        case 'png':
-        case 'jpg':
-        case 'jpeg':
-        case 'gif':
-            return 'image';
-        default:
-            return 'file'; // Default icon for other file types
-    }
-}
 
 function hide_add_new_products_btn() {
     let inputs = document.querySelectorAll('input[name="name_Material[]"]');

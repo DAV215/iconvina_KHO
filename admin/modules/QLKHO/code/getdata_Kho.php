@@ -459,46 +459,13 @@
             return $data;
         }
         
-        function getChild_ofParent_FL_Level($id_parent,$level_ofChild){
+        public static function getChild_ofParent_FL_Level($id_parent,$level_ofChild){
             include('config_DB_KHO.php');
             $sql = "SELECT * FROM `tbl_component_ct` WHERE `id_parent` = '$id_parent' AND `level` = '$level_ofChild';";
             $query = mysqli_query($mysqli_kho, $sql);
             $data = [];
             while ($row = mysqli_fetch_array($query)){
                 $data[] = $row;
-            }
-            return $data;
-        }
-        function testDEQUY($id_parent, $indent = 0, $data = []){
-            echo '</br>';
-            $container_Parent  = $this->getChild_ofParent($id_parent);
-            $componentName = $this->get_oneRow_Onecomponent('name',$id_parent)['name'].'</br>';
-            $indentation = str_repeat('----', $indent*2);
-            // echo $indentation . $componentName . '</br>';
-            if($this->get_oneRow_Onecomponent('level',$id_parent)['level']>0){
-                $level=[];
-                foreach ($container_Parent as $row) {
-                    $level[] = $row['level'];
-                }
-                $lv = max($level);
-                for($i = 0; $i <= $lv; $i++){ // Concatenate additional '--' for each iteration
-                    foreach ($this->getChild_ofParent_FL_Level($id_parent,$i) as $row) {
-                        echo $indentation . $row['name'].'-- SL:'.$row['quantity_ofChild'] . '</br>';
-                        if($row['level']>0){
-                            for($i_ = 0; $i_ < $row['quantity_ofChild']; $i_++){
-                                $data = $this->testDEQUY($row['id_child'],$indent + 1,$data);
-                            }
-                        }
-                        else $data[] = array('name' => $row['name'],'quantity'=> $row['quantity_ofChild']);
-                    }
-                }
-            }else{
-                foreach ($container_Parent as $row) {
-                    echo $row['name'].'</br>';
-                    $data[] = array('name' => $row['name'],'quantity'=> $row['quantity_ofChild']);
-
-
-                }
             }
             return $data;
         }
@@ -536,197 +503,114 @@
                 return $data;
             }
         }
-        function testDEQUY_22($id_parent, $data = []) {
-            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
-                if(count($get_DMNL_Component)!=0){
-                    $container_Parent = $this->getChild_ofParent($id_parent);  
-                    if ($this->get_oneRow_Onecomponent('level', $id_parent)['level'] > 0) {
-                        $level = [];
-                        foreach ($container_Parent as $row) {
-                            $level[] = $row['level'];
-                        }
-                        $lv = max($level);
-                        if ($lv > 0) {
-                            echo "<ol>";
-                        }
-                        for ($i = 0; $i <= $lv; $i++) {
-                            foreach ($this->getChild_ofParent_FL_Level($id_parent, $i) as $row) {
-                                if ($row['level'] > 0) {
-                                    echo "<li>" . $row['name'] . '-- SL:' . $row['quantity_ofChild'] . "</li>";
-                                    echo "<ol>";
-                                    $data = $this->testDEQUY_2($row['id_child'], $data);
-                                    echo "</ol>";
-                                } else {
-                                    $data[] = ['name' => $row['name'], 'quantity' => $row['quantity_ofChild']];
-                                    echo "<li>" . $row['name'] . '-- SL:' . $row['quantity_ofChild'] . "</li>";
-                                }
-                            }
-                        }
-                        if ($lv > 0) {
-                            echo "</ol>";
-                        }
-                    }
-                    return $data;
-                }
-            }
-            public function testDEQUY_5($id_parent, $data = []) {
-                $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
-                if(count($get_DMNL_Component) != 0) {
-                    $container_Parent = $this->getChild_ofParent($id_parent);  
-                    if ($this->get_oneRow_Onecomponent('level', $id_parent)['level'] > 0) {
-                        $level = [];
-                        foreach ($container_Parent as $row) {
-                            $level[] = $row['level'];
-                        }
-                        $lv = max($level);
-                        foreach ($this->getChild_ofParent_FL_Level($id_parent, $lv) as $row) {
-                            $item = [
-                                'id' => $row['id_child'],
-                                'name' => $row['name'],
-                                'post' => '', // Assuming post information is not available in the current context
-                                'phone' => '', // Assuming phone information is not available in the current context
-                                'mail' => '', // Assuming mail information is not available in the current context
-                                'photo' => '', // Assuming photo information is not available in the current context
-                            ];
-                            if ($row['level'] > 0) {
-                                $children = $this->testDEQUY_5($row['id_child']);
-                                if (!empty($children)) {
-                                    $item['children'] = $children;
-                                }
-                            }
-                            $data[] = $item;
-                        }
-                    }
-                }
-                return $data;
-            }
-            
-            
-        
-        
-        
-        
-        
-        function testDEQUY_thongke($id_parent, $indent = 0, $data = []){
-            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+        public static function Vattu_CnM_hidden($id_parent, $indent = 0, $data = []){
+            $component_class = new component;
+            $get_DMNL_Component = $component_class->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
             if(count($get_DMNL_Component)!=0){
-                $container_Parent  = $this->getChild_ofParent($id_parent);
-                if($this->get_oneRow_Onecomponent('level',$id_parent)['level']>0){
+                $container_Parent  = $component_class->getChild_ofParent($id_parent);
+                if($component_class->get_oneRow_Onecomponent('level',$id_parent)['level']>0){
                     $level=[];
                     foreach ($container_Parent as $row) {
                         $level[] = $row['level'];
                     }
                     $lv = max($level);
-                    for($i = 0; $i <= $lv; $i++){ // Concatenate additional '--' for each iteration
-                        foreach ($this->getChild_ofParent_FL_Level($id_parent,$i) as $row) {
-                    
-                            if($row['level']>0){
-                                for($i_ = 0; $i_ < $row['quantity_ofChild']; $i_++){
-                                    $data = $this->testDEQUY_thongke($row['id_child'],$indent + 1,$data);
-                                }
-                            }
-                            else {
-                                $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'quantity'=> $row['quantity_ofChild']);
+                    for($i = 0; $i <= $lv; $i++){ 
+                        
+                        foreach ($component_class->getChild_ofParent_FL_Level($id_parent,$i) as $row) {
+                            if($row['level']>0 && $i>0){
+                                $c = component::Component_Join_Info('AND id = '. $row['id_child'])[0];
 
-                            }
-                        }
-                    }
-                }else{
-                    foreach ($container_Parent as $row) {
-                
-                        $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'code' => $row['code'],'quantity'=> $row['quantity_ofChild']);
-                    }
-                }
-                return $data;
-            }
-        }
-        function testDEQUY_thongke_in_CMD($id_parent, $indent = 0, $data = [], $id_prod_cmd){
-            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
-            if(count($get_DMNL_Component)!=0){
-                $container_Parent  = $this->getChild_ofParent($id_parent);
-                if($this->get_oneRow_Onecomponent('level',$id_parent)['level']>0){
-                    $level=[];
-                    foreach ($container_Parent as $row) {
-                        $level[] = $row['level'];
-                    }
-                    $lv = max($level);
-                    for($i = 0; $i <= $lv; $i++){ // Concatenate additional '--' for each iteration
-                        foreach ($this->getChild_ofParent_FL_Level($id_parent,$i) as $row) {
-                    
-                            if($row['level']>0){
-                                for($i_ = 0; $i_ < $row['quantity_ofChild']; $i_++){
-                                    $data = $this->testDEQUY_thongke($row['id_child'],$indent + 1,$data);
-                                }
-                            }
-                            else {
-
-                                $id_export = export_material::getAll('*', " id_prod_cmd =  $id_prod_cmd ")['id'];
-                                $quantity_geted = 0;
-                                for($i = 0; $i < count($id_export); $i++){
-                                    $v = export_material_detail::getAll('*', "id_export = $id_export");
-                                    foreach ($v as $row_material) {
-                                        if($row_material['id_material'] == $row['id_child'] ){
-                                            $quantity_geted += $row_material['quantity'];
-                                        }
+                                if($c['quantity'] > 0){
+                                    $data[] = array('type' => 'Component' ,'id'=>$row['id_child'],'name' => $c['name'],'quantity'=> $row['quantity_ofChild'], 'quantity_inStorage' => $c['quantity']);
+                                }else{
+                                    for($i_ = 0; $i_ < $row['quantity_ofChild']; $i_++){
+                                        $data = $component_class->Vattu_CnM_hidden($row['id_child'],$indent + 1,$data);
                                     }
                                 }
-                                $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'quantity'=> $row['quantity_ofChild'],'quantity_geted' => $quantity_geted);
+                            }
+                            else {
+                                $m  = material::get_info_Material($row['id_child']);
+                                $data[] = array('type' => 'Material' , 'id'=>$row['id_child'],'name' => $row['name'],'quantity'=> $row['quantity_ofChild'], 'quantity_inStorage' => $m['quantity']);
 
                             }
                         }
                     }
                 }else{
                     foreach ($container_Parent as $row) {
-                
-                        $data[] = array('id'=>$row['id_child'],'name' => $row['name'],'code' => $row['code'],'quantity'=> $row['quantity_ofChild']);
+                        $m  = material::get_info_Material($row['id_child']);
+                        $data[] = array('type' => 'Material' ,'id'=>$row['id_child'],'name' => $row['name'],'code' => $row['code'],'quantity'=> $row['quantity_ofChild'], 'quantity_inStorage' => $m['quantity']);
                     }
                 }
                 return $data;
             }
+
         }
-        function thongke_Vattu_Component($data){
+        public static function sum_vattu_CnM($data){
             $result = [];
             foreach ($data as $item) {
-                $id = $item['id'];
-                $name = $item['name'];
-                $code = isset(info_Material::get_info_Material($id)['code'])?info_Material::get_info_Material($id)['code']:0;
-                $quantity = $item['quantity'];
-        
-                if (isset($result[$name])) {
-                    $result[$name]['quantity'] += $quantity;
-                } else {
-                    $result[$name] = ['id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity];
+                $type = $item['type'];
+                if($type == 'Material'){
+                    $id = $item['id'];
+                    $name = $item['name'];
+                    $code = isset(info_Material::get_info_Material($id)['code'])?info_Material::get_info_Material($id)['code']:0;
+                    $quantity = $item['quantity'];
+                    $quantity_inStorage = material::get_info_Material($id)['quantity'];
+                    if (isset($result[$name])) {
+                        $result[$name]['quantity'] += $quantity;
+                    } else {
+                        $result[$name] = ['type'=>'Material', 'id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity, 'quantity_inStorage' => $quantity_inStorage];
+                    }
+                }else{
+                    $id = $item['id'];
+                    $name = $item['name'];
+                    $code = isset(info_Component::get_info_Component($id)['code'])?info_Component::get_info_Component($id)['code']:0;
+                    $quantity = $item['quantity'];
+                    $quantity_inStorage = info_Component::get_info_Component($id)['quantity'];
+            
+                    if (isset($result[$name])) {
+                        $result[$name]['quantity'] += $quantity;
+                    } else {
+                        $result[$name] = ['type'=>'Component', 'id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity, 'quantity_inStorage' => $quantity_inStorage];
+                    }
                 }
+
             }
-        
-            return array_values($result); 
+            $combinedArray = [];
+            foreach ($result as $item) {
+                $combinedArray[] = $item;
+            }
+            
+            return $combinedArray;
         }
-        
-        function thongke_Vattu_Component_in_ProdCMD($data, $id_prod_cmd){
+        public static function thongke_Vattu_Component_in_ProdCMD2($data, $id_prod_cmd){
             $result = [];
             $id_export = [];
             foreach(export_material::getAll('*', " id_prod_cmd =  $id_prod_cmd ") as $row){
                 $id_export[] = $row['id'];
             }
             foreach ($data as $item) {
+                $type = $item['type'];
                 $id = $item['id'];
                 $name = $item['name'];
-                $code = isset(info_Material::get_info_Material($id)['code'])?info_Material::get_info_Material($id)['code']:0;
+                $code = isset($item['code'])?$item['code']:null;
                 $quantity = $item['quantity'];
-
                 $quantity_geted = 0;
+                $quantity_inStorage = $item['quantity_inStorage'];
+
                 for($i = 0; $i < count($id_export); $i++){
                     $v = export_material_detail::getAll('*', "id_export = $id_export[$i]");
-                    foreach ($v as $row_material) {
-                        if($row_material['id_material'] == $id ){
-                            $quantity_geted += $row_material['quantity'];
+                    foreach ($v as $row) {
+                        if($type == 'Material' && $row['id_material'] == $id){
+                            $quantity_geted += $row['quantity'];
+                        }elseif($type == 'Component' && $row['id_component'] == $id){
+                            $quantity_geted += $row['quantity'];
                         }
                     }
                 }
                 if (isset($result[$name])) {
                     $result[$name]['quantity'] += $quantity;
                 } else {
-                    $result[$name] = ['id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity, 'quantity_geted' => $quantity_geted];
+                    $result[$name] = ['type' => $type, 'id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity, 'quantity_geted' => $quantity_geted, 'quantity_inStorage' => $quantity_inStorage];
                 }
             }
         
@@ -832,46 +716,6 @@
             return $targetDirectory;
         }
     
-    }
-    class ftp_server{
-        private $var;
-        public $ftp;
-         public function __construct( $var = null) {
-            $this->var = $var;
-        }
-
-        public static function ftp_Config(){
-            $ftp_server = "aquabolo.vn";
-            $ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
-            ftp_login($ftp_conn, 'iconvina@aquabolo.vn', 'anhvu21052001');
-            ftp_pasv($ftp_conn, true);
-            return $ftp_conn;
-        }
-        public static function ftp_createFolder($path){
-            $ftp_conn = ftp_server::ftp_Config();
-            ftp_mkdir($ftp_conn, $path);
-        }
-        public static function ftp_Set_permission($permission, $path){
-            $v = ftp_chmod(ftp_server::ftp_Config(), $permission, $path);
-            return $v;
-        }
-        public static function ftp_Get_root(){
-            // $v = ftp_chdir(ftp_server::ftp_Config(), '~');
-            $v = ftp_pwd(ftp_server::ftp_Config());
-            return $v;
-        }
-        
-        public static function put_file_FR_folder($localPath, $remotePath) {
-            $remotePath .= '/'.$localPath;
-            $error = "";
-            try {
-                $absoluteLocalPath = __DIR__ . '/' . $localPath;
-                ftp_put(ftp_server::ftp_Config(), $remotePath, $absoluteLocalPath, FTP_BINARY); 
-            } catch (Exception $e) {
-                if ($e->getCode() == 2) $error = $e->getMessage(); 
-            }
-            return $error;
-        }
     }
 
     class Position{
@@ -1602,20 +1446,4 @@ if(isset($_POST['import'])){
 
     }
 }
-///////API EXPORT
-
-
-
-
-
-    if(isset($_POST['TREEDATA'])){
-        $id_parent = $_POST['id_parent'];
-        $m =  new component;
-        $data = $m->testDEQUY_5($id_parent);
-        echo json_encode($data);
-    }
-    function getaaaaa(){
-        var_dump(getAllPersonnel());
-    }
-    // require_once('..\..\QLNS\getdataUser.php');
 ?>

@@ -347,3 +347,72 @@ function del_jobchild(id_jobchild) {
         success: function(response) {}
     });
 }
+
+function get_BOM_hidden_miss_M_of_C_PROD_CMD(id_prod, id_Component_parent, id_tbl) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            get_BOM_hidden_miss_M_of_C_in_PROD_CMD: 1,
+            id_prod: id_prod,
+            id_Component_parent: id_Component_parent
+        },
+        dataType: 'JSON',
+        type: 'POST',
+        success: function(response) {
+            if (!response || !response.length) {
+                console.error('No data received from the server');
+                return;
+            }
+
+            $(id_tbl).DataTable({
+                pagingType: 'simple_numbers',
+                scrollX: true,
+                data: response,
+                destroy: true,
+                columnDefs: [
+                    { targets: [0], orderData: [0, 1] },
+                    { targets: [1], orderData: [1, 0] },
+                    { targets: [4], orderData: [4, 0] }
+                ],
+                order: [0, 'desc'],
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1; // Return row number
+                        }
+                    },
+                    { data: 'type' },
+                    { data: 'name' },
+                    { data: 'code' },
+                    { data: 'quantity' },
+                    { data: 'quantity_geted' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return row.quantity_geted - row.quantity;
+                        }
+
+                    },
+                    { data: 'quantity_inStorage' },
+                    {
+                        render: function(data, type, row) {
+                            var link = (row.type === 'Material') ?
+                                'admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=' + row.id :
+                                'admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=' + row.id;
+                            return '<a href="' + link + '">Chi tiết</a>';
+                        }
+                    }
+                ],
+                pageLength: 15,
+                rowCallback: function(row, data) {
+                    if (parseInt(data.quantity_inStorage) < parseInt(data.quantity)) {
+                        $(row).addClass('highlight');
+                    }
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX request failed:', error);
+        }
+    });
+}

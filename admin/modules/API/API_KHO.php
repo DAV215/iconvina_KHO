@@ -140,4 +140,14 @@
         $result = array('data' => $all_prods, 'total' => number_format($total));
         echo json_encode($result);
     }
+    ////////// Vật tư BOM - Ẩn vật liệu Component thiếu:
+    if(isset($_POST['get_BOM_hidden_miss_M_of_C'])){
+        $id_parent  =  $_POST['id_parent'];
+        echo json_encode(component::sum_vattu_CnM(component::Vattu_CnM_hidden($id_parent)), JSON_UNESCAPED_UNICODE);
+    }
+    if(isset($_POST['get_BOM_hidden_miss_M_of_C_in_PROD_CMD'])){
+        $id_prod  =  $_POST['id_prod'];
+        $id_Component_parent  =  $_POST['id_Component_parent'];
+        echo json_encode(component::thongke_Vattu_Component_in_ProdCMD2(component::Vattu_CnM_hidden($id_Component_parent), $id_prod), JSON_UNESCAPED_UNICODE);
+    }
 ?>

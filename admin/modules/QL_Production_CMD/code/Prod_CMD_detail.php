@@ -44,11 +44,12 @@
                         $component->testDEQUY_2($id_Component_parent); 
                         echo "<h1>Thống kê vật tư:</h1>";
                         ?>
-    <table class="data_table" id="tbl_BOM">
+    <table  class="stripe hover display order-column row-border  " style="width:90%; margin: 0;" id="tbl_BOM_PROD_CMD">
         <thead>
-            <tr class="headerTable">
-                <div class="rowTitle">
+            <tr class="">
+                <div class="">
                     <th>Số thứ tự</th>
+                    <th>Loại</th>
                     <th>Tên</th>
                     <th>Code</th>
                     <th>Số lượng</th>
@@ -59,49 +60,7 @@
                 </div>
             </tr>
         </thead>
-        <tbody id="tbody_Component">
-            <?php 
-                                        $i = 0;
-                                        foreach ($component->thongke_Vattu_Component_in_ProdCMD($component->testDEQUY_thongke($id_Component_parent), $id_Prod_CMD) as $row) {
-                                            // echo $row['id'] . $row['name'] . '-SL:' . $row['quantity'] . '</br>';
-                                            $i++;
-                                            $quantity_need = $row['quantity'];
-                                            $quantity_exist = material::get_info_Material($row['id'])['quantity'];
-                                            $diff = 1-floatval(($quantity_need / $quantity_exist));
-                                            switch ($diff) {
-                                                case ($diff< 0.1):
-                                                    $color_background = 'red';
-                                                    $color_text = 'black';
-                                                    break;
-                                                case ( $diff < 0.3):
-                                                    $color_background = 'yellow';
-                                                    $color_text = 'black';
-                                                    break;
-                                                default:
-                                                    $color_text = 'ccc';
-                                                    $color_background = 'rgba(0, 0, 0, 0.2)';
-                                                    break;
-                                            }
-                                            ?>
-            <tr style="background: <?php echo $color_background ?>  ; color: <?php echo $color_text ?>  ;"
-                <?php echo $diff?>>
-                <td><?php echo $i ?></td>
-                <td><?php echo $row['name']  ?></td>
-                <td><?php echo $row['code']  ?></td>
-                <td><?php echo $quantity_need  ?></td>
-                <td><?php echo $row['quantity_geted'] ?></td>
-                <td><?php echo $quantity_need -$row['quantity_geted'] ?></td>
-                <td><?php echo $quantity_exist  ?></td>
-                <td class="tacvu">
-                    <a
-                        href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=<?php echo $row['id']  ?>">
-                        Chi tiết
-                    </a>
-                </td>
-            </tr>
-            <?php
-                                        }
-                                    ?>
+        <tbody>
 
         </tbody>
     </table>
@@ -324,4 +283,5 @@ function change_tab(event, nameTab) {
 fillmember_list_divJOB('#member', '#ALL_member_in_prod_cmd');
 getALL_prod_cmd_jobchild(<?php echo $id_Prod_CMD ?>)
 getALL_division_job(<?php echo $id_Prod_CMD ?>)
+get_BOM_hidden_miss_M_of_C_PROD_CMD(<?php echo $id_Prod_CMD ?>, <?php echo $id_Component_parent ?>, '#tbl_BOM_PROD_CMD');
 </script>

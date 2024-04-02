@@ -255,3 +255,9 @@ td.tacvu {
 .permissionTable td {
     border-top: 0px !important;
 }
+
+.highlight,
+.highlight a {
+    background-color: #ff61da !important;
+    color: white;
+}

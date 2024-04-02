@@ -130,8 +130,14 @@
         echo "<meta http-equiv='refresh' content='0'>";
         
     }
+// var_dump(component::Component_Join_Info("AND id = 188")[0]);
+// foreach (component::getChild_ofParent_FL_Level(199,$i) as $row){
+//     print_r($row); echo '<br>';
 
-
+// }
+    // foreach (component::thongke_Vattu_Component_2($component->testDEQUY_thongke_2($id_Component_parent)) as $row){
+    //     print_r($row); echo '<br>';
+    // }
 ?>
 
 <form action="" method="post" enctype="multipart/form-data">
@@ -219,7 +225,7 @@
                                     if(isset($info_component['link_folder'])){
                                         info_component::createFolder($info_component['link_folder']);
                                         $images = array('jpg','png','jpeg','gif');
-                                        $path = 'QLKHO\MEDIA\component'.'/' .$info_component['link_folder'].'/';
+                                        $path = 'QLKHO/MEDIA/component'.'/' .$info_component['link_folder'].'/';
                                         $files = scandir($path);
                                         $found = false;
                                         foreach($files as $key => $value) {
@@ -383,73 +389,24 @@
     </div>
 </form>
 
-<div id="tbl_taolenhsanxuat" class="tableComponent tabcontent">
-    <?php
-                    $component = new component;
-                        $component->testDEQUY_2($id_Component_parent); 
-                        echo "<h1>Thống kê vật tư:</h1>";
-                        ?>
-    <table class="data_table" id="tbl_BOM">
+<div id="tbl_taolenhsanxuat" class="tableComponent tabcontent" style="width:90%;">
+
+    <table id="tbl_BOM_hidden_miss_M_of_C" class="stripe hover display order-column row-border  " style="width:100%; margin: 0 !important;" >
         <thead>
-            <tr class="headerTable">
-                <div class="rowTitle">
-                    <th>Số thứ tự</th>
-                    <th>Tên</th>
-                    <th>Code</th>
-                    <th>Số lượng</th>
-                    <th>Số lượng trong kho</th>
-                    <th>Tác vụ</th>
-                </div>
+            <tr class="">
+                <th>Số thứ tự</th>
+                <th>Loại</th>
+                <th>Tên</th>
+                <th>Số lượng</th>
+                <th>Số lượng trong kho</th>
+                <th>Tác vụ</th>
             </tr>
         </thead>
-        <tbody id="tbody_Component">
-            <?php 
-                                        $i = 0;
-                                        foreach ($component->thongke_Vattu_Component($component->testDEQUY_thongke($id_Component_parent)) as $row) {
-                                            // echo $row['id'] . $row['name'] . '-SL:' . $row['quantity'] . '</br>';
-                                            $i++;
-                                            $quantity_need = $row['quantity'];
-                                            $quantity_exist = material::get_info_Material($row['id'])['quantity'];
-                                            $diff = 1-floatval(($quantity_need / $quantity_exist));
-                                            switch ($diff) {
-                                                case ($diff< 0.1):
-                                                    $color_background = 'red';
-                                                    $color_text = 'black';
-                                                    break;
-                                                case ( $diff < 0.3):
-                                                    $color_background = 'yellow';
-                                                    $color_text = 'black';
-                                                    break;
-                                                default:
-                                                    $color_text = 'ccc';
-                                                    $color_background = 'rgba(0, 0, 0, 0.2)';
-                                                    break;
-                                            }
-                                            ?>
-            <tr style="background: <?php echo $color_background ?>  ; color: <?php echo $color_text ?>  ;"
-                <?php echo $diff?>>
-                <td><?php echo $i ?></td>
-                <td><?php echo $row['name']  ?></td>
-                <td><?php echo $row['code']  ?></td>
-                <td><?php echo $quantity_need  ?></td>
-                <td><?php echo $quantity_exist  ?></td>
-                <td class="tacvu">
-                    <a
-                        href="admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=<?php echo $row['id']  ?>">
-                        Chi tiết
-                    </a>
-                </td>
-            </tr>
-            <?php
-                                        }
-                                    ?>
+        <tbody>
 
         </tbody>
     </table>
-    <button onclick="exportTableToExcel('tbl_BOM', '<?php echo 'BOM_'.$component_parent_basicInfo['name'] ?>')">Xuất
-        EXCEL</button>
-    <?
-                    ?>
+    <button onclick="exportTableToExcel('tbl_BOM_hidden_miss_M_of_C', '<?php echo 'BOM_'.$component_parent_basicInfo['name'] ?>')">Xuất EXCEL</button>
     <div class="input_class">
         <form action="" method="post" id="production_cmd_form">
             <input type="hidden" name="id_component" value="<?php echo $id_Component_parent ?>">
@@ -471,7 +428,7 @@
             </fieldset>
             <fieldset>
                 <legend>Người cùng tham gia:</legend>
-                <input  type="search" name="" id="searchStaff" list="staff">
+                <input type="search" name="" id="searchStaff" list="staff">
                 <button type="button" class="btn_common" onclick="addMember()"><i class="fa-solid fa-plus"></i></button>
                 <input required type="text" name="member[]" list="staff" id="member">
             </fieldset>
@@ -483,7 +440,8 @@
                 <legend>Ghi chú:</legend>
                 <textarea name="note_production_cmd" id="" cols="30" rows="10" style="width:99%;">note</textarea>
             </fieldset>
-            <button class="btn_common" style="width:auto; border-radius: 10px;" type="button" onclick="create_cmd()">Tạo lệnh</button>
+            <button class="btn_common" style="width:auto; border-radius: 10px;" type="button" onclick="create_cmd()">Tạo
+                lệnh</button>
         </form>
 
     </div>
@@ -538,8 +496,7 @@
     ?>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script  src="../asset/js/KHO/settingKho.js"></script>
+<script src="../asset/js/KHO/settingKho.js"></script>
 
 <script>
 function create_cmd() {
@@ -564,15 +521,15 @@ function addMember() {
     // Get the input element and the selected value
     var searchInput = document.getElementById('searchStaff');
     var selectedValue = searchInput.value.trim(); // Trim whitespace from the input
-    
+
     // Check if the value is not empty
     if (selectedValue !== '') {
         // Select the member input element by name attribute
         var memberInput = document.querySelector('input[name="member[]"]');
-        
+
         // Append the selected value to the existing value of the member input
         memberInput.value += (memberInput.value ? ', ' : '') + selectedValue;
-        
+
         // Clear the search input
         searchInput.value = '';
     }
@@ -834,7 +791,8 @@ function del_Img_Component(path_Component_Img_DEL) {
         success: function(data) {
             alert(data);
             if (
-                <?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>) {
+                <?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>
+                ) {
                 location.reload();
             }
 
@@ -869,7 +827,8 @@ function ADD_new_FILE(file) {
         success: function(php_script_response) {
             alert(php_script_response);
             if (
-                <?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>) {
+                <?php echo info_Component::get_info_Component($id_Component_parent) == null ? '0' : '1' ?>
+                ) {
                 location.reload();
             }
 
@@ -908,7 +867,7 @@ function exportTableToExcel(tableID, filename = '') {
 
     // Specify file name
     filename = filename ? filename.replace(/\.[^.]+$/, '') + '.xlsx' :
-    'excel_data.xlsx'; // Update default filename to .xlsx
+        'excel_data.xlsx'; // Update default filename to .xlsx
 
     // Create download link element
     downloadLink = document.createElement("a");
@@ -942,4 +901,7 @@ function s2ab(s) {
     for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
     return buf;
 }
+</script>
+<script>
+get_BOM_hidden_miss_M_of_C(<?php echo $id_Component_parent ?>, '#tbl_BOM_hidden_miss_M_of_C');
 </script>
