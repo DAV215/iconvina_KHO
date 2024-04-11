@@ -849,3 +849,222 @@ function get_BOM_hidden_miss_M_of_C(id_parent, id_tbl) {
         }
     });
 }
+
+function treeMap_DMNL(id_component_parent, width) {
+    $.ajax({
+        url: "API/API_KHO.php",
+        data: {
+            treeMap_DMNL: 1,
+            id_component_parent: id_component_parent
+        },
+        dataType: 'JSON',
+        type: 'post',
+        success: function(response) {
+            tree2(response)
+        }
+    });
+}
+
+function tree2(data) {
+    new d3.OrgChart().container('.chart-container').data(data)
+        .nodeContent(function(d, i, arr, state) {
+            const color = '#FFFFFF';
+            return `
+        <div style="font-family: 'Inter', sans-serif;background-color:${color}; position:absolute;margin-top:-1px; margin-left:-1px;width:${d.width}px;height:${d.height}px;border-radius:10px;border: 1px solid #E4E2E9">
+           
+           <img src=" ${
+             d.data.img
+           }" style="position:absolute;margin-top:-20px;margin-left:${20}px;border-radius:5px;width:80px;height:50px;" />
+           
+          <div style="color:#08011E;position:absolute;right:20px;top:17px;font-size:10px;"><i class="fas fa-ellipsis-h"></i></div>
+
+          <div style="font-size:15px;color:#08011E;margin-left:20px;margin-top:32px">              
+            <a style="color: #e24d0e;font-size: 16px;text-decoration: none; " href="${d.data.link}"> ${d.data.name}</a></div>
+          <div style="color:#716E7B;margin-left:20px;margin-top:3px;font-size:14px;"> Trong kho: ${
+            d.data.quantity_inStorage
+          } </div>
+          <div style="color:#716E7B;margin-left:20px;margin-top:3px;font-size:14px;"> Cần: ${
+            d.data.quantity
+          } </div>
+       </div>
+`;
+        })
+        .render();
+}
+
+
+// function generateTree(data, width_input) {
+//     // Set up dimensions and margins for the tree
+//     var margin = { top: 20, right: 90, bottom: 30, left: 90 };
+//     var width = width_input - margin.left - margin.right;
+//     var height = 500 - margin.top - margin.bottom;
+
+//     // Append an SVG element to the tree container
+//     var svg = d3.select("#tree-container").append("svg")
+//         .attr("width", "100%") // Set width to 100% for responsiveness
+//         .attr("height", "500px") // Set height to 100% for responsiveness
+//         .append("g")
+//         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+//         .call(d3.zoom().on("zoom", function() {
+//             svg.attr("transform", d3.event.transform)
+//         }));
+
+//     // Create a hierarchical layout
+//     var root = d3.hierarchy(data);
+
+//     // Create a tree layout
+//     var tree = d3.tree().size([width, height]);
+
+//     // Assigns the x and y position for the nodes
+//     var treeData = tree(root);
+
+//     // Draw links between nodes
+//     // Draw links between nodes
+//     var links = svg.selectAll(".link")
+//         .data(treeData.links())
+//         .enter().append("path")
+//         .attr("class", "link")
+//         .attr("fill", "transparent")
+//         .attr("d", function(d) {
+//             var sourceX = d.source.x;
+//             var sourceY = d.source.y - 0;
+//             var targetX = d.target.x;
+//             var targetY = d.target.y + 100;
+//             var deltaX = targetX - sourceX;
+//             var deltaY = targetY - sourceY;
+//             var offsetX = 20; // Adjust this value to control the offset of the horizontal line
+//             var offsetY = 10; // Adjust this value to control the length of the vertical line
+//             var path = "M" + sourceX + "," + sourceY +
+//                 "V" + (sourceY + deltaY / 2) + // Draw a vertical line to the middle of the link
+//                 "H" + (targetX); // Draw a horizontal line to the left of the target node
+//             if (d.target.children) {
+//                 // Draw an additional vertical line if the target node has children
+//                 path += "V" + (targetY + offsetY);
+//             } else {
+//                 // Draw a shorter vertical line if the target node doesn't have children
+//                 path += "V" + (targetY - offsetY);
+//             }
+//             return path;
+//         })
+//         .style("stroke", "#ccc") // Set line color to gray
+//         .style("stroke-width", "1px");
+
+//     // Draw nodes
+//     // Draw nodes
+//     // Draw nodes
+//     var nodes = svg.selectAll(".node")
+//         .data(treeData.descendants())
+//         .enter().append("g")
+//         .attr("class", "node")
+//         .attr("transform", function(d) {
+//             return "translate(" + d.x + "," + (d.depth * 200) + ")"; // Adjust y position based on node depth
+//         });
+
+
+//     // Add rectangles as node containers
+//     nodes.append("rect")
+//         .attr("x", -50) // Half of the box width
+//         .attr("y", -50) // Half of the box height
+//         .attr("width", 100)
+//         .attr("height", 150)
+//         .attr("fill", "lightgray")
+//         .attr("rx", 10) // Set border radius for x-axis
+//         .attr("ry", 10) // Set border radius for y-axis
+//         .attr("stroke", "black");
+
+//     // Add image to the node
+//     nodes.append("image")
+//         .attr("xlink:href", function(d) { return d.data.img; }) // Set image dynamically based on data
+//         .attr("x", -50) // Adjust x position to center the image
+//         .attr("y", -40) // Adjust y position to place the image above the text
+//         .attr("width", 100)
+//         .attr("height", 80);
+
+//     // Add text labels to the node
+//     // Add text labels to the node with links
+//     nodes.append("a")
+//         .attr("xlink:href", function(d) { return d.data.link; }) // Set link dynamically based on data
+//         .append("text")
+//         .attr("dy", ".35em")
+//         .style("text-anchor", "middle")
+//         .text(function(d) { return d.data.name; })
+//         .attr("x", -50) // Adjust x position to center the image
+//         .attr("y", 50)
+//         .style("font-size", 10)
+//         .style("font-weight", "bold")
+//         .call(wrap, 100); // Wrap text with a maximum width of 50px
+
+//     // Function to wrap text
+//     function wrap(text, width) {
+//         text.each(function() {
+//             var text = d3.select(this),
+//                 words = text.text().split(/\s+/).reverse(),
+//                 word,
+//                 line = [],
+//                 lineNumber = 0,
+//                 lineHeight = 0.9, // ems
+//                 y = text.attr("y"),
+//                 dy = parseFloat(text.attr("dy")),
+//                 tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+//             while (word = words.pop()) {
+//                 line.push(word);
+//                 tspan.text(line.join(" "));
+//                 if (tspan.node().getComputedTextLength() > width) {
+//                     line.pop();
+//                     tspan.text(line.join(" "));
+//                     line = [word];
+//                     tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+//                 }
+//             }
+//         });
+//     }
+
+
+//     // Define zoom behavior
+//     let zoom = d3.zoom().on("zoom", function(event) {
+//         svg.attr("transform", event.transform)
+//     });
+//     svg.call(zoom);
+//     // Apply zoom behavior to the SVG container on button click
+//     d3.select("#zoom-in-button").on("click", function() {
+//         svg.transition().duration(250).attr("pointer-events", "none").call(zoom.scaleBy, 1.25).transition().attr("pointer-events", "all"); // Zoom in by scaling
+//     });
+
+//     d3.select("#zoom-out-button").on("click", function() {
+//         svg.transition().duration(250).attr("pointer-events", "none").call(zoom.scaleBy, 0.75).transition().attr("pointer-events", "all"); // Zoom out by scaling
+//     });
+//     d3.select("#center_treeMap").on("click", function() {
+//         svg.transition().call(zoom.translateTo, 0.5 * width, 0.5 * height);
+//     });
+//     d3.select("#move_left_treeMap").on("click", function() {
+//         svg.transition().call(zoom.translateBy, -200, 0);
+//     });
+//     d3.select("#move_right_treeMap").on("click", function() {
+//         svg.transition().call(zoom.translateBy, 200, 0);
+//     });
+//     d3.select("#move_up_treeMap").on("click", function() {
+//         svg.transition().call(zoom.translateBy, 0, 200);
+//     });
+
+//     d3.select("#move_down_treeMap").on("click", function() {
+//         svg.transition().call(zoom.translateBy, 0, -200);
+//     });
+//     // Create a tooltip div
+//     var tooltip = d3.select("#tree-container")
+//         .append("div")
+//         .attr("class", "tooltip_treeMap")
+//         .style("opacity", 0);
+
+//     // Add mouseover event to the nodes
+//     nodes.on("mouseover", function(event, d) {
+//             // Update the tooltip content with node data
+//             tooltip.html(`<strong>Name:</strong> ${d.data.name}<br><strong>Số lượng trong kho:</strong> ${d.data.quantity_inStorage}<br><strong>Số lượng cần:</strong> ${d.data.quantity_need}<br>`)
+//                 .style("opacity", 1)
+//                 .style("left", (event.pageX - 350) + "px")
+//                 .style("top", (event.pageY - 28) + "px");
+//         })
+//         .on("mouseout", function() {
+//             // Hide the tooltip when mouse leaves the node
+//             tooltip.style("opacity", 0);
+//         });
+// }

@@ -10,13 +10,17 @@
         
         // If members array is not empty, implode and encode it
         $members_json = !empty($members) ? json_encode($members, JSON_UNESCAPED_UNICODE) : '[]';
-        
+
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        $time = isset($_POST['start'])?$_POST['start']:date("Y-m-d H:i:s");
         $deadline = $_POST['deadline'];
         $note_production_cmd = $_POST['note_production_cmd'];
         $addBy = $_POST['addBy'];
         $id_component = $_POST['id_component'];
-         production_cmd::addNew($id_component, $name_production_cmd, $deadline, null, $addBy, $manager, $note_production_cmd, $members_json, $priority_range);
-         echo json_encode('Đã tạo lệnh thành công !', JSON_UNESCAPED_UNICODE);
+        $quantity_production = $_POST['quantity_production'];
+         production_cmd::addNew($id_component, $name_production_cmd, $deadline, null, $addBy, 
+         $manager, $note_production_cmd, $members_json, $priority_range,$time, $quantity_production);
+         echo true;
     }
     // if(isset($_POST['getALL_prod_cmd'])){
     //     $getPage = isset($_POST['pagenumber_Prods_cmd'])?$_POST['pagenumber_Prods_cmd']:1;
@@ -71,6 +75,22 @@
             );
         }
         echo json_encode($all);                                             
+    }
+    //update process job child of PROD CMD
+    if(isset($_POST['update_process_jobChild_Prod_CMD'])){
+        $id_prod_cmd = $_POST['data']['id_prod_cmd'];
+        $job_child_prod_cmd = $_POST['data']['job_child_prod_cmd'];
+        $progress = $_POST['data']['progress'];
+
+        prod_cmd_job_child::update(array('progress' => $progress), "  `id` = $job_child_prod_cmd");
+
+        $temp_all = prod_cmd_job_child::getAll('*', " id_production_cmd = $id_prod_cmd ");
+        $sum_progress = 0;
+        foreach($temp_all as $row){
+            $sum_progress += ($row['percent_ofall']*$row['progress'])/100;
+        }
+        production_cmd::update(array('progress_realtime' => $sum_progress), "  `id` = $id_prod_cmd");
+        echo $sum_progress;
     }
     //del job child
     if(isset($_POST['del_jobchild'])){
@@ -148,6 +168,27 @@
     if(isset($_POST['get_BOM_hidden_miss_M_of_C_in_PROD_CMD'])){
         $id_prod  =  $_POST['id_prod'];
         $id_Component_parent  =  $_POST['id_Component_parent'];
-        echo json_encode(component::thongke_Vattu_Component_in_ProdCMD2(component::Vattu_CnM_hidden($id_Component_parent), $id_prod), JSON_UNESCAPED_UNICODE);
+        $quantity_component = $_POST['quantity_component'];
+        echo json_encode(component::thongke_Vattu_Component_in_ProdCMD2(component::Vattu_CnM_hidden($id_Component_parent), $id_prod, $quantity_component), JSON_UNESCAPED_UNICODE);
+    }
+    // if(isset($_POST['treeMap_DMNL'])){
+    //     $id_component_parent  =  $_POST['id_component_parent'];
+    //     $component = new component;
+    //     $name = $component->get_info($id_component_parent)['name'];
+    //     $jsonOutput = [
+    //         "name" => $name,
+    //         "children" => $component->convertToJSON($id_component_parent)
+    //     ];    
+    //     echo json_encode($jsonOutput, JSON_PRETTY_PRINT);
+    // }
+    if(isset($_POST['treeMap_DMNL'])){
+        $id_component_parent  =  $_POST['id_component_parent'];
+        $component = new component;
+        $parent = $component->get_info($id_component_parent);
+        $result[] = ['id' => $parent['id'],'name' => $parent['name'], 'quantity' => $parent['quantity_ofChild'], 'parentId' => null ];
+        foreach ($component-> testDEQUY_3_MAIN_8t4($id_component_parent) as $row) {
+            $result[] = $row;
+        }
+        echo json_encode($result, JSON_UNESCAPED_UNICODE);
     }
 ?>

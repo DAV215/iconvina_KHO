@@ -1,11 +1,12 @@
 <h1>Lệnh sản xuất:</h1>
 <div class="tableComponent" style="width:90%;">
-    <table class="stripe hover display order-column row-border  " style="width:100%" id="table3">
+    <table class="stripe hover display order-column row-border  " style="width:100%; margin: 0;" id="table3">
         <thead>
-            <tr class="">
+            <tr class="" style="font-size: 1rem;">
 
                 <th>STT</th>
                 <th>Tên lệnh</th>
+                <th>Số lượng</th>
                 <th>Bắt đầu</th>
                 <th>Thời hạn</th>
                 <th>Tiến độ</th>

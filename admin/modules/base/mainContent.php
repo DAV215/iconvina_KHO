@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="../asset/css/admin/modalForm.css">
 <link rel="stylesheet" href="../asset/css/admin/chatbox.css">
 <script src="../asset/js/modal.js"></script>
+<script src="../asset/js/orgchart.js"></script>
 <div class="mainContent">
     <?php 
     include("../modules/base/menuTop.php");

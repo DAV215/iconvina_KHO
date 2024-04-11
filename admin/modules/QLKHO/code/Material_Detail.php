@@ -274,6 +274,9 @@
         
                                             }
                                         }   else  info_Material::createFolder($info_Material['link_folder']);
+                                    }else{
+                                        $link_folder = $id_material.'_'.$material['name'];
+                                        info_Material::update_arr(array('link_folder' => $link_folder)," id_item = $id_material  ");
                                     }
 
                                     ?>

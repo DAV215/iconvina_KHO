@@ -130,6 +130,12 @@
             $m->table_ = "tbl_info_material";
             $m->update($m->table_, $Info_material, $where);
         }
+        public static function update_arr($Info_material,$where){
+
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_info_material";
+            $m->update($m->table_, $Info_material, $where);
+        }
         public static function get_info_Material($id){
             $db = new DB_driver_KHO_Material;
             return $db->get_1row('`tbl_info_material`','*',"  `id_item` =  ".$id);
@@ -217,6 +223,9 @@
         function overview($sql){
             return parent::overview($sql);
         }
+        function update_set($tbl, $set, $where){
+            return parent::update_set($tbl, $set, $where);
+        }
     }
     class DB_driver{
         private $__conn;
@@ -303,6 +312,12 @@
             return $data;
         }
         
+        function update_set($tbl, $set, $where){
+            $this->connection();
+            $sql = "UPDATE $tbl SET $set WHERE $where ";
+            $query = mysqli_query($this-> __conn, $sql);
+
+        }
     }
 
     class component{
@@ -503,6 +518,269 @@
                 return $data;
             }
         }
+        
+        function testDEQUY_2_8T4($id_parent, $data = []) {
+            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+            
+            if(count($get_DMNL_Component) != 0) {
+                $container_Parent = $this->getChild_ofParent($id_parent);  
+                
+                if ($this->get_oneRow_Onecomponent('level', $id_parent)['level'] > 0) {
+                    $level = [];
+                    foreach ($container_Parent as $row) {
+                        $level[] = $row['level'];
+                    }
+                    $lv = max($level);
+                    
+                    foreach ($container_Parent as $row) {
+                        $parentId = $row['id_parent']; // Get the parentId
+                        
+                        // Generate a unique ID based on the parentId
+                        $uniqueId = $parentId . '_' . $row['id_child'];
+                        
+                        if ($row['level'] > 0) {
+                            $data[] = ['id' => $uniqueId, 'parentId' => $parentId, 'name' => $row['name'], 'quantity' => $row['quantity_ofChild']];
+                            $data = $this->testDEQUY_2_8T4($row['id_child'], $data);
+                        } else {
+                            $data[] = ['id' => $uniqueId, 'parentId' => $parentId, 'name' => $row['name'], 'quantity' => $row['quantity_ofChild']];
+                        }
+                    }
+                }
+            }
+            
+            return $data;
+        }
+        
+        function testDEQUY_3_MAIN($id_parent, $data = []) {
+            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+                if(count($get_DMNL_Component)!=0){
+                    $container_Parent = $this->getChild_ofParent($id_parent);  
+                    if ($this->get_oneRow_Onecomponent('level', $id_parent)['level'] > 0) {
+                        $level = [];
+                        foreach ($container_Parent as $row) {
+                            $level[] = $row['level'];
+                        }
+                        $lv = max($level);
+                        for ($i = 0; $i <= $lv; $i++) {
+                            foreach ($this->getChild_ofParent_FL_Level($id_parent, $i) as $row) {
+                                if ($row['level'] > 0) {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = info_Component::get_info_Component($row['id_child'])['quantity'];
+                                    $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $row['id_parent'], 'img' => $img, 'quantity_inStorage' => $quantity_inStorage];
+                                    $data = $this->testDEQUY_3_MAIN($row['id_child'], $data);
+                                } else {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = material::get_info_Material($row['id_child'])['quantity'];
+
+                                    $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $row['id_parent'], 'img' => $img, 'quantity_inStorage' => $quantity_inStorage ];
+                                }
+                            }
+                        }
+                    }
+                    return $data;
+                }
+            }
+
+            function testDEQUY_32($id_parent, $data = [], $id_parent_now = null) {
+                $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+                $id_parent_fake = [];
+                $id_parent_fake[] = $id_parent;
+                
+                if(count($get_DMNL_Component) != 0) {
+                    $container_Parent = $this->getChild_ofParent($id_parent);  
+                    
+                    if ($this->get_oneRow_Onecomponent('level', $id_parent)['level'] > 0) {
+                        $level = [];
+                        
+                        foreach ($container_Parent as $row) {
+                            $level[] = $row['level'];
+                        }
+                        
+                        $lv = max($level);
+                        
+                        for ($i = 0; $i <= $lv; $i++) {
+                            foreach ($this->getChild_ofParent_FL_Level($id_parent, $i) as $row) {
+                                if ($row['level'] > 0) {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = info_Component::get_info_Component($row['id_child'])['quantity'];
+                                    
+                                    if(in_array($row['id_parent'], $id_parent_fake)){
+                                        $id_parent_now = rand(9999999, 99999999);
+                                        $id_parent_fake[] = $id_parent_now;
+                                        $data[] = ['id' => $id_parent_now,'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $row['id_parent'], 'img' => $img, 'quantity_inStorage' => $quantity_inStorage];
+                                        $data = $this->testDEQUY_3($row['id_child'], $data, $id_parent_now);
+                                    } else {
+                                        $id_parent_now = $row['id_parent'];
+                                        $id_parent_fake[] = $id_parent_now;
+                                        $data[] = ['id' => $id_parent_now,'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => end($id_parent_fake), 'img' => $img, 'quantity_inStorage' => $quantity_inStorage];
+                                        $data = $this->testDEQUY_3($row['id_child'], $data, null);
+                                    }
+                                } else {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = material::get_info_Material($row['id_child'])['quantity'];
+                                    
+                                    if($id_parent_now != null){
+                                        $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $id_parent_now, 'img' => $img, 'quantity_inStorage' => $quantity_inStorage ];
+                                    } else {
+                                        $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $row['id_parent'], 'img' => $img, 'quantity_inStorage' => $quantity_inStorage ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return $data;
+                }
+            }
+            function testDEQUY_3($id_parent, $data = [], $id_parent_now = null) {
+                $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+                $id_parent_fake[] = $id_parent;
+                
+                if(count($get_DMNL_Component) != 0) {
+                    $container_Parent = $this->getChild_ofParent($id_parent);  
+                    
+                    if ($this->get_oneRow_Onecomponent('level', $id_parent)['level'] > 0) {
+                        $level = [];
+                        
+                        foreach ($container_Parent as $row) {
+                            $level[] = $row['level'];
+                        }
+                        
+                        $lv = max($level);
+                        
+                        for ($i = 0; $i <= $lv; $i++) {
+                            foreach ($this->getChild_ofParent_FL_Level($id_parent, $i) as $row) {
+                                if ($row['level'] > 0) {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = info_Component::get_info_Component($row['id_child'])['quantity'];
+                                    
+                                    if(in_array($row['id_parent'], $id_parent_fake)){
+                                        $id_parent_now = rand(9999999, 99999999);
+                                        $data[] = ['id' => $id_parent_now,'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $id_parent_fake(count($id_parent_fake)-2), 'img' => $img, 'quantity_inStorage' => $quantity_inStorage];
+                                        $id_parent_fake[] = $id_parent_now;
+                                        
+                                        $data = $this->testDEQUY_3($row['id_child'], $data, $id_parent_now);
+                                    } else {
+                                        if($id_parent_now != null){
+                                            // $id_parent_now = $row['id_parent'];
+                                            $data[] = ['id' => $id_parent_now,'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => end($id_parent_fake), 'img' => $img, 'quantity_inStorage' => $quantity_inStorage];
+                                            $id_parent_fake[] = $id_parent_now;
+                                            
+                                            $data = $this->testDEQUY_3($row['id_child'], $data, $id_parent_now);
+                                        }else{
+                                            // $id_parent_now = $row['id_parent'];
+                                            $data[] = ['id' => $id_parent_now,'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => end($id_parent_fake), 'img' => $img, 'quantity_inStorage' => $quantity_inStorage];
+                                            $id_parent_fake[] = $id_parent_now;
+                                            
+                                            $data = $this->testDEQUY_3($row['id_child'], $data, null);
+                                        }
+                                        
+                                    }
+                                } else {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = material::get_info_Material($row['id_child'])['quantity'];
+                                    
+                                    if($id_parent_now != null){
+                                        $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $id_parent_now, 'img' => $img, 'quantity_inStorage' => $quantity_inStorage ];
+                                    } else {
+                                        $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $row['id_parent'], 'img' => $img, 'quantity_inStorage' => $quantity_inStorage ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return $data;
+                }
+            }
+            public static function checkUnique($data, $key, $value){
+                foreach ($data as $row) {
+                    if($row[$key] ==  $value){
+                        return false;
+                    }
+                }
+                return true;
+            }
+            public static function return_id_parent($data, $level){
+                $sl = count($data);
+                if($sl > 1){
+                    for($i = $sl - 1; $i >= 0; $i--){
+                        $temp = $data[$i];
+                        if($temp['level'] > $level){
+                            return $temp['id'];
+                        }
+                    }
+                }
+                return null;
+            }
+            
+            function testDEQUY_3_MAIN_8t4($id_parent, $data = [], $id_parent_now = null) {
+                $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+                $id_parent_fake[] = $id_parent;
+                
+                if(count($get_DMNL_Component) != 0) {
+                    $container_Parent = $this->getChild_ofParent($id_parent);  
+                    
+                    if ($this->get_oneRow_Onecomponent('level', $id_parent)['level'] > 0) {
+                        $level = [];
+                        
+                        foreach ($container_Parent as $row_) {
+                            $level[] = $row_['level'];
+                        }
+                        
+                        $lv = max($level);
+                        
+                        for ($i = 0; $i <= $lv; $i++) {
+                            foreach ($this->getChild_ofParent_FL_Level($id_parent, $i) as $row) {
+                                
+                                if ($row['level'] >0) {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = info_Component::get_info_Component($row['id_child'])['quantity'];
+                                    if(!self::checkUnique($data, 'id', $row['id_child'])){
+                                        $id_parent_now = rand(9999999, 99999999);
+                                        $temp_id_pr = self::return_id_parent($data,$i);
+                                        $data[] = ['id' => $id_parent_now,'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $temp_id_pr,
+                                        'img' => $img, 'quantity_inStorage' => $quantity_inStorage, 'link' => $link, 'level' => $row['level'], 'real_id' => $row['id_child']];
+                                        $id_parent_fake[] = $id_parent_now;
+                                        $data = $this->testDEQUY_3_MAIN_8t4($row['id_child'], $data, $id_parent_now);
+                                    }else{
+                                        $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' =>  $row['id_parent'], 'img' => $img, 'quantity_inStorage' => $quantity_inStorage, 'link' => $link, 'level' => $row['level'], 'real_id' => $row['id_child']];
+                                        $data = $this->testDEQUY_3_MAIN_8t4($row['id_child'], $data, null);
+                                    }
+                                } else {
+                                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=".$row['id_child'];
+                                    $folder = __DIR__.'/..'.'/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'];
+                                    $img = 'QLKHO/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                                    $quantity_inStorage = material::get_info_Material($row['id_child'])['quantity'];
+                                    
+                                    if($id_parent_now != null){
+                                        if ($row['level'] == 0){
+                                            $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => $id_parent_now, 'img' => $img, 'quantity_inStorage' => $quantity_inStorage, 'link' => $link, 'level' => $row['level'], 'real_id' => $row['id_child'] ];
+                                        }else{
+                                        $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => end($id_parent_fake), 'img' => $img, 'quantity_inStorage' => $quantity_inStorage, 'link' => $link, 'level' => $row['level'], 'real_id' => $row['id_child'] ];
+                                        }
+                                    } else {
+                                        $data[] = ['id' => $row['id_child'],'name' => $row['name'], 'quantity' => $row['quantity_ofChild'], 'parentId' => end($id_parent_fake), 'img' => $img, 'quantity_inStorage' => $quantity_inStorage, 'link' => $link, 'level' => $row['level'], 'real_id' => $row['id_child'] ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return $data;
+                }
+            }
         public static function Vattu_CnM_hidden($id_parent, $indent = 0, $data = []){
             $component_class = new component;
             $get_DMNL_Component = $component_class->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
@@ -519,14 +797,15 @@
                         foreach ($component_class->getChild_ofParent_FL_Level($id_parent,$i) as $row) {
                             if($row['level']>0 && $i>0){
                                 $c = component::Component_Join_Info('AND id = '. $row['id_child'])[0];
+                                $data[] = array('type' => 'Component' ,'id'=>$row['id_child'],'name' => $c['name'],'quantity'=> $row['quantity_ofChild'], 'quantity_inStorage' => $c['quantity']);
 
-                                if($c['quantity'] > 0){
-                                    $data[] = array('type' => 'Component' ,'id'=>$row['id_child'],'name' => $c['name'],'quantity'=> $row['quantity_ofChild'], 'quantity_inStorage' => $c['quantity']);
-                                }else{
-                                    for($i_ = 0; $i_ < $row['quantity_ofChild']; $i_++){
-                                        $data = $component_class->Vattu_CnM_hidden($row['id_child'],$indent + 1,$data);
-                                    }
-                                }
+                                // if($c['quantity'] > 0){
+                                //     $data[] = array('type' => 'Component' ,'id'=>$row['id_child'],'name' => $c['name'],'quantity'=> $row['quantity_ofChild'], 'quantity_inStorage' => $c['quantity']);
+                                // }else{
+                                //     for($i_ = 0; $i_ < $row['quantity_ofChild']; $i_++){
+                                //         $data = $component_class->Vattu_CnM_hidden($row['id_child'],$indent + 1,$data);
+                                //     }
+                                // }
                             }
                             else {
                                 $m  = material::get_info_Material($row['id_child']);
@@ -582,7 +861,7 @@
             
             return $combinedArray;
         }
-        public static function thongke_Vattu_Component_in_ProdCMD2($data, $id_prod_cmd){
+        public static function thongke_Vattu_Component_in_ProdCMD2($data, $id_prod_cmd, $quantity_component){
             $result = [];
             $id_export = [];
             foreach(export_material::getAll('*', " id_prod_cmd =  $id_prod_cmd ") as $row){
@@ -610,11 +889,91 @@
                 if (isset($result[$name])) {
                     $result[$name]['quantity'] += $quantity;
                 } else {
-                    $result[$name] = ['type' => $type, 'id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity, 'quantity_geted' => $quantity_geted, 'quantity_inStorage' => $quantity_inStorage];
+                    $result[$name] = ['type' => $type, 'id'=>$id,'name' => $name, 'code' => $code, 'quantity' => $quantity*$quantity_component, 'quantity_geted' => $quantity_geted, 'quantity_inStorage' => $quantity_inStorage];
                 }
             }
         
             return array_values($result); 
+        }
+
+        function convertToJSON($id_parent) {
+            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+            $jsonArray = [];
+            foreach ($get_DMNL_Component as $row) {
+                $type = isset($this->get_info($row['id_child'])['id'])?'Component':'Material';
+                if($type == 'Component'){
+                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=".$row['id_child'];
+                    $folder = __DIR__.'/..'.'/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'];
+                $img = 'QLKHO/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                    $quantity_inStorage = info_Component::get_info_Component($row['id_child'])['quantity'];
+                }else{
+                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=".$row['id_child'];
+                    $folder = __DIR__.'/..'.'/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'];
+                $img = 'QLKHO/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'].'/'.str_replace('\\', '/',$this->getFirstImagePath($folder));
+                $quantity_inStorage = material::get_info_Material($row['id_child'])['quantity'];
+                }
+                $element = [
+                    "name" => $row['name'],
+                    "quantity_need" => $row['quantity_ofChild'],
+                    "id" => $row['id_child'],
+                    "type" => $type,
+                    "link" => $link,
+                    "img" => $img,
+                    "children" => $this->convertToJSON($row['id_child']),
+                    "quantity_inStorage" => $quantity_inStorage 
+                ];
+                $jsonArray[] = $element;
+            }
+            return $jsonArray;
+        }
+        function convertToJSON_VIP($id_parent) {
+            $get_DMNL_Component = $this->getALL_Child(' `id_parent` = '.$id_parent.' ORDER BY `id` DESC');
+            $jsonArray = [];
+            foreach ($get_DMNL_Component as $row) {
+                $type = isset($this->get_info($row['id_child'])['id']) ? 'Component' : 'Material';
+                if ($type == 'Component') {
+                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=ComponentDetail&id_Component_parent=".$row['id_child'];
+                    $folder = __DIR__.'/..'.'/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'];
+                    $img = 'QLKHO/MEDIA/component/'.info_Component::get_info_Component($row['id_child'])['link_folder'].'/'.str_replace('\\', '/', $this->getFirstImagePath($folder));
+                    $quantity_inStorage = info_Component::get_info_Component($row['id_child'])['quantity'];
+                } else {
+                    $link = "admin.php?job=QLKHO&action=thongke&actionChild=MaterialDetail&id_material=".$row['id_child'];
+                    $folder = __DIR__.'/..'.'/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'];
+                    $img = 'QLKHO/MEDIA/material/'.info_Material::get_info_Material($row['id_child'])['link_folder'].'/'.str_replace('\\', '/', $this->getFirstImagePath($folder));
+                    $quantity_inStorage = material::get_info_Material($row['id_child'])['quantity'];
+                }
+                $element = [
+                    "name" => $row['name'],
+                    "quantity_need" => $row['quantity_ofChild'],
+                    "id" => $row['id_child'],
+                    "type" => $type,
+                    "link" => $link,
+                    "img" => $img,
+                    "children" => $this->convertToJSON($row['id_child']),
+                    "quantity_inStorage" => $quantity_inStorage 
+                ];
+                // Check if there are children, and add them as needed
+                if (!empty($element['children'])) {
+                    $element['children'] = array_values($element['children']);
+                }
+                $jsonArray[] = $element;
+            }
+            return $jsonArray;
+        }
+        
+        public static function getFirstImagePath($folderPath) {
+            if(is_dir($folderPath)){
+                $files = scandir($folderPath);
+                foreach ($files as $file) {
+                    if (is_file($folderPath . '/' . $file) && preg_match("/\.(jpg|jpeg|png|gif)$/i", $file)) {
+                        return  '/' . $file;
+                    }
+                }
+            }else{
+                return null;
+
+            }
+
         }
     }
     class info_Component {
@@ -1064,6 +1423,44 @@
             return $db->getAll_WHERE('`tbl_import_detail`',$GET,  $WHERE);
         }
     }
+    class import_component_internal{
+        private $var;
+        public function __construct( $var = null) {
+            $this->var = $var;
+        }
+        public static function addNew($id_user_import,$id_component_parent, $note, $id_production_cmd, $quantity){
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $import_time  =  date("Y-m-d H:i:s");
+            $array = array(
+                'id_user_import' => $id_user_import,
+                'id_production_cmd ' => $id_production_cmd,
+                'id_component_parent ' => $id_component_parent,
+                'quantity' => $quantity,
+                'import_time' => $import_time,
+                'note' => $note,
+            );
+                    
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_import_component_internal";
+            $m->add($array);
+        }
+        public static function getAll($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->getAll_WHERE('`tbl_import_component_internal`',$GET,  $WHERE);
+        }
+        public static function sum_quantity($id_production_cmd){
+            $all_import_note = self::getAll('quantity', "id_production_cmd = $id_production_cmd");
+            $quantity = 0;
+            foreach ($all_import_note as $row) {
+                $quantity += $row['quantity'];
+            }
+            return $quantity;
+        }
+        public static function get_1row($GET, $WHERE){
+            $db = new DB_driver_KHO_Material;
+            return $db->get_1row('`tbl_import_component_internal`',$GET,  $WHERE);
+        }
+    }
     class export_material{
         
         private $var;
@@ -1136,7 +1533,7 @@
         public function __construct( $var = null) {
             $this->var = $var;
         }
-        public static function addNew( $id_component, $name, $deadline, $progress_realtime, $addBy, $receiver, $note, $member, $priority) {
+        public static function addNew( $id_component, $name, $deadline, $progress_realtime, $addBy, $receiver, $note, $member, $priority, $time, $quantity) {
             date_default_timezone_set('Asia/Ho_Chi_Minh');
             $time = date("Y-m-d H:i:s");
         
@@ -1150,7 +1547,8 @@
                 'note' => $note,
                 'member' => $member,
                 'priority' => $priority,
-                'time' => $time
+                'time' => $time,
+                'quantity' => $quantity
             );
         
             $m = new DB_driver_KHO_Material;
@@ -1170,6 +1568,12 @@
             $m = new DB_driver_KHO_Material;
             $m->table_ = "tbl_production_cmd";
             $m->update($m->table_, $array, $where);
+        }
+        
+        public static function update_set($set, $where){
+            $m = new DB_driver_KHO_Material;
+            $m->table_ = "tbl_production_cmd";
+            $m->update_set($m->table_, $set, $where);
         }
     }
     class prod_cmd_job_child{
