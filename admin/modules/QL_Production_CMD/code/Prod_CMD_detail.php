@@ -4,6 +4,7 @@
     $PCMD_BasicInfo = production_cmd::get_1row('*', "id = $id_Prod_CMD");
     $id_Component_parent = $PCMD_BasicInfo['id_component'];
     $manager = $PCMD_BasicInfo['receiver'];
+
     if (isset($_POST['save_jobfor_member'])) {
         foreach ($_POST['name_staff'] as $index => $nameStaff) {
             if($nameStaff != '' && isset($nameStaff )){

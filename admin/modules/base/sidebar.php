@@ -276,6 +276,23 @@ ob_start();
                 </ul>
             </div>
         </div>
+        <div href="" class="sideMenu-Item">
+            <div class="Main-sideMenu">
+                <div class="sideMenu-icon-title">
+                    <span class="sideMenu-icon"> <i class="fa-solid fa-puzzle-piece"></i></span>
+                    <span class="sideMenu-Title">Khách hàng</span>
+                </div>
+                <button onclick="toggleSubMenu(this)"><i class="fa-solid fa-angle-right"></i></button>
+            </div>
+            <div class="sub-sideMenu ">
+                <ul>
+                    <li><a href="admin.php?job=QL_Client&action=Client&actionChild=add_Client" onclick="changeActive(this)">Thêm khách hàng</a></li>
+                    <li><a href="admin.php?job=QL_Client&action=Client" onclick="changeActive(this)">Thống kê Khách hàng</a></li>
+                    <li><a href="admin.php?job=QL_Client&action=Order&actionChild=add_Order" onclick="changeActive(this)">Tạo đơn hàng</a></li>
+                    <li><a href="admin.php?job=QL_Client&action=Order&actionChild=order_Detail" onclick="changeActive(this)">Thống kê đơn hàng</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
         </div>
         

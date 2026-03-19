@@ -261,3 +261,20 @@ td.tacvu {
     background-color: #ff61da !important;
     color: white;
 }
+
+.tbl_common_ver1 tr,
+.tbl_common_ver1 th,
+.tbl_common_ver1 td {
+    border: solid 1px black;
+    align-items: center;
+}
+
+.tbl_common_ver1 input {
+    display: flex !important;
+    width: 100%;
+    border: none;
+    border: none !important;
+    outline: none;
+    margin: 10px 0;
+    justify-content: center;
+}

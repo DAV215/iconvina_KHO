@@ -830,7 +830,7 @@ input#img_Component {
     border-width: 1px;
     border-style: groove;
     border-color: rgb(192, 192, 192);
-    margin: 25px 0;
+    /* margin: 25px 0; */
 }
 
 .input_class input {

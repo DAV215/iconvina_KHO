@@ -190,7 +190,8 @@ function addROW_(event, class_Append, Id_container) {
         if (container && c.length > 0) {
             // Clone the last element with the specified class
             var newItemCal = c[c.length - 1].cloneNode(true);
-
+            var newRowNumber = parseInt(newItemCal.querySelector("td").textContent) + 1;
+                newItemCal.querySelector("td").textContent = newRowNumber;
             // Clear the input values in the cloned div
             newItemCal.querySelectorAll("input").forEach(function(input) {
                 input.value = "";

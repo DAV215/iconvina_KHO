@@ -22,22 +22,6 @@
          $manager, $note_production_cmd, $members_json, $priority_range,$time, $quantity_production);
          echo true;
     }
-    // if(isset($_POST['getALL_prod_cmd'])){
-    //     $getPage = isset($_POST['pagenumber_Prods_cmd'])?$_POST['pagenumber_Prods_cmd']:1;
-    //     $start_el = ($getPage-1)*5;
-    //     if(isset($_POST['search_prod_cmd']) && $_POST['search_prod_cmd'] != null){
-    //         $search = $_POST['search_prod_cmd'];
-    //         $all = production_cmd::getAll('*', "   ((name LIKE '%" . $search . "%'  ) OR (receiver LIKE '%" . $search . "%'  ) OR (deadline LIKE '%" . $search . "%'  ))");
-    //         $all_eachPage = production_cmd::getAll('*', "   ((name LIKE '%" . $search . "%'  ) OR (receiver LIKE '%" . $search . "%'  ) OR (deadline LIKE '%" . $search . "%'  )) LIMIT $start_el, 5");
-    //         $quantity_el = count($all);
-    //         echo json_encode(array('data' => $all_eachPage, 'quantity_el' => $quantity_el));
-    //     } else {
-    //         $all = production_cmd::getAll('*', " 1 ");
-    //         $all_eachPage = production_cmd::getAll('*', " 1  LIMIT $start_el, 5");
-    //         $quantity_el = count($all);
-    //         echo json_encode(array('data' => $all_eachPage, 'quantity_el' => $quantity_el));
-    //     }
-    // }
     if(isset($_POST['getALL_prod_cmd'])){
         $all = production_cmd::getAll('*', " 1 ");
         $all_eachPage = production_cmd::getAll('*', " 1  ");
@@ -171,16 +155,6 @@
         $quantity_component = $_POST['quantity_component'];
         echo json_encode(component::thongke_Vattu_Component_in_ProdCMD2(component::Vattu_CnM_hidden($id_Component_parent), $id_prod, $quantity_component), JSON_UNESCAPED_UNICODE);
     }
-    // if(isset($_POST['treeMap_DMNL'])){
-    //     $id_component_parent  =  $_POST['id_component_parent'];
-    //     $component = new component;
-    //     $name = $component->get_info($id_component_parent)['name'];
-    //     $jsonOutput = [
-    //         "name" => $name,
-    //         "children" => $component->convertToJSON($id_component_parent)
-    //     ];    
-    //     echo json_encode($jsonOutput, JSON_PRETTY_PRINT);
-    // }
     if(isset($_POST['treeMap_DMNL'])){
         $id_component_parent  =  $_POST['id_component_parent'];
         $component = new component;
@@ -190,5 +164,12 @@
             $result[] = $row;
         }
         echo json_encode($result, JSON_UNESCAPED_UNICODE);
+    }
+////////Update 11/04/2024
+    if(isset($_POST['material_listed_table'])){
+        echo json_encode(  material::SUPER_join_With_Info('' ));
+    }
+    if(isset($_POST['component_listed_table'])){
+        echo json_encode(  component::SUPER_Component_Join_Info('' ));
     }
 ?>

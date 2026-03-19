@@ -45,9 +45,12 @@
                     if($action == 'thongke_imp_exp') include('QLKHO/code/QLKHO.php');  
                 }if($job=="QL_Production_CMD"){
                     if($action == 'thongke') include('QL_Production_CMD/code/QL_Production_CMD.php');  
+                }if($job=="QL_Client"){
+                    if($action == 'Client' || $action == 'Order') include('QL_CLIENT/code/Client.php');  
                 }
+                
             }else{
-                include('QLDXM/buysuggest.php');
+                include('QL_Production_CMD/code/QL_Production_CMD.php'); 
             }
         ?>
     </div>
