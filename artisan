@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Core\Application;
+use App\Core\Database\Migrations\Migrator;
+use App\Core\Database\Seeders\AdminSeeder;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$app = new Application(__DIR__);
+$app->bootstrap();
+
+$command = $argv[1] ?? null;
+
+if ($command === 'migrate') {
+    /** @var Migrator $migrator */
+    $migrator = $app->container()->get(Migrator::class);
+    $migrator->run();
+    exit(0);
+}
+
+if ($command === 'seed:admin') {
+    /** @var AdminSeeder $seeder */
+    $seeder = $app->container()->get(AdminSeeder::class);
+    $seeder->run();
+    exit(0);
+}
+
+fwrite(STDOUT, "Available commands:`n");
+fwrite(STDOUT, "  php artisan migrate`n");
+fwrite(STDOUT, "  php artisan seed:admin`n");
+exit(0);
