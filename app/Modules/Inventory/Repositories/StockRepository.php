@@ -9,7 +9,7 @@ use Throwable;
 
 final class StockRepository extends Repository
 {
-    public function search(?string $search = null, ?string $txnType = null): array
+    public function search(?string $search = null, ?string $txnType = null, int $page = 1, int $perPage = 25): array
     {
         $sql = 'SELECT st.*,
                        COUNT(sti.id) AS item_count,
@@ -17,21 +17,30 @@ final class StockRepository extends Repository
                 FROM stock_transactions st
                 LEFT JOIN stock_transaction_items sti ON sti.stock_transaction_id = st.id
                 WHERE 1 = 1';
+        $countSql = 'SELECT COUNT(*) AS aggregate
+                     FROM stock_transactions st
+                     WHERE 1 = 1';
         $params = [];
+        $offset = max(0, ($page - 1) * $perPage);
 
         if ($search !== null && trim($search) !== '') {
             $params['search'] = '%' . trim($search) . '%';
             $sql .= ' AND (st.txn_no LIKE :search OR st.txn_date LIKE :search)';
+            $countSql .= ' AND (st.txn_no LIKE :search OR st.txn_date LIKE :search)';
         }
 
         if ($txnType !== null && trim($txnType) !== '') {
             $params['txn_type'] = trim($txnType);
             $sql .= ' AND st.txn_type = :txn_type';
+            $countSql .= ' AND st.txn_type = :txn_type';
         }
 
-        $sql .= ' GROUP BY st.id ORDER BY st.id DESC LIMIT 100';
+        $sql .= sprintf(' GROUP BY st.id ORDER BY st.id DESC LIMIT %d OFFSET %d', $perPage, $offset);
 
-        return $this->fetchAll($sql, $params);
+        return [
+            'items' => $this->fetchAll($sql, $params),
+            'total' => (int) (($this->fetchOne($countSql, $params)['aggregate'] ?? 0)),
+        ];
     }
 
     public function findById(int $id): ?array
@@ -69,10 +78,12 @@ final class StockRepository extends Repository
     public function materialOptions(): array
     {
         return $this->fetchAll(
-            'SELECT id, code, name, unit, standard_cost
-             FROM materials
-             WHERE is_active = 1
-             ORDER BY name ASC, id ASC
+            'SELECT m.id, m.code, m.name, m.unit, m.standard_cost, m.category_id,
+                    mc.name AS category_name, mc.code AS category_code
+             FROM materials m
+             LEFT JOIN material_categories mc ON mc.id = m.category_id
+             WHERE m.is_active = 1
+             ORDER BY m.name ASC, m.id ASC
              LIMIT 500'
         );
     }
@@ -85,6 +96,16 @@ final class StockRepository extends Repository
              WHERE is_active = 1
              ORDER BY name ASC, id ASC
              LIMIT 500'
+        );
+    }
+
+    public function materialCategoryOptions(): array
+    {
+        return $this->fetchAll(
+            'SELECT id, code, name, parent_id
+             FROM material_categories
+             WHERE is_active = 1
+             ORDER BY COALESCE(parent_id, id) ASC, parent_id ASC, name ASC, id ASC'
         );
     }
 

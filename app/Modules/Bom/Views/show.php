@@ -40,6 +40,7 @@ $statusMap = [
                         </div>
                         <div class="d-flex gap-2">
                             <a href="<?php echo htmlspecialchars(app_url('/bom'), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-light rounded-4 px-4">Back</a>
+                            <a href="<?php echo htmlspecialchars(app_url('/bom/tree?id=' . (int) $bom['id']), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-outline-secondary rounded-4 px-4">Tree</a>
                             <a href="<?php echo htmlspecialchars(app_url('/bom/edit?id=' . (int) $bom['id']), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-dark rounded-4 px-4">Edit</a>
                         </div>
                     </div>

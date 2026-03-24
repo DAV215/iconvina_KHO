@@ -12,16 +12,16 @@ use PDOException;
 
 final class StockService
 {
-    private const TXN_TYPES = ['import', 'export', 'adjustment'];
+    private const TXN_TYPES = ['import', 'export', 'issue', 'receipt', 'adjustment'];
     private const ITEM_KINDS = ['material', 'component'];
 
     public function __construct(private readonly StockRepository $repository)
     {
     }
 
-    public function list(?string $search = null, ?string $txnType = null): array
+    public function list(?string $search = null, ?string $txnType = null, int $page = 1, int $perPage = 25): array
     {
-        return $this->repository->search($search, $this->normalizeTxnTypeFilter($txnType));
+        return $this->repository->search($search, $this->normalizeTxnTypeFilter($txnType), $page, $perPage);
     }
 
     public function find(int $id): array
@@ -85,6 +85,11 @@ final class StockService
         return $this->repository->componentOptions();
     }
 
+    public function materialCategoryOptions(): array
+    {
+        return $this->flattenMaterialCategoryOptions($this->repository->materialCategoryOptions());
+    }
+
     public function itemPayload(): array
     {
         $materials = [];
@@ -93,8 +98,12 @@ final class StockService
                 'id' => (int) $material['id'],
                 'code' => (string) $material['code'],
                 'name' => (string) $material['name'],
+                'option_label' => trim((string) $material['code'] . ' - ' . (string) $material['name']),
                 'unit' => (string) $material['unit'],
                 'standard_cost' => number_format((float) $material['standard_cost'], 2, '.', ''),
+                'category_id' => $material['category_id'] !== null ? (int) $material['category_id'] : null,
+                'category_name' => (string) ($material['category_name'] ?? ''),
+                'category_code' => (string) ($material['category_code'] ?? ''),
             ];
         }
 
@@ -104,7 +113,9 @@ final class StockService
                 'id' => (int) $component['id'],
                 'code' => (string) $component['code'],
                 'name' => (string) $component['name'],
+                'option_label' => trim((string) $component['code'] . ' - ' . (string) $component['name']),
                 'component_type' => (string) $component['component_type'],
+                'unit' => (string) $component['component_type'],
                 'standard_cost' => number_format((float) $component['standard_cost'], 2, '.', ''),
             ];
         }
@@ -348,5 +359,43 @@ final class StockService
     private function formatDecimal(float $value): string
     {
         return number_format(round($value, 2), 2, '.', '');
+    }
+
+    private function flattenMaterialCategoryOptions(array $rows): array
+    {
+        $children = [];
+        foreach ($rows as $row) {
+            $parentId = $row['parent_id'] ?? null;
+            $key = $parentId === null ? 'root' : (string) $parentId;
+            $children[$key][] = $row;
+        }
+
+        foreach ($children as &$siblings) {
+            usort($siblings, static function (array $left, array $right): int {
+                return [$left['name'], $left['id']] <=> [$right['name'], $right['id']];
+            });
+        }
+        unset($siblings);
+
+        $flattened = [];
+        $visited = [];
+        $walker = function (?int $parentId, int $depth) use (&$walker, &$flattened, &$children, &$visited): void {
+            $key = $parentId === null ? 'root' : (string) $parentId;
+            foreach ($children[$key] ?? [] as $row) {
+                $id = (int) $row['id'];
+                if (isset($visited[$id])) {
+                    continue;
+                }
+
+                $visited[$id] = true;
+                $row['label'] = ($depth > 0 ? str_repeat('-- ', $depth) : '') . (string) $row['name'];
+                $flattened[] = $row;
+                $walker($id, $depth + 1);
+            }
+        };
+
+        $walker(null, 0);
+
+        return $flattened;
     }
 }

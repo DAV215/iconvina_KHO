@@ -16,6 +16,7 @@ final class StockApiController extends Controller
 
     public function index(Request $request): array
     {
+        $this->authorize('stock.view');
         $search = (string) $request->query('search', '');
         $txnType = (string) $request->query('txn_type', '');
 

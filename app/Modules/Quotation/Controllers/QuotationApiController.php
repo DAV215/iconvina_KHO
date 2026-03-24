@@ -16,6 +16,7 @@ final class QuotationApiController extends Controller
 
     public function index(Request $request): array
     {
+        $this->authorize('quotation.view');
         $search = (string) $request->query('search', '');
         $status = (string) $request->query('status', '');
 

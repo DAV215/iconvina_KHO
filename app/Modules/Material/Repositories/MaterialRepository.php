@@ -8,27 +8,72 @@ use App\Core\Database\Repository;
 
 final class MaterialRepository extends Repository
 {
-    public function search(?string $search = null): array
+    public function search(array $filters = [], array $sort = [], int $page = 1, int $perPage = 25): array
     {
+        $allowedOrderBy = [
+            'code' => 'm.code',
+            'name' => 'm.name',
+            'category' => 'mc.name',
+            'unit' => 'm.unit',
+            'standard_cost' => 'm.standard_cost',
+            'min_stock' => 'm.min_stock',
+            'updated_at' => 'm.updated_at',
+        ];
+        $orderBy = $allowedOrderBy[$sort['by'] ?? ''] ?? 'm.id';
+        $direction = strtoupper((string) ($sort['dir'] ?? 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
+
         $sql = 'SELECT m.*, mc.code AS category_code, mc.name AS category_name
                 FROM materials m
                 LEFT JOIN material_categories mc ON mc.id = m.category_id';
+        $countSql = 'SELECT COUNT(*) AS aggregate
+                     FROM materials m
+                     LEFT JOIN material_categories mc ON mc.id = m.category_id';
         $params = [];
+        $conditions = [];
+        $offset = max(0, ($page - 1) * $perPage);
 
-        if ($search !== null && trim($search) !== '') {
-            $sql .= ' WHERE m.code LIKE :search
-                       OR m.name LIKE :search
-                       OR m.unit LIKE :search
-                       OR m.specification LIKE :search
-                       OR m.color LIKE :search
-                       OR mc.code LIKE :search
-                       OR mc.name LIKE :search';
-            $params['search'] = '%' . trim($search) . '%';
+        $code = trim((string) ($filters['code'] ?? ''));
+        if ($code !== '') {
+            $conditions[] = 'm.code LIKE :code';
+            $params['code'] = '%' . $code . '%';
         }
 
-        $sql .= ' ORDER BY m.id DESC LIMIT 100';
+        $name = trim((string) ($filters['name'] ?? ''));
+        if ($name !== '') {
+            $conditions[] = 'm.name LIKE :name';
+            $params['name'] = '%' . $name . '%';
+        }
 
-        return $this->fetchAll($sql, $params);
+        $categoryId = trim((string) ($filters['category_id'] ?? ''));
+        if ($categoryId !== '' && ctype_digit($categoryId)) {
+            $conditions[] = 'm.category_id = :category_id';
+            $params['category_id'] = (int) $categoryId;
+        }
+
+        $color = trim((string) ($filters['color'] ?? ''));
+        if ($color !== '') {
+            $conditions[] = 'm.color LIKE :color';
+            $params['color'] = '%' . $color . '%';
+        }
+
+        $status = (string) ($filters['status'] ?? '');
+        if ($status === '1' || $status === '0') {
+            $conditions[] = 'm.is_active = :is_active';
+            $params['is_active'] = (int) $status;
+        }
+
+        if ($conditions !== []) {
+            $whereSql = ' WHERE ' . implode(' AND ', $conditions);
+            $sql .= $whereSql;
+            $countSql .= $whereSql;
+        }
+
+        $sql .= sprintf(' ORDER BY %s %s, m.id DESC LIMIT %d OFFSET %d', $orderBy, $direction, $perPage, $offset);
+
+        return [
+            'items' => $this->fetchAll($sql, $params),
+            'total' => (int) (($this->fetchOne($countSql, $params)['aggregate'] ?? 0)),
+        ];
     }
 
     public function findById(int $id): ?array
@@ -56,10 +101,19 @@ final class MaterialRepository extends Repository
     public function categoryOptions(): array
     {
         return $this->fetchAll(
-            'SELECT id, code, name
+            'SELECT id, code, name, parent_id
              FROM material_categories
              WHERE is_active = 1
-             ORDER BY name ASC, id ASC'
+             ORDER BY COALESCE(parent_id, id) ASC, parent_id ASC, name ASC, id ASC'
+        );
+    }
+
+    public function allCategoryOptions(): array
+    {
+        return $this->fetchAll(
+            'SELECT id, code, name, parent_id, is_active
+             FROM material_categories
+             ORDER BY COALESCE(parent_id, id) ASC, parent_id ASC, name ASC, id ASC'
         );
     }
 
@@ -71,7 +125,7 @@ final class MaterialRepository extends Repository
     public function options(): array
     {
         return $this->fetchAll(
-            'SELECT id, code, name, unit, is_active
+            'SELECT id, code, name, unit, standard_cost, is_active
              FROM materials
              ORDER BY name ASC, id ASC
              LIMIT 500'

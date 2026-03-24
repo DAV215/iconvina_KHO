@@ -18,8 +18,15 @@ final class BomController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('bom.view');
         $componentId = (int) $request->query('component_id', 0);
         $version = (string) $request->query('version', '');
+        $paging = $this->paginationParams($request);
+        $list = $this->service->list($componentId > 0 ? $componentId : null, $version, $paging['page'], $paging['per_page']);
+        $pagination = erp_paginate('/bom', [
+            'component_id' => $componentId > 0 ? (string) $componentId : '',
+            'version' => $version,
+        ], $paging['page'], $paging['per_page'], (int) $list['total']);
 
         return $this->view('app/Modules/Bom/Views/index.php', [
             'pageTitle' => 'BOM',
@@ -28,20 +35,34 @@ final class BomController extends Controller
             'componentId' => $componentId,
             'version' => $version,
             'components' => $this->service->componentOptions(),
-            'boms' => $this->service->list($componentId > 0 ? $componentId : null, $version),
+            'boms' => $list['items'],
+            'pagination' => $pagination,
             'status' => (string) $request->query('status', ''),
         ]);
     }
 
     public function create(Request $request)
     {
-        unset($request);
+        $this->authorize('bom.create');
+        $prefill = [];
+        $componentId = (int) $request->query('component_id', 0);
+        if ($componentId > 0) {
+            $prefill['component_id'] = $componentId;
+        }
+        $version = trim((string) $request->query('version', ''));
+        if ($version !== '') {
+            $prefill['version'] = $version;
+        }
+        if ($prefill !== []) {
+            $prefill['is_active'] = '1';
+        }
 
-        return $this->renderForm('Thêm BOM', app_url('/bom/store'));
+        return $this->renderForm('Thêm BOM', app_url('/bom/store'), $prefill);
     }
 
     public function store(Request $request)
     {
+        $this->authorize('bom.create');
         $input = $request->all();
 
         try {
@@ -57,6 +78,7 @@ final class BomController extends Controller
 
     public function show(Request $request)
     {
+        $this->authorize('bom.view');
         $id = (int) $request->query('id', 0);
 
         return $this->view('app/Modules/Bom/Views/show.php', [
@@ -68,8 +90,24 @@ final class BomController extends Controller
         ]);
     }
 
+    public function tree(Request $request)
+    {
+        $this->authorize('bom.view');
+        $id = (int) $request->query('id', 0);
+        $payload = $this->service->tree($id);
+
+        return $this->view('app/Modules/Bom/Views/tree.php', [
+            'pageTitle' => 'BOM Tree',
+            'pageEyebrow' => 'Cấu trúc BOM',
+            'activeSidebar' => 'bom',
+            'bom' => $payload['bom'],
+            'tree' => $payload['tree'],
+        ]);
+    }
+
     public function edit(Request $request)
     {
+        $this->authorize('bom.update');
         $id = (int) $request->query('id', 0);
         $bom = $this->service->find($id);
 
@@ -78,6 +116,7 @@ final class BomController extends Controller
 
     public function update(Request $request)
     {
+        $this->authorize('bom.update');
         $id = (int) $request->query('id', 0);
         $input = $request->all();
 
@@ -96,6 +135,7 @@ final class BomController extends Controller
 
     public function delete(Request $request)
     {
+        $this->authorize('bom.delete');
         $id = (int) $request->query('id', 0);
         $this->service->delete($id);
         session_flash('success', 'Xóa BOM thành công.');

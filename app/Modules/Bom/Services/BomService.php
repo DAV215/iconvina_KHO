@@ -22,9 +22,12 @@ final class BomService
     ) {
     }
 
-    public function list(?int $componentId = null, ?string $version = null): array
+    public function list(?int $componentId = null, ?string $version = null, int $page = 1, int $perPage = 25): array
     {
-        return array_map(fn (array $bom): array => $this->appendDisplayName($bom), $this->repository->search($componentId, $version));
+        $result = $this->repository->search($componentId, $version, $page, $perPage);
+        $result['items'] = array_map(fn (array $bom): array => $this->appendDisplayName($bom), $result['items']);
+
+        return $result;
     }
 
     public function find(int $id): array
@@ -38,6 +41,16 @@ final class BomService
         $bom['items'] = $this->repository->findItemsByBomId($id);
 
         return $bom;
+    }
+
+    public function tree(int $id): array
+    {
+        $bom = $this->find($id);
+
+        return [
+            'bom' => $bom,
+            'tree' => $this->buildComponentNode($bom, []),
+        ];
     }
 
     public function create(array $data): int
@@ -254,5 +267,68 @@ final class BomService
         $bom['bom_name'] = trim($componentName . ($version !== '' ? ' - ' . $version : ''));
 
         return $bom;
+    }
+
+    private function buildComponentNode(array $bom, array $visitedBomIds): array
+    {
+        $bomId = (int) $bom['id'];
+        $visitedBomIds[$bomId] = true;
+        $items = $this->repository->findItemsByBomId($bomId);
+        $children = [];
+
+        foreach ($items as $item) {
+            $children[] = $this->buildItemNode($item, $visitedBomIds);
+        }
+
+        return [
+            'node_type' => 'component',
+            'id' => (int) $bom['component_id'],
+            'bom_id' => $bomId,
+            'name' => (string) $bom['component_name'],
+            'code' => (string) $bom['component_code'],
+            'quantity' => '1.00',
+            'note' => null,
+            'image_path' => $bom['component_image_path'] ?? null,
+            'version' => (string) $bom['version'],
+            'children' => $children,
+        ];
+    }
+
+    private function buildItemNode(array $item, array $visitedBomIds): array
+    {
+        if ((string) $item['item_kind'] === 'component') {
+            $activeBom = $this->repository->findActiveByComponentId((int) $item['component_id']);
+            $children = [];
+
+            if ($activeBom !== null && !isset($visitedBomIds[(int) $activeBom['id']])) {
+                $children = $this->buildComponentNode($this->appendDisplayName($activeBom), $visitedBomIds)['children'];
+            }
+
+            return [
+                'node_type' => 'component',
+                'id' => (int) $item['component_id'],
+                'bom_id' => $activeBom['id'] ?? null,
+                'name' => (string) ($item['child_component_name'] ?? ''),
+                'code' => (string) ($item['child_component_code'] ?? ''),
+                'quantity' => $this->formatDecimal((float) $item['quantity']),
+                'note' => $item['note'] ?? null,
+                'image_path' => $item['child_component_image_path'] ?? null,
+                'version' => $activeBom['version'] ?? null,
+                'children' => $children,
+            ];
+        }
+
+        return [
+            'node_type' => 'material',
+            'id' => (int) $item['material_id'],
+            'bom_id' => null,
+            'name' => (string) ($item['material_name'] ?? ''),
+            'code' => (string) ($item['material_code'] ?? ''),
+            'quantity' => $this->formatDecimal((float) $item['quantity']),
+            'note' => $item['note'] ?? null,
+            'image_path' => null,
+            'version' => null,
+            'children' => [],
+        ];
     }
 }

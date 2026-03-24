@@ -18,20 +18,26 @@ final class CustomerController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('customer.view');
         $search = (string) $request->query('search', '');
+        $paging = $this->paginationParams($request);
+        $list = $this->service->list($search, $paging['page'], $paging['per_page']);
+        $pagination = erp_paginate('/customers', ['search' => $search], $paging['page'], $paging['per_page'], (int) $list['total']);
 
         return $this->view('app/Modules/Customer/Views/index.php', [
             'pageTitle' => 'Khách hàng',
             'pageEyebrow' => 'Quản lý khách hàng',
             'activeSidebar' => 'customers',
             'search' => $search,
-            'customers' => $this->service->list($search),
+            'customers' => $list['items'],
+            'pagination' => $pagination,
             'status' => (string) $request->query('status', ''),
         ]);
     }
 
     public function create(Request $request)
     {
+        $this->authorize('customer.create');
         unset($request);
 
         return $this->renderForm('Thêm khách hàng', app_url('/customers/store'));
@@ -39,6 +45,7 @@ final class CustomerController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('customer.create');
         $input = $request->all();
 
         try {
@@ -54,6 +61,7 @@ final class CustomerController extends Controller
 
     public function show(Request $request)
     {
+        $this->authorize('customer.view');
         $id = (int) $request->query('id', 0);
         $customer = $this->service->find($id);
 
@@ -68,6 +76,7 @@ final class CustomerController extends Controller
 
     public function edit(Request $request)
     {
+        $this->authorize('customer.update');
         $id = (int) $request->query('id', 0);
         $customer = $this->service->find($id);
 
@@ -76,6 +85,7 @@ final class CustomerController extends Controller
 
     public function update(Request $request)
     {
+        $this->authorize('customer.update');
         $id = (int) $request->query('id', 0);
         $input = $request->all();
 
@@ -94,6 +104,7 @@ final class CustomerController extends Controller
 
     public function delete(Request $request)
     {
+        $this->authorize('customer.delete');
         $id = (int) $request->query('id', 0);
         $this->service->delete($id);
         session_flash('success', 'Xóa khách hàng thành công.');

@@ -8,21 +8,33 @@ use App\Core\Database\Repository;
 
 final class ComponentRepository extends Repository
 {
-    public function search(?string $search = null): array
+    public function search(?string $search = null, int $page = 1, int $perPage = 25): array
     {
+        $offset = max(0, ($page - 1) * $perPage);
+
         if ($search === null || trim($search) === '') {
-            return $this->fetchAll('SELECT * FROM components ORDER BY id DESC LIMIT 100');
+            $total = (int) (($this->fetchOne('SELECT COUNT(*) AS aggregate FROM components')['aggregate'] ?? 0));
+            $items = $this->fetchAll(sprintf('SELECT * FROM components ORDER BY id DESC LIMIT %d OFFSET %d', $perPage, $offset));
+
+            return ['items' => $items, 'total' => $total];
         }
 
-        return $this->fetchAll(
-            'SELECT * FROM components
-             WHERE code LIKE :search
-                OR name LIKE :search
-                OR component_type LIKE :search
-             ORDER BY id DESC
-             LIMIT 100',
-            ['search' => '%' . trim($search) . '%']
+        $params = ['search' => '%' . trim($search) . '%'];
+        $where = ' WHERE code LIKE :search
+                    OR name LIKE :search
+                    OR component_type LIKE :search';
+        $total = (int) (($this->fetchOne('SELECT COUNT(*) AS aggregate FROM components' . $where, $params)['aggregate'] ?? 0));
+        $items = $this->fetchAll(
+            sprintf(
+                'SELECT * FROM components%s ORDER BY id DESC LIMIT %d OFFSET %d',
+                $where,
+                $perPage,
+                $offset
+            ),
+            $params
         );
+
+        return ['items' => $items, 'total' => $total];
     }
 
     public function findById(int $id): ?array
@@ -43,7 +55,7 @@ final class ComponentRepository extends Repository
     public function options(): array
     {
         return $this->fetchAll(
-            'SELECT id, code, name, component_type, is_active
+            'SELECT id, code, name, unit, component_type, standard_cost, image_path, is_active
              FROM components
              ORDER BY name ASC, id ASC
              LIMIT 500'

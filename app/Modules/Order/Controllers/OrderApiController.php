@@ -16,6 +16,7 @@ final class OrderApiController extends Controller
 
     public function index(Request $request): array
     {
+        $this->authorize('sales_order.view');
         $search = (string) $request->query('search', '');
         $status = (string) $request->query('status', '');
 

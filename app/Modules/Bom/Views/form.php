@@ -1,7 +1,6 @@
 <?php
 $activeSidebar = $activeSidebar ?? 'bom';
 $pageTitle = $pageTitle ?? 'BOM Form';
-$pageEyebrow = $pageEyebrow ?? 'Quản lý BOM';
 $formAction = $formAction ?? '/bom/store';
 $bom = $bom ?? [];
 $components = $components ?? [];
@@ -74,7 +73,7 @@ if ($formHeading === '') {
                                 <div class="row g-4">
                                     <div class="col-12 col-lg-5">
                                         <label class="form-label fw-semibold">Component</label>
-                                        <select name="component_id" id="bomParentComponent" class="form-select form-select-lg rounded-4 <?php echo $errorFor('component_id') ? 'is-invalid' : ''; ?>" onchange="syncAllBomRows();">
+                                        <select name="component_id" id="bomParentRef" class="form-select form-select-lg rounded-4 <?php echo $errorFor('component_id') ? 'is-invalid' : ''; ?>" onchange="syncAllBomRows();">
                                             <option value="">Chọn bán thành phẩm</option>
                                             <?php foreach ($components as $component): ?>
                                                 <option value="<?php echo (int) $component['id']; ?>" <?php echo $selectedComponentId === (string) $component['id'] ? 'selected' : ''; ?>>
@@ -255,8 +254,8 @@ function syncBomRowState(row) {
         return;
     }
 
-    var parentComponent = document.getElementById('bomParentComponent');
-    var parentId = parentComponent ? parentComponent.value : '';
+    var parentRef = document.getElementById('bomParentRef');
+    var parentId = parentRef ? parentRef.value : '';
     var itemKind = row.querySelector('.item-kind');
     var material = row.querySelector('.item-material');
     var component = row.querySelector('.item-component');

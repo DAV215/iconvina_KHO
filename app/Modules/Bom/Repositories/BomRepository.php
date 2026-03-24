@@ -9,33 +9,43 @@ use Throwable;
 
 final class BomRepository extends Repository
 {
-    public function search(?int $componentId = null, ?string $version = null): array
+    public function search(?int $componentId = null, ?string $version = null, int $page = 1, int $perPage = 25): array
     {
         $sql = 'SELECT bh.*, c.code AS component_code, c.name AS component_name, c.component_type
                 FROM bom_headers bh
                 INNER JOIN components c ON c.id = bh.component_id
                 WHERE 1 = 1';
+        $countSql = 'SELECT COUNT(*) AS aggregate
+                     FROM bom_headers bh
+                     INNER JOIN components c ON c.id = bh.component_id
+                     WHERE 1 = 1';
         $params = [];
+        $offset = max(0, ($page - 1) * $perPage);
 
         if ($componentId !== null && $componentId > 0) {
             $sql .= ' AND bh.component_id = :component_id';
+            $countSql .= ' AND bh.component_id = :component_id';
             $params['component_id'] = $componentId;
         }
 
         if ($version !== null && trim($version) !== '') {
             $sql .= ' AND bh.version LIKE :version';
+            $countSql .= ' AND bh.version LIKE :version';
             $params['version'] = '%' . trim($version) . '%';
         }
 
-        $sql .= ' ORDER BY c.name ASC, bh.id DESC LIMIT 200';
+        $sql .= sprintf(' ORDER BY c.name ASC, bh.id DESC LIMIT %d OFFSET %d', $perPage, $offset);
 
-        return $this->fetchAll($sql, $params);
+        return [
+            'items' => $this->fetchAll($sql, $params),
+            'total' => (int) (($this->fetchOne($countSql, $params)['aggregate'] ?? 0)),
+        ];
     }
 
     public function findById(int $id): ?array
     {
         return $this->fetchOne(
-            'SELECT bh.*, c.code AS component_code, c.name AS component_name, c.component_type
+            'SELECT bh.*, c.code AS component_code, c.name AS component_name, c.component_type, c.image_path AS component_image_path
              FROM bom_headers bh
              INNER JOIN components c ON c.id = bh.component_id
              WHERE bh.id = :id
@@ -53,13 +63,28 @@ final class BomRepository extends Repository
                     m.unit AS material_unit,
                     c.code AS child_component_code,
                     c.name AS child_component_name,
-                    c.component_type AS child_component_type
+                    c.component_type AS child_component_type,
+                    c.image_path AS child_component_image_path
              FROM bom_items bi
              LEFT JOIN materials m ON m.id = bi.material_id
              LEFT JOIN components c ON c.id = bi.component_id
              WHERE bi.bom_id = :bom_id
              ORDER BY bi.id ASC',
             ['bom_id' => $bomId]
+        );
+    }
+
+    public function findActiveByComponentId(int $componentId): ?array
+    {
+        return $this->fetchOne(
+            'SELECT bh.*, c.code AS component_code, c.name AS component_name, c.component_type, c.image_path AS component_image_path
+             FROM bom_headers bh
+             INNER JOIN components c ON c.id = bh.component_id
+             WHERE bh.component_id = :component_id
+               AND bh.is_active = 1
+             ORDER BY bh.id DESC
+             LIMIT 1',
+            ['component_id' => $componentId]
         );
     }
 

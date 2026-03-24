@@ -16,6 +16,7 @@ final class BomApiController extends Controller
 
     public function index(Request $request): array
     {
+        $this->authorize('bom.view');
         $componentId = (int) $request->query('component_id', 0);
         $version = (string) $request->query('version', '');
 

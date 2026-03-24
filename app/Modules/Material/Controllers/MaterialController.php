@@ -18,27 +18,60 @@ final class MaterialController extends Controller
 
     public function index(Request $request)
     {
-        $search = (string) $request->query('search', '');
+        $this->authorize('material.view');
+        $filters = [
+            'code' => (string) $request->query('code', ''),
+            'name' => (string) $request->query('name', ''),
+            'category_id' => (string) $request->query('category_id', ''),
+            'color' => (string) $request->query('color', ''),
+            'status' => (string) $request->query('status', ''),
+        ];
+        $sort = [
+            'by' => (string) $request->query('sort', ''),
+            'dir' => (string) $request->query('dir', ''),
+        ];
+        $paging = $this->paginationParams($request);
+        $list = $this->service->list($filters, $sort, $paging['page'], $paging['per_page']);
+        $pagination = erp_paginate('/materials', array_merge($filters, [
+            'sort' => $sort['by'],
+            'dir' => $sort['dir'],
+        ]), $paging['page'], $paging['per_page'], (int) $list['total']);
 
         return $this->view('app/Modules/Material/Views/index.php', [
             'pageTitle' => 'Nguyên vật liệu',
             'pageEyebrow' => 'Quản lý nguyên vật liệu',
             'activeSidebar' => 'materials',
-            'search' => $search,
-            'materials' => $this->service->list($search),
-            'status' => (string) $request->query('status', ''),
+            'filters' => $filters,
+            'sort' => $sort,
+            'materials' => $list['items'],
+            'pagination' => $pagination,
+            'categoryOptions' => $this->service->allCategoryOptions(),
         ]);
     }
 
     public function create(Request $request)
     {
+        $this->authorize('material.create');
         unset($request);
 
         return $this->renderForm('Thêm nguyên vật liệu', app_url('/materials/store'));
     }
 
+    public function duplicate(Request $request)
+    {
+        $this->authorize('material.create');
+        $id = (int) $request->query('id', 0);
+
+        return $this->renderForm(
+            'Nhân bản nguyên vật liệu',
+            app_url('/materials/store'),
+            $this->service->duplicatePayload($id)
+        );
+    }
+
     public function store(Request $request)
     {
+        $this->authorize('material.create');
         $input = $request->all();
 
         try {
@@ -54,6 +87,7 @@ final class MaterialController extends Controller
 
     public function show(Request $request)
     {
+        $this->authorize('material.view');
         $id = (int) $request->query('id', 0);
 
         return $this->view('app/Modules/Material/Views/show.php', [
@@ -67,6 +101,7 @@ final class MaterialController extends Controller
 
     public function edit(Request $request)
     {
+        $this->authorize('material.update');
         $id = (int) $request->query('id', 0);
         $material = $this->service->find($id);
 
@@ -75,6 +110,7 @@ final class MaterialController extends Controller
 
     public function update(Request $request)
     {
+        $this->authorize('material.update');
         $id = (int) $request->query('id', 0);
         $input = $request->all();
 
@@ -93,6 +129,7 @@ final class MaterialController extends Controller
 
     public function delete(Request $request)
     {
+        $this->authorize('material.delete');
         $id = (int) $request->query('id', 0);
         $this->service->delete($id);
         session_flash('success', 'Xóa nguyên vật liệu thành công.');

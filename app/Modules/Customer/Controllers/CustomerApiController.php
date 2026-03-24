@@ -16,6 +16,7 @@ final class CustomerApiController extends Controller
 
     public function index(Request $request): array
     {
+        $this->authorize('customer.view');
         $search = (string) $request->query('search', '');
 
         return [

@@ -18,20 +18,26 @@ final class ComponentController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('component.view');
         $search = (string) $request->query('search', '');
+        $paging = $this->paginationParams($request);
+        $list = $this->service->list($search, $paging['page'], $paging['per_page']);
+        $pagination = erp_paginate('/components', ['search' => $search], $paging['page'], $paging['per_page'], (int) $list['total']);
 
         return $this->view('app/Modules/Component/Views/index.php', [
             'pageTitle' => 'Bán thành phẩm',
             'pageEyebrow' => 'Quản lý bán thành phẩm',
             'activeSidebar' => 'components',
             'search' => $search,
-            'components' => $this->service->list($search),
+            'components' => $list['items'],
+            'pagination' => $pagination,
             'status' => (string) $request->query('status', ''),
         ]);
     }
 
     public function create(Request $request)
     {
+        $this->authorize('component.create');
         unset($request);
 
         return $this->renderForm('Thêm bán thành phẩm', app_url('/components/store'));
@@ -39,6 +45,7 @@ final class ComponentController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('component.create');
         $input = $request->all();
 
         try {
@@ -54,6 +61,7 @@ final class ComponentController extends Controller
 
     public function show(Request $request)
     {
+        $this->authorize('component.view');
         $id = (int) $request->query('id', 0);
 
         return $this->view('app/Modules/Component/Views/show.php', [
@@ -67,6 +75,7 @@ final class ComponentController extends Controller
 
     public function edit(Request $request)
     {
+        $this->authorize('component.update');
         $id = (int) $request->query('id', 0);
         $component = $this->service->find($id);
 
@@ -75,6 +84,7 @@ final class ComponentController extends Controller
 
     public function update(Request $request)
     {
+        $this->authorize('component.update');
         $id = (int) $request->query('id', 0);
         $input = $request->all();
 
@@ -93,6 +103,7 @@ final class ComponentController extends Controller
 
     public function delete(Request $request)
     {
+        $this->authorize('component.delete');
         $id = (int) $request->query('id', 0);
         $this->service->delete($id);
         session_flash('success', 'Xóa bán thành phẩm thành công.');
@@ -119,6 +130,7 @@ final class ComponentController extends Controller
             'name' => 'required|string|max:190',
             'unit' => 'required|string|max:50',
             'standard_cost' => 'required|numeric',
+            'image_path' => 'nullable|string|max:255',
         ];
     }
 }

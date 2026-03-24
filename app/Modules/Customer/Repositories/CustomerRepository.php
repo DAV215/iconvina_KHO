@@ -8,23 +8,35 @@ use App\Core\Database\Repository;
 
 final class CustomerRepository extends Repository
 {
-    public function search(?string $search = null): array
+    public function search(?string $search = null, int $page = 1, int $perPage = 25): array
     {
+        $offset = max(0, ($page - 1) * $perPage);
+
         if ($search === null || trim($search) === '') {
-            return $this->fetchAll('SELECT * FROM customers ORDER BY id DESC LIMIT 100');
+            $total = (int) (($this->fetchOne('SELECT COUNT(*) AS aggregate FROM customers')['aggregate'] ?? 0));
+            $items = $this->fetchAll(sprintf('SELECT * FROM customers ORDER BY id DESC LIMIT %d OFFSET %d', $perPage, $offset));
+
+            return ['items' => $items, 'total' => $total];
         }
 
-        return $this->fetchAll(
-            'SELECT * FROM customers
-             WHERE code LIKE :search
-                OR name LIKE :search
-                OR contact_name LIKE :search
-                OR phone LIKE :search
-                OR email LIKE :search
-             ORDER BY id DESC
-             LIMIT 100',
-            ['search' => '%' . trim($search) . '%']
+        $params = ['search' => '%' . trim($search) . '%'];
+        $where = ' WHERE code LIKE :search
+                    OR name LIKE :search
+                    OR contact_name LIKE :search
+                    OR phone LIKE :search
+                    OR email LIKE :search';
+        $total = (int) (($this->fetchOne('SELECT COUNT(*) AS aggregate FROM customers' . $where, $params)['aggregate'] ?? 0));
+        $items = $this->fetchAll(
+            sprintf(
+                'SELECT * FROM customers%s ORDER BY id DESC LIMIT %d OFFSET %d',
+                $where,
+                $perPage,
+                $offset
+            ),
+            $params
         );
+
+        return ['items' => $items, 'total' => $total];
     }
 
     public function findById(int $id): ?array

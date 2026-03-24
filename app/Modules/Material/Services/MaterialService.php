@@ -15,9 +15,9 @@ final class MaterialService
     {
     }
 
-    public function list(?string $search = null): array
+    public function list(array $filters = [], array $sort = [], int $page = 1, int $perPage = 25): array
     {
-        return $this->repository->search($search);
+        return $this->repository->search($filters, $sort, $page, $perPage);
     }
 
     public function find(int $id): array
@@ -32,7 +32,12 @@ final class MaterialService
 
     public function categoryOptions(): array
     {
-        return $this->repository->categoryOptions();
+        return $this->flattenCategoryOptions($this->repository->categoryOptions());
+    }
+
+    public function allCategoryOptions(): array
+    {
+        return $this->flattenCategoryOptions($this->repository->allCategoryOptions());
     }
 
     public function create(array $data): int
@@ -41,6 +46,21 @@ final class MaterialService
         $this->assertUniqueCode($payload['code']);
 
         return $this->repository->create($payload);
+    }
+
+    public function suggestQuickCode(): string
+    {
+        $baseCode = 'MAT-' . date('ymdHis');
+        $candidate = $baseCode;
+        $suffix = 1;
+
+        while ($this->repository->findByCode($candidate) !== null) {
+            $tail = '-' . $suffix;
+            $candidate = substr($baseCode, 0, max(1, 30 - strlen($tail))) . $tail;
+            $suffix++;
+        }
+
+        return $candidate;
     }
 
     public function update(int $id, array $data): void
@@ -53,6 +73,26 @@ final class MaterialService
         }
 
         $this->repository->update($id, $payload);
+    }
+
+    public function duplicatePayload(int $id): array
+    {
+        $material = $this->find($id);
+        $suggestedCode = $this->suggestDuplicateCode((string) $material['code']);
+
+        return [
+            'code' => $suggestedCode,
+            'name' => trim((string) $material['name']) . ' - Bản sao',
+            'category_id' => $material['category_id'] ?? null,
+            'unit' => $material['unit'] ?? '',
+            'standard_cost' => $this->formatDecimal((float) ($material['standard_cost'] ?? 0)),
+            'min_stock' => $this->formatDecimal((float) ($material['min_stock'] ?? 0)),
+            'is_active' => (int) ($material['is_active'] ?? 1),
+            'specification' => $material['specification'] ?? null,
+            'color' => $material['color'] ?? null,
+            'image_path' => $material['image_path'] ?? null,
+            'description' => $material['description'] ?? null,
+        ];
     }
 
     public function delete(int $id): void
@@ -175,5 +215,64 @@ final class MaterialService
     private function formatDecimal(float $value): string
     {
         return number_format(round($value, 2), 2, '.', '');
+    }
+
+    private function flattenCategoryOptions(array $rows): array
+    {
+        $children = [];
+        foreach ($rows as $row) {
+            $parentId = $row['parent_id'] ?? null;
+            $key = $parentId === null ? 'root' : (string) $parentId;
+            $children[$key][] = $row;
+        }
+
+        foreach ($children as &$siblings) {
+            usort($siblings, static function (array $left, array $right): int {
+                return [$left['name'], $left['id']] <=> [$right['name'], $right['id']];
+            });
+        }
+        unset($siblings);
+
+        $flattened = [];
+        $visited = [];
+        $walker = function (?int $parentId, int $depth) use (&$walker, &$flattened, &$children, &$visited): void {
+            $key = $parentId === null ? 'root' : (string) $parentId;
+            foreach ($children[$key] ?? [] as $row) {
+                $id = (int) $row['id'];
+                if (isset($visited[$id])) {
+                    continue;
+                }
+
+                $visited[$id] = true;
+                $row['depth'] = $depth;
+                $row['label'] = ($depth > 0 ? str_repeat('-- ', $depth) : '') . $row['name'];
+                $flattened[] = $row;
+                $walker($id, $depth + 1);
+            }
+        };
+
+        $walker(null, 0);
+
+        return $flattened;
+    }
+
+    private function suggestDuplicateCode(string $code): string
+    {
+        $baseCode = strtoupper(trim($code));
+        if ($baseCode === '') {
+            return '';
+        }
+
+        $candidate = $baseCode . '-COPY';
+        if ($this->repository->findByCode($candidate) === null) {
+            return $candidate;
+        }
+
+        $suffix = 2;
+        while ($this->repository->findByCode($candidate . '-' . $suffix) !== null) {
+            $suffix++;
+        }
+
+        return $candidate . '-' . $suffix;
     }
 }

@@ -4,10 +4,13 @@ $pageTitle = $pageTitle ?? 'Stock Transaction Detail';
 $pageEyebrow = $pageEyebrow ?? 'Inventory transaction profile';
 $transaction = $transaction ?? [];
 $status = $status ?? '';
+$canUpdate = has_permission('stock.update');
 
 $txnTypeBadgeMap = [
     'import' => 'success',
+    'receipt' => 'success',
     'export' => 'danger',
+    'issue' => 'danger',
     'adjustment' => 'warning',
 ];
 ?>
@@ -40,7 +43,7 @@ $txnTypeBadgeMap = [
                         </div>
                         <div class="d-flex gap-2">
                             <a href="<?php echo htmlspecialchars(app_url('/stocks'), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-light rounded-4 px-4">Back</a>
-                            <a href="<?php echo htmlspecialchars(app_url('/stocks/edit?id=' . (int) $transaction['id']), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-dark rounded-4 px-4">Edit</a>
+                            <?php if ($canUpdate): ?><a href="<?php echo htmlspecialchars(app_url('/stocks/edit?id=' . (int) $transaction['id']), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-dark rounded-4 px-4">Edit</a><?php endif; ?>
                         </div>
                     </div>
 

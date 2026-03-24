@@ -14,9 +14,9 @@ final class CustomerService
     {
     }
 
-    public function list(?string $search = null): array
+    public function list(?string $search = null, int $page = 1, int $perPage = 25): array
     {
-        return $this->repository->search($search);
+        return $this->repository->search($search, $page, $perPage);
     }
 
     public function find(int $id): array

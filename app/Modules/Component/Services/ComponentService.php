@@ -14,9 +14,9 @@ final class ComponentService
     {
     }
 
-    public function list(?string $search = null): array
+    public function list(?string $search = null, int $page = 1, int $perPage = 25): array
     {
-        return $this->repository->search($search);
+        return $this->repository->search($search, $page, $perPage);
     }
 
     public function find(int $id): array
@@ -75,6 +75,7 @@ final class ComponentService
             'name' => trim((string) ($data['name'] ?? '')),
             'component_type' => trim((string) ($data['unit'] ?? '')),
             'standard_cost' => $this->formatDecimal((float) ($data['standard_cost'] ?? 0)),
+            'image_path' => $this->nullableString($data['image_path'] ?? null),
             'is_active' => $this->normalizeBoolInt($data['is_active'] ?? 0),
         ];
     }
@@ -93,6 +94,13 @@ final class ComponentService
     private function normalizeBoolInt(mixed $value): int
     {
         return (string) $value === '1' ? 1 : 0;
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        $value = trim((string) ($value ?? ''));
+
+        return $value === '' ? null : $value;
     }
 
     private function formatDecimal(float $value): string
